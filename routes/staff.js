@@ -22,12 +22,12 @@ router.post("/addStaff", (req, res) => {
  
 });
 
-router.post('/getData',(req,res)=>{
-    db('tbl_staffs').select().then((data)=>{
-       return res.status(200).json({
-           message:"getted",
-           data:data
-       }) 
+router.post("/getData", (req, res) => {
+  db("tbl_staffs")
+    .select()
+    .then((data) => {
+      return res.status(200).send(data);
+    })
     }).catch((err)=>{
         return res.status(500).json({
             message:err
