@@ -8,6 +8,7 @@ const userRouter = require("./routes/user.js");
 const enginnerRouter= require('./routes/engineer.js')
 const employeeRouter = require("./routes/employees.js");
 const dailyStaffListRouter = require("./routes/daily_staff_list.js");
+const attendanceRouter=require('./routes/attendance')
 
 const app = express();
 var port = process.env.PORT;
@@ -26,3 +27,4 @@ app.use("/staff", staffRouter);
 app.use("/user", userRouter);
 app.use("/engineer",enginnerRouter)
 app.use("/daily_staff_list", dailyStaffListRouter);
+app.use('/attendance',attendanceRouter)
