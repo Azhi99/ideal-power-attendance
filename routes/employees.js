@@ -1,5 +1,6 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
+const fs = require("fs");
 const db = require("../DB/mainDBconfig.js");
 const { createValidation, updateValidation, checkID } = require("../validators/employees.js");
 
@@ -7,6 +8,87 @@ const router = express.Router();
 router.use(fileUpload());
 
 router.post("/addEmployee", createValidation, (req, res) => {
+    var personal_image_path = null;
+    var identification_image_path = null;
+    if(req.files && req.files.personal_image != null){
+        var image_name = req.files.personal_image.name;
+        const ext = image_name.substring(image_name.lastIndexOf('.') + 1);
+        if(["jpg", "jpeg", "png"].includes(ext.toLowerCase())){
+            req.files.personal_image.name = new Date().getTime() + "." + ext;
+            image_name = req.files.personal_image.name;
+            personal_image_path = "./employee_images/" + image_name;
+        } else {
+            return res.status(500).json({
+                message: "Invalid image type"
+            });
+        }
+    }
+    if(req.files && req.files.identification_image != null){
+        var image_name = req.files.identification_image.name;
+        const ext = image_name.substring(image_name.lastIndexOf('.') + 1);
+        if(["jpg", "jpeg", "png"].includes(ext.toLowerCase())){
+            req.files.identification_image.name = new Date().getTime() + "." + ext;
+            image_name = req.files.identification_image.name;
+            identification_image_path = "./employee_id_images/" + image_name;
+        } else {
+            return res.status(500).json({
+                message: "Invalid image type"
+            });
+        }
+    }
+
+    db("tbl_employees").insert({
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        st_id: req.body.st_id,
+        phone: req.body.phone,
+        birth_date: req.body.birth_date,
+        reg_date: db.fn.now(),
+        salary_type: req.body.salary_type,
+        monthly_salary: req.body.monthly_salary,
+        daily_salary: req.body.daily_salary,
+        hour_salary: req.body.hour_salary,
+        identification_image_path,
+        personal_image_path
+    }).then(([data]) => {
+        if(personal_image_path != null){
+            req.files.personal_image.mv("./public/employee_images/" + req.files.personal_image.name, function(err){
+                if(err){
+                    db("tbl_employees").where("emp_id", data).delete().then(() => {
+                        return res.status(500).json({
+                            message: err
+                        });
+                    });
+                }
+            });
+        }
+        if(identification_image_path != null){
+            req.files.identification_image.mv("./public/employee_id_images/" + req.files.identification_image.name, function(err){
+                if(err){
+                    db("tbl_employees").where("emp_id", data).delete().then(() => {
+                        return res.status(500).json({
+                            message: err
+                        });
+                    });
+                }
+            });
+        }
+        return res.status(200).json({
+            message: "Employee Added",
+            emp_id: data,
+            identification_image_path,
+            personal_image_path
+        });
+    }).catch((err) => {
+        if(err.errno === 1062){
+            return res.status(500).json({
+                message: "The phone number already exist, please change it"
+            });
+        }
+        return res.status(500).json({
+            message: err
+        });
+    });
 
 });
 
@@ -57,12 +139,89 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
     });
 });
 
+// Move new image, unlink old image, update image path
 router.patch("/updateIdentificationImage/:emp_id", checkID, (req, res) => {
-    
+    if(req.files && req.files.identification_image != null){
+        var image_name = req.files.identification_image.name;
+        const ext = image_name.substring(image_name.lastIndexOf('.') + 1);
+        if(["jpeg", "jpg", "png"].includes(ext.toLowerCase())){
+            req.files.identification_image.name = new Date().getTime() + "." + ext;
+            image_name = req.files.identification_image.name;
+            req.files.identification_image.mv("./public/employee_id_images/" + image_name, async function(err){
+                if(err){
+                    return res.status(500).json({
+                        message: err
+                    });
+                }
+                const [{old_image}] = await db("tbl_employees").where("emp_id", req.params.emp_id).select(["identification_image_path as old_image"]).limit(1);
+                if(old_image != null){
+                    fs.unlinkSync("./public" + old_image.slice(1));
+                }
+                db("tbl_employees").where("emp_id", req.params.emp_id).update({
+                    identification_image_path: "./employee_id_images/" + image_name
+                }).then(() => {
+                    return res.status(200).json({
+                        message: "Identification image updated",
+                        identification_image_path: "./employee_id_images/" + image_name
+                    });
+                }).catch((err) => {
+                    return res.status(500).json({
+                        message: err
+                    });
+                });
+            });
+        } else {
+            return res.status(500).json({
+                message: "Invalid image type"
+            });
+        }
+    } else {
+        return res.status(500).json({
+            message: "Select an image"
+        });
+    }
 });
 
 router.patch("/updatePersonalImage/:emp_id", checkID, (req, res) => {
-
+    if(req.files && req.files.personal_image != null){
+        var image_name = req.files.personal_image.name;
+        const ext = image_name.substring(image_name.lastIndexOf('.') + 1);
+        if(["jpeg", "jpg", "png"].includes(ext.toLowerCase())){
+            req.files.personal_image.name = new Date().getTime() + "." + ext;
+            image_name = req.files.personal_image.name;
+            req.files.personal_image.mv("./public/employee_images/" + image_name, async function(err){
+                if(err){
+                    return res.status(500).json({
+                        message: err
+                    });
+                }
+                const [{old_image}] = await db("tbl_employees").where("emp_id", req.params.emp_id).select(["personal_image_path as old_image"]).limit(1);
+                if(old_image != null){
+                    fs.unlinkSync("./public" + old_image.slice(1));
+                }
+                db("tbl_employees").where("emp_id", req.params.emp_id).update({
+                    personal_image_path: "./employee_images/" + image_name
+                }).then(() => {
+                    return res.status(200).json({
+                        message: "Personal image updated",
+                        personal_image_path: "./employee_images/" + image_name
+                    });
+                }).catch((err) => {
+                    return res.status(500).json({
+                        message: err
+                    });
+                });
+            });
+        } else {
+            return res.status(500).json({
+                message: "Invalid image type"
+            });
+        }
+    } else {
+        return res.status(500).json({
+            message: "Select an image"
+        });
+    }
 });
 
 router.patch("/deactiveEmployee/:emp_id", checkID, (req, res) => {
@@ -79,7 +238,6 @@ router.patch("/deactiveEmployee/:emp_id", checkID, (req, res) => {
     });
 });
 
-
 router.patch("/activeEmployee/:emp_id", checkID, (req, res) => {
     db("tbl_employees").where("emp_id", req.params.emp_id).update({
         active_status: "1"
@@ -94,6 +252,42 @@ router.patch("/activeEmployee/:emp_id", checkID, (req, res) => {
     });
 });
 
+router.delete("/deleteIdentificationImage/:emp_id", checkID, (req, res) => {
+    db("tbl_employees").where("emp_id", req.params.emp_id).select(["identification_image_path as image"]).limit(1).then(([{image}]) => {
+        if(image != null){
+            fs.unlinkSync("./public" + image.slice(1));
+        }
+        db("tbl_employees").where("emp_id", req.params.emp_id).update({
+            identification_image_path: null
+        }).then(() => {
+            return res.status(200).json({
+                message: "Identification Image deleted"
+            });
+        }).catch((err) => {
+            return res.status(500).json({
+                message: err
+            });
+        });
+    });
+});
 
+router.delete("/deletePersonalImage/:emp_id", checkID, (req, res) => {
+    db("tbl_employees").where("emp_id", req.params.emp_id).select(["personal_image_path as image"]).limit(1).then(([{image}]) => {
+        if(image != null){
+            fs.unlinkSync("./public" + image.slice(1));
+        }
+        db("tbl_employees").where("emp_id", req.params.emp_id).update({
+            personal_image_path: null
+        }).then(() => {
+            return res.status(200).json({
+                message: "Personal Image deleted"
+            });
+        }).catch((err) => {
+            return res.status(500).json({
+                message: err
+            });
+        });
+    });
+});
 
 module.exports = router;
