@@ -1,11 +1,14 @@
 const express = require("express");
+const fileUpload = require("express-fileupload");
 const db = require("../DB/mainDBconfig.js");
 const { createValidation, updateValidation, checkID } = require("../validators/employees.js");
 
 const router = express.Router();
+router.use(fileUpload());
 
-// router to add employee and upload images
+router.post("/addEmployee", createValidation, (req, res) => {
 
+});
 
 /* 
     First select staff id of the employee as old staff id
