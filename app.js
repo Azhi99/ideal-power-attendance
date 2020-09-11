@@ -5,6 +5,7 @@ const cors = require("cors");
 const jobRouter = require("./routes/job.js");
 const staffRouter = require("./routes/staff.js");
 const userRouter = require("./routes/user.js");
+const enginnerRouter= require('./routes/engineer.js')
 const employeeRouter = require("./routes/employees.js");
 
 const app = express();
@@ -22,3 +23,4 @@ app.use("/user", userRouter);
 app.use("/employee", employeeRouter);
 app.use("/staff", staffRouter);
 app.use("/user", userRouter);
+app.use('/engineer',enginnerRouter)
