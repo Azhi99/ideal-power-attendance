@@ -1,5 +1,6 @@
 const express = require("express");
 const db = require("../DB/mainDBconfig.js");
+const { checkJobTitle, checkID } = require("../validators/job.js");
 const router = express.Router();
 
 router.post("/getData", (req, res) => {
@@ -12,7 +13,7 @@ router.post("/getData", (req, res) => {
     });
 });
 
-router.post("/addJob", (req, res) => {
+router.post("/addJob", checkJobTitle, (req, res) => {
     db("tbl_jobs").insert({
         job_title: req.body.job_title
     }).then(([data]) => {
@@ -32,7 +33,7 @@ router.post("/addJob", (req, res) => {
     });
 });
 
-router.patch("/updateJob/:job_id", (req, res) => {
+router.patch("/updateJob/:job_id", checkID, (req, res) => {
     db("tbl_jobs").where("job_id", req.params.job_id).update({
         job_title: req.body.job_title
     }).then(() => {
@@ -51,7 +52,7 @@ router.patch("/updateJob/:job_id", (req, res) => {
     });
 });
 
-router.delete("/deleteJob/:job_id", (req, res) => {
+router.delete("/deleteJob/:job_id", checkID, (req, res) => {
     db("tbl_jobs").where("job_id", req.params.job_id).delete().then(()=> {
         return res.status(200).json({
             message: "Job Deleted"
