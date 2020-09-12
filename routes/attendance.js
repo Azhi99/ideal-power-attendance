@@ -26,7 +26,8 @@ router.post("/addAttendance", (req, res) => {
 
 router.patch("/setAbsent/:at_id", (req, res) => {
     db("tbl_attendace").where("at_id", req.params.at_id).update({
-        absent: "0"
+        absent: "0",
+        worked_hours: 0
     }).then(() => {
         return res.status(200).json({
             message: "Absented"
@@ -40,7 +41,8 @@ router.patch("/setAbsent/:at_id", (req, res) => {
 
 router.patch("/cancelAbsent/:at_id", (req, res) => {
     db("tbl_attendace").where("at_id", req.params.at_id).update({
-        absent: "1"
+        absent: "1",
+        worked_hours: 8
     }).then(() => {
         return res.status(200).json({
             message: "Absent canceled"
