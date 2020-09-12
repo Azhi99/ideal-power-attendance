@@ -228,8 +228,14 @@ router.patch("/deactiveEmployee/:emp_id", checkID, (req, res) => {
     db("tbl_employees").where("emp_id", req.params.emp_id).update({
         active_status: "0"
     }).then(() => {
-        return res.status(200).json({
-            message: "Employee Deactived"
+        db("tbl_active_log_employee").insert({
+            emp_id: req.params.emp_id,
+            change_type: "Set to Deactive",
+            change_date: db.fn.now()
+        }).then(() => {
+            return res.status(200).json({
+                message: "Employee Deactived"
+            });
         });
     }).catch((err) => {
         return res.status(500).json({
@@ -242,8 +248,14 @@ router.patch("/activeEmployee/:emp_id", checkID, (req, res) => {
     db("tbl_employees").where("emp_id", req.params.emp_id).update({
         active_status: "1"
     }).then(() => {
-        return res.status(200).json({
-            message: "Employee Actived"
+        db("tbl_active_log_employee").insert({
+            emp_id: req.params.emp_id,
+            change_type: "Set to Active",
+            change_date: db.fn.now()
+        }).then(() => {
+            return res.status(200).json({
+                message: "Employee Actived"
+            });
         });
     }).catch((err) => {
         return res.status(500).json({
