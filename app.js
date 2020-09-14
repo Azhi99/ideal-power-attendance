@@ -8,7 +8,8 @@ const userRouter = require("./routes/user.js");
 const enginnerRouter = require('./routes/engineer.js')
 const employeeRouter = require("./routes/employees.js");
 const dailyStaffListRouter = require("./routes/daily_staff_list.js");
-const attendanceRouter = require('./routes/attendance')
+const attendanceRouter = require('./routes/attendance');
+const indexRouter = require("./routes/indexPage.js");
 
 const app = express();
 var port = process.env.PORT;
@@ -20,6 +21,8 @@ app.listen(port, () => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cors());
+
 app.use("/job", jobRouter);
 app.use("/user", userRouter);
 app.use("/employee", employeeRouter);
@@ -27,4 +30,5 @@ app.use("/staff", staffRouter);
 app.use("/user", userRouter);
 app.use("/engineer", enginnerRouter)
 app.use("/daily_staff_list", dailyStaffListRouter);
-app.use('/attendance',attendanceRouter)
+app.use('/attendance',attendanceRouter);
+app.use('/index', indexRouter);
