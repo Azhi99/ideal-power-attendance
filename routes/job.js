@@ -58,6 +58,11 @@ router.delete("/deleteJob/:job_id", checkID, (req, res) => {
             message: "Job Deleted"
         });
     }).catch((err) => {
+        if(err.errno === 1451){
+            return res.status(500).json({
+                message: "Cannot delete this job, it used to engineers"
+            });
+        }
         return res.status(500).json({
             message: err
         });
