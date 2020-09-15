@@ -10,8 +10,8 @@ router.post("/addEngineer", (req, res) => {
       job_id: req.body.job_id,
       phone1: req.body.phone1,
       phone2: req.body.phone2,
-      reg_date: req.body.reg_data,
-      active_status: req.body.active_status,
+      reg_date: db.fn.now(),
+      active_status: "1"
     })
     .then(([data]) => {
       return res.status(200).json({
@@ -35,8 +35,7 @@ router.patch("/updateEngineer/:en_id", (req, res) => {
       job_id: req.body.job_id,
       phone1: req.body.phone1,
       phone2: req.body.phone2,
-      reg_date: req.body.reg_data,
-      active_status: req.body.active_status,
+      active_status: "1"
     })
     .then(() => {
       return res.status(200).json({
@@ -67,6 +66,20 @@ router.delete("/deleteEngineer/:en_id", (req, res) => {
 router.post("/getData", (req, res) => {
   db("tbl_engineers")
     .select("*")
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
+
+router.post("/getNames", (req, res) => {
+  db("tbl_engineers")
+    .where("active_status", "1")
+    .select(["en_id", db.raw("concat(first_name, ' ', last_name) as full_name")])
     .then((data) => {
       return res.status(200).send(data);
     })

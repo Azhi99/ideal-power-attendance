@@ -50,6 +50,11 @@ router.delete("/deleteStaff/:st_id", (req, res) => {
       });
     })
     .catch((err) => {
+      if(err.errno === 1451){
+        return res.status(500).json({
+          message: "Cannot delete this staff, it used to employees"
+        });
+      }
       return res.status(500).json({
         message: err,
       });
