@@ -302,4 +302,14 @@ router.delete("/deletePersonalImage/:emp_id", checkID, (req, res) => {
     });
 });
 
+router.get('/getData',(req,res)=>{
+    db('tbl_employees').select('*').then((data)=>{
+        return res.status(200).send(data)
+    }).catch((err)=>{
+        return res.status(500).json({
+            message:err
+        })
+    })
+})
+
 module.exports = router;
