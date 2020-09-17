@@ -5,6 +5,19 @@ const { createValidation, updateValidation, updatePasswordValidation, checkID } 
 
 const router = express.Router();
 
+router.post("/getData", (req, res) => {
+    user_db("tbl_users").where("user_id", "<>", "1").select([
+        "user_id",
+        "username",
+        "full_name",
+        "role",
+        "phone",
+        "active_status"
+    ]).then((data) => {
+        return res.status(200).send(data);
+    });
+});
+
 router.post("/addUser", createValidation, (req, res) => {
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         user_db("tbl_users").insert({
