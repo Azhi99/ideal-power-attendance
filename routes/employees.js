@@ -58,9 +58,7 @@ router.post("/addEmployee", createValidation, (req, res) => {
     })
     .then(([data]) => {
       if (personal_image_path != null) {
-        req.files.personal_image.mv(
-          "./public/employee_images/" + req.files.personal_image.name,
-          function (err) {
+        req.files.personal_image.mv("./public/employee_images/" + req.files.personal_image.name, function (err) {
             if (err) {
               db("tbl_employees")
                 .where("emp_id", data)
@@ -75,9 +73,7 @@ router.post("/addEmployee", createValidation, (req, res) => {
         );
       }
       if (identification_image_path != null) {
-        req.files.identification_image.mv(
-          "./public/employee_id_images/" + req.files.identification_image.name,
-          function (err) {
+        req.files.identification_image.mv("./public/employee_id_images/" + req.files.identification_image.name, function (err) {
             if (err) {
               db("tbl_employees")
                 .where("emp_id", data)
