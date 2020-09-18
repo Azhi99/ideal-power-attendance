@@ -395,6 +395,8 @@ router.post("/getData", (req, res) => {
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .offset(req.body.offset)
+    .limit(15)
     .then((data) => {
       return res.status(200).send(data);
     })
@@ -403,6 +405,13 @@ router.post("/getData", (req, res) => {
         message: err,
       });
     });
+});
+
+router.post("/getNoOfEmployees", async (req, res) => {
+  const [{ noOfEmployees }] = await db("tbl_employees").count("* as noOfEmployees");
+  return res.status(200).json({
+    noOfEmployees
+  });
 });
 
 module.exports = router;
