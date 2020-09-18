@@ -398,6 +398,7 @@ router.post("/getData", (req, res) => {
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
     .offset(req.body.offset)
     .limit(15)
+    .orderBy("tbl_employees.emp_id", "desc")
     .then((data) => {
       return res.status(200).send(data);
     })
@@ -413,6 +414,38 @@ router.post("/getNoOfEmployees", async (req, res) => {
   return res.status(200).json({
     noOfEmployees
   });
+});
+
+router.post("/searchEmployee", (req, res) => {
+  db.select(
+    "tbl_employees.emp_id as emp_id",
+    "tbl_employees.first_name as first_name",
+    "tbl_employees.last_name as last_name",
+    "tbl_employees.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_employees.phone as phone",
+    "tbl_employees.reg_date as reg_date",
+    "tbl_employees.salary_type",
+    "tbl_employees.active_status as status",
+    "tbl_employees.birth_date as birth_date",
+    "tbl_employees.monthly_salary as monthly_salary",
+    "tbl_employees.daily_salary as daily_salary",
+    "tbl_employees.hour_salary as hour_salary",
+    "tbl_employees.identification_image_path as identification_image_path",
+    "tbl_employees.personal_image_path as personal_image_path"
+  )
+    .from("tbl_employees")
+    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .where("tbl_employees.first_name", "like", ('%' + req.body.search_value + '%'))
+    .orWhere("tbl_employees.last_name", "like", ('%' + req.body.search_value + '%'))
+    .orWhere("tbl_staffs.staff_name", "like", ('%' + req.body.search_value + '%'))
+    .orWhere("tbl_employees.phone", "like", ('%' + req.body.search_value + '%'))
+    .orWhere("tbl_employees.reg_date", "like", ('%' + req.body.search_value + '%'))
+    .orWhere("tbl_employees.salary_type", "like", ('%' + req.body.search_value + '%'))
+    .orWhere("tbl_employees.birth_date", "like", ('%' + req.body.search_value + '%'))
+    .orderBy("tbl_employees.emp_id", "desc").then((data) => {
+      return res.status(200).send(data);
+    })
 });
 
 module.exports = router;
