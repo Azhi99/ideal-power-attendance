@@ -55,6 +55,7 @@ router.post("/addEmployee", createValidation, (req, res) => {
       hour_salary: req.body.hour_salary,
       identification_image_path,
       personal_image_path,
+      active_status:"1"
     })
     .then(([data]) => {
       if (personal_image_path != null) {
