@@ -11,7 +11,7 @@ router.post("/addAttendance", (req, res) => {
         worked_hours: 8,
         fine: 0,
         fine_reason: req.body.fine_reason,
-        absent: "1"
+        absent: "0"
     }).then(([data]) => {
         return res.status(200).json({
             message: "Attendance Added",
@@ -24,9 +24,37 @@ router.post("/addAttendance", (req, res) => {
     });
 });
 
+router.post("/addOtherEmployee", (req, res) => {
+    db.raw(
+      "select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?) and emp_id = ?",
+      [req.body.work_date, req.body.emp_id]
+    ).then(([data]) => {
+        if(data.length != 0){
+            return res.status(500).json({
+                message: "This employee has in another staff for this day"
+            });
+        } else {
+            db("tbl_attendance").insert({
+                dsl_id: req.body.dsl_id,
+                emp_id: req.body.emp_id,
+                overtime: 0,
+                worked_hours: 8,
+                fine: 0,
+                fine_reason: null,
+                absent: "0"
+            }).then(([data]) => {
+                return res.status(200).json({
+                    message: "Attendance Added",
+                    at_id: data
+                });
+            });
+        }
+    });
+});
+
 router.patch("/setAbsent/:at_id", (req, res) => {
-    db("tbl_attendace").where("at_id", req.params.at_id).update({
-        absent: "0",
+    db("tbl_attendance").where("at_id", req.params.at_id).update({
+        absent: "1",
         worked_hours: 0
     }).then(() => {
         return res.status(200).json({
@@ -40,8 +68,8 @@ router.patch("/setAbsent/:at_id", (req, res) => {
 });
 
 router.patch("/cancelAbsent/:at_id", (req, res) => {
-    db("tbl_attendace").where("at_id", req.params.at_id).update({
-        absent: "1",
+    db("tbl_attendance").where("at_id", req.params.at_id).update({
+        absent: "0",
         worked_hours: 8
     }).then(() => {
         return res.status(200).json({
@@ -55,21 +83,59 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
 });
 
 
-router.patch('/updateAttendance/:at_id',(req,res)=>{
-    db('tbl_attendance').where('at_id',req.params.at_id).update({
-        overtime:req.body.overtime,
-        worked_hours:req.body.worked_hours,
+router.patch('/updateAttendance/:at_id',(req, res)=>{
+    db('tbl_attendance').where('at_id', req.params.at_id).update({
         fine:req.body.fine,
         fine_reason:req.body.fine_reason
     }).then(()=>{
         return res.status(200).json({
             message:'Update'
-        })
+        });
     }).catch((err)=>{
         return res.status(500).json({
             message:err
-        })
-    })
-})
+        });
+    });
+});
+
+router.patch('/setWorkedHours/:at_id',(req, res)=>{
+    db('tbl_attendance').where('at_id', req.params.at_id).update({
+        worked_hours: req.body.worked_hours
+    }).then(()=>{
+        return res.status(200).json({
+            message: 'Update'
+        });
+    }).catch((err)=>{
+        return res.status(500).json({
+            message: err
+        });
+    });
+});
+
+router.patch('/setOvertime/:at_id',(req, res)=>{
+    db('tbl_attendance').where('at_id', req.params.at_id).update({
+        overtime: req.body.overtime
+    }).then(()=>{
+        return res.status(200).json({
+            message: 'Update'
+        });
+    }).catch((err)=>{
+        return res.status(500).json({
+            message: err
+        });
+    });
+});
+
+router.delete("/deleteAttendance/:at_id", (req, res) => {
+    db("tbl_attendance").where("at_id", req.params.at_id).delete().then(() => {
+        return res.status(200).json({
+            message: "Attendance deleted"
+        });
+    }).catch((err) => {
+        return res.status(500).json({
+            message: err
+        });
+    });
+});
 
 module.exports = router;

@@ -386,7 +386,7 @@ router.post("/getData", (req, res) => {
     "tbl_employees.phone as phone",
     "tbl_employees.reg_date as reg_date",
     "tbl_employees.salary_type",
-    "tbl_employees.active_status as status",
+    "tbl_employees.active_status as active_status",
     "tbl_employees.birth_date as birth_date",
     "tbl_employees.monthly_salary as monthly_salary",
     "tbl_employees.daily_salary as daily_salary",
@@ -409,6 +409,18 @@ router.post("/getData", (req, res) => {
     });
 });
 
+router.post("/getNames/:st_id", (req, res) => {
+  db("tbl_employees").where("st_id", req.params.st_id).andWhere("active_status", "1").andWhereRaw(
+    "emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))",
+    [req.body.work_date]
+  ).select([
+    "emp_id as emp_id",
+    db.raw("concat(first_name, ' ', last_name) as full_name")
+  ]).then((data) => {
+    return res.status(200).send(data);
+  });
+});
+
 router.post("/getNoOfEmployees", async (req, res) => {
   const [{ noOfEmployees }] = await db("tbl_employees").count("* as noOfEmployees");
   return res.status(200).json({
@@ -426,7 +438,7 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.phone as phone",
     "tbl_employees.reg_date as reg_date",
     "tbl_employees.salary_type",
-    "tbl_employees.active_status as status",
+    "tbl_employees.active_status as active_status",
     "tbl_employees.birth_date as birth_date",
     "tbl_employees.monthly_salary as monthly_salary",
     "tbl_employees.daily_salary as daily_salary",
