@@ -33,6 +33,7 @@ router.post("/addList", (req, res) => {
                 "tbl_attendance.emp_id as emp_id",
                 db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
                 "tbl_employees.st_id as st_id",
+                "tbl_employees.salary_type as salary_type",
                 "tbl_attendance.overtime as overtime",
                 "tbl_attendance.worked_hours as worked_hours",
                 "tbl_attendance.fine as fine",
@@ -61,9 +62,6 @@ router.post("/addList", (req, res) => {
 
 router.patch("/updateList/:dsl_id", (req, res) => {
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
-    st_id: req.body.st_id,
-    work_date: req.body.work_date,
-    user_id: req.body.user_id,
     location: req.body.location,
     note: req.body.note,
   }).then(()=>{
@@ -78,21 +76,24 @@ router.patch("/updateList/:dsl_id", (req, res) => {
 });
 
 router.delete('/deleteList/:dsl_id',(req,res)=>{
-  db("tbl_attendance").where('dsl_id', req.params.dsl_id).delete().then(() => {
-    db('tbl_daily_staff_list').where('dsl_id', req.params.dsl_id).delete().then(()=>{
-      return res.status(200).json({
-        message:'List deleted'
-      });
-    }).catch((err)=>{
-      return res.status(500).json({
-        message:err
-      });
-    });
-  }).catch((err)=>{
-    return res.status(500).json({
-      message:err
-    });
+  return res.status(500).json({
+    message: "You can't delete list"
   });
+  // db("tbl_attendance").where('dsl_id', req.params.dsl_id).delete().then(() => {
+  //   db('tbl_daily_staff_list').where('dsl_id', req.params.dsl_id).delete().then(()=>{
+  //     return res.status(200).json({
+  //       message:'List deleted'
+  //     });
+  //   }).catch((err)=>{
+  //     return res.status(500).json({
+  //       message:err
+  //     });
+  //   });
+  // }).catch((err)=>{
+  //   return res.status(500).json({
+  //     message:err
+  //   });
+  // });
 });
 
 router.post("/getListAndAttendance", async (req, res) => {
@@ -106,8 +107,10 @@ router.post("/getListAndAttendance", async (req, res) => {
   if(typeof dsl_list != "undefined"){
     employees = await db.select(
       "tbl_attendance.at_id as at_id",
+      "tbl_attendance.emp_id as emp_id",
       db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
       "tbl_employees.st_id as st_id",
+      "tbl_employees.salary_type as salary_type",
       "tbl_attendance.overtime as overtime",
       "tbl_attendance.worked_hours as worked_hours",
       "tbl_attendance.fine as fine",
