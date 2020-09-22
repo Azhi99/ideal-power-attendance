@@ -74,4 +74,16 @@ router.post("/getData", (req, res) => {
     });
 });
 
+router.post("/getStaffReport", (req, res) => {
+  db.select(
+    "tbl_staffs.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    db.raw("concat(tbl_engineers.first_name, ' ', tbl_engineers.last_name) as engineer")
+  ).from("tbl_staffs")
+   .join("tbl_engineers", "tbl_staffs.en_id", "=", "tbl_engineers.en_id")
+   .then((data) => {
+     return res.status(200).send(data);
+   });
+});
+
 module.exports = router;

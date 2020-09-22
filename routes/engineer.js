@@ -111,6 +111,22 @@ router.post("/getData", (req, res) => {
    });
 });
 
+router.post("/getEngineerReport", (req, res) => {
+  db.select(
+    "tbl_engineers.en_id as en_id",
+    "tbl_engineers.first_name as first_name",
+    "tbl_engineers.last_name as last_name",
+    "tbl_jobs.job_title as job_title",
+    "tbl_engineers.phone1 as phone1",
+    "tbl_engineers.phone2 as phone2",
+    "tbl_engineers.reg_date as reg_date",
+    "tbl_engineers.active_status as active_status"
+  ).from("tbl_engineers")
+   .join("tbl_jobs", "tbl_jobs.job_id", "=", "tbl_engineers.job_id").then((data) => {
+     return res.status(200).send(data);
+   });
+});
+
 router.post("/getDeactived", (req, res) => {
   db.select(
     "tbl_engineers.en_id as en_id",
@@ -143,20 +159,28 @@ router.post("/getNames", (req, res) => {
 });
 
 router.patch("/deactiveEngineer/:en_id", (req, res) => {
-  db("tbl_engineers").where("en_id", req.params.en_id).update({
-    active_status: "0"
-  }).then(() => {
-    db_user("tbl_users").where("en_id", req.params.en_id).update({
-      active_status: "0"
-    }).then(() => {
-      return res.status(200).json({
-        message: "Engineer Deactived"
+  db("tbl_staffs").where("en_id", req.params.en_id).count("* as staffs").then(([{staffs}]) => {
+    if(staffs > 0){
+      return res.status(500).json({
+        message: "Change staffs engineer before deactive"
       });
-    });
-  }).catch((err) => {
-    return res.status(500).json({
-      message: err
-    });
+    } else {
+      db("tbl_engineers").where("en_id", req.params.en_id).update({
+        active_status: "0"
+      }).then(() => {
+        db_user("tbl_users").where("en_id", req.params.en_id).update({
+          active_status: "0"
+        }).then(() => {
+          return res.status(200).json({
+            message: "Engineer Deactived"
+          });
+        });
+      }).catch((err) => {
+        return res.status(500).json({
+          message: err
+        });
+      });
+    }
   });
 });
 
