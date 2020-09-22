@@ -41,7 +41,8 @@ router.post("/addOtherEmployee", (req, res) => {
                 worked_hours: 8,
                 fine: 0,
                 fine_reason: null,
-                absent: "0"
+                absent: "0",
+                location: req.body.location
             }).then(([data]) => {
                 return res.status(200).json({
                     message: "Attendance Added",
@@ -122,6 +123,16 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
     }).catch((err)=>{
         return res.status(500).json({
             message: err
+        });
+    });
+});
+
+router.patch("/setLocation/:at_id", (req, res) => {
+    db("tbl_attendance").where("at_id", req.params.at_id).update({
+        location: req.body.location
+    }).then(() => {
+        return res.status(200).json({
+            message: "Updated"
         });
     });
 });

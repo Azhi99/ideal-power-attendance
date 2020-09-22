@@ -25,6 +25,7 @@ router.post("/addList", (req, res) => {
           db.raw("0 as fine"),
           db.raw("null as fine_reason"),
           db.raw("'0' as absent"),
+          db.raw("'"+ req.body.location.split(",")[0] +"' as location")
         ])
         .then((data) => {
           db("tbl_attendance").insert(data).then(() => {
@@ -38,7 +39,8 @@ router.post("/addList", (req, res) => {
                 "tbl_attendance.worked_hours as worked_hours",
                 "tbl_attendance.fine as fine",
                 "tbl_attendance.fine_reason as fine_reason",
-                "tbl_attendance.absent as absent"
+                "tbl_attendance.absent as absent",
+                "tbl_attendance.location as location"
               )
                 .from("tbl_attendance")
                 .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
@@ -115,7 +117,8 @@ router.post("/getListAndAttendance", async (req, res) => {
       "tbl_attendance.worked_hours as worked_hours",
       "tbl_attendance.fine as fine",
       "tbl_attendance.fine_reason as fine_reason",
-      "tbl_attendance.absent as absent"
+      "tbl_attendance.absent as absent",
+      "tbl_attendance.location as location"
     ).from("tbl_attendance")
      .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
      .where("tbl_attendance.dsl_id", dsl_list.dsl_id);
