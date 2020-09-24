@@ -83,6 +83,22 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
     });
 });
 
+router.patch("/setOff/:at_id", (req, res) => {
+    db("tbl_attendance").where("at_id", req.params.at_id).update({
+        absent: "2"
+    }).then(() => {
+        return res.status(200).json({
+            message: "Setted to Off"
+        });
+    }).catch((err) => {
+        return res.status(500).json({
+            message: err
+        });
+    });
+});
+
+
+
 
 router.patch('/updateAttendance/:at_id',(req, res)=>{
     db('tbl_attendance').where('at_id', req.params.at_id).update({
