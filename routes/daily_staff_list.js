@@ -129,4 +129,34 @@ router.post("/getListAndAttendance", async (req, res) => {
   });
 });
 
+router.post("/getStaffs", (req, res) => {
+  db.select(
+    "tbl_daily_staff_list.dsl_id as dsl_id",
+    "tbl_daily_staff_list.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name"
+  )
+   .from("tbl_daily_staff_list")
+   .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
+   .where("tbl_daily_staff_list.work_date", req.body.work_date)
+   .then((data) => {
+     return res.status(200).send(data || []);
+   });
+});
+
+router.post("/getDailyList", (req, res) => {
+  db.select(
+    "tbl_daily_staff_list.dsl_id as dsl_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_daily_staff_list.user as user",
+    "tbl_daily_staff_list.location as location",
+    "tbl_daily_staff_list.note as note"
+  )
+    .from("tbl_daily_staff_list")
+    .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
+    .where("tbl_daily_staff_list.work_date", new Date().toISOString().split("T")[0])
+    .then((data) => {
+      return res.status(200).send(data || []);
+    });
+});
+
 module.exports = router;

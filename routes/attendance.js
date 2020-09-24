@@ -137,6 +137,23 @@ router.patch("/setLocation/:at_id", (req, res) => {
     });
 });
 
+router.patch("/changeStaff/:at_id/:dsl_id", (req, res) => {
+    db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).select(["location"]).limit(1).then(([{location}]) => {
+        db("tbl_attendance").where("at_id", req.params.at_id).update({
+            dsl_id: req.params.dsl_id,
+            location: location.split(",")[0]
+        }).then(() => {
+            return res.status(200).json({
+                message: "List changed"
+            });
+        }).catch((err) => {
+            return res.status(500).json({
+                message: err
+            });
+        });
+    });
+});
+
 router.delete("/deleteAttendance/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).delete().then(() => {
         return res.status(200).json({
