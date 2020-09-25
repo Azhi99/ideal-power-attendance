@@ -62,6 +62,49 @@ router.post("/addList", (req, res) => {
     });
 });
 
+router.post("/createRestList", (req, res) => {
+  db("tbl_staffs")
+    .whereRaw("st_id not in (select st_id from tbl_daily_staff_list where work_date = ?)", [req.body.work_date])
+    .select(["st_id"])
+    .then((data) => {
+      if(data.length == 0){
+        return res.status(500).json({
+          message: "All staffs has list"
+        });
+      }
+      data.forEach(obj => {
+        db("tbl_daily_staff_list").insert({
+          st_id: obj.st_id,
+          work_date: req.body.work_date,
+          user: req.body.user,
+          location: "Rest",
+          note: null
+        }).then(([data]) => {
+          var dsl_id = data;
+          db("tbl_employees")
+            .where("st_id", obj.st_id)
+            .andWhere("active_status", "1")
+            .andWhereRaw("emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))",
+              [req.body.work_date]).select([
+              "emp_id as emp_id",
+              db.raw(dsl_id + " as dsl_id"),
+              db.raw("0 as overtime"),
+              db.raw("0 as worked_hours"),
+              db.raw("0 as fine"),
+              db.raw("null as fine_reason"),
+              db.raw("if(salary_type = 'Monthly', '0', '1') as absent"),
+              db.raw("'Rest' as location")
+            ]).then((data) => {
+              db("tbl_attendance").insert(data).then(() => {});
+            });
+        });
+      });
+      return res.status(200).json({
+        message: "Rest List Created"
+      });
+    })
+});
+
 router.patch("/updateList/:dsl_id", (req, res) => {
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
     location: req.body.location,

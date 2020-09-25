@@ -56,7 +56,8 @@ router.post("/addOtherEmployee", (req, res) => {
 router.patch("/setAbsent/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         absent: "1",
-        worked_hours: 0
+        worked_hours: 0,
+        overtime: 0
     }).then(() => {
         return res.status(200).json({
             message: "Absented"
@@ -85,7 +86,9 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
 
 router.patch("/setOff/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
-        absent: "2"
+        absent: "2",
+        worked_hours: 0,
+        overtime: 0
     }).then(() => {
         return res.status(200).json({
             message: "Setted to Off"
@@ -145,6 +148,16 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
 
 router.patch("/setLocation/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
+        location: req.body.location
+    }).then(() => {
+        return res.status(200).json({
+            message: "Updated"
+        });
+    });
+});
+
+router.patch("/updateAttendancesLocation", (req, res) => {
+    db("tbl_attendance").whereIn("at_id", req.body.emps).update({
         location: req.body.location
     }).then(() => {
         return res.status(200).json({
