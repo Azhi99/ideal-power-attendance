@@ -144,6 +144,23 @@ router.post("/getDeactived", (req, res) => {
    });
 });
 
+router.post("/getActived", (req, res) => {
+  db.select(
+    "tbl_engineers.en_id as en_id",
+    "tbl_engineers.first_name as first_name",
+    "tbl_engineers.last_name as last_name",
+    "tbl_jobs.job_title as job_title",
+    "tbl_engineers.phone1 as phone1",
+    "tbl_engineers.phone2 as phone2",
+    "tbl_engineers.reg_date as reg_date",
+    "tbl_engineers.active_status as active_status"
+  ).from("tbl_engineers")
+   .join("tbl_jobs", "tbl_jobs.job_id", "=", "tbl_engineers.job_id")
+   .where("tbl_engineers.active_status", "1").then((data) => {
+     return res.status(200).send(data);
+   });
+});
+
 router.post("/getNames", (req, res) => {
   db("tbl_engineers")
     .where("active_status", "1")

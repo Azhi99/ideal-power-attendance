@@ -56,7 +56,8 @@ router.post("/addOtherEmployee", (req, res) => {
 router.patch("/setAbsent/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         absent: "1",
-        worked_hours: 0
+        worked_hours: 0,
+        overtime: 0
     }).then(() => {
         return res.status(200).json({
             message: "Absented"
@@ -82,6 +83,24 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
         });
     });
 });
+
+router.patch("/setOff/:at_id", (req, res) => {
+    db("tbl_attendance").where("at_id", req.params.at_id).update({
+        absent: "2",
+        worked_hours: 0,
+        overtime: 0
+    }).then(() => {
+        return res.status(200).json({
+            message: "Setted to Off"
+        });
+    }).catch((err) => {
+        return res.status(500).json({
+            message: err
+        });
+    });
+});
+
+
 
 
 router.patch('/updateAttendance/:at_id',(req, res)=>{
@@ -133,6 +152,33 @@ router.patch("/setLocation/:at_id", (req, res) => {
     }).then(() => {
         return res.status(200).json({
             message: "Updated"
+        });
+    });
+});
+
+router.patch("/updateAttendancesLocation", (req, res) => {
+    db("tbl_attendance").whereIn("at_id", req.body.emps).update({
+        location: req.body.location
+    }).then(() => {
+        return res.status(200).json({
+            message: "Updated"
+        });
+    });
+});
+
+router.patch("/changeStaff/:at_id/:dsl_id", (req, res) => {
+    db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).select(["location"]).limit(1).then(([{location}]) => {
+        db("tbl_attendance").where("at_id", req.params.at_id).update({
+            dsl_id: req.params.dsl_id,
+            location: location.split(",")[0]
+        }).then(() => {
+            return res.status(200).json({
+                message: "List changed"
+            });
+        }).catch((err) => {
+            return res.status(500).json({
+                message: err
+            });
         });
     });
 });

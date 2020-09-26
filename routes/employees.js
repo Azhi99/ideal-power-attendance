@@ -409,6 +409,102 @@ router.post("/getData", (req, res) => {
     });
 });
 
+router.post("/getAll", (req, res) => {
+  db.select(
+    "tbl_employees.emp_id as emp_id",
+    "tbl_employees.first_name as first_name",
+    "tbl_employees.last_name as last_name",
+    "tbl_employees.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_employees.phone as phone",
+    "tbl_employees.reg_date as reg_date",
+    "tbl_employees.salary_type",
+    "tbl_employees.active_status as active_status",
+    "tbl_employees.birth_date as birth_date",
+    "tbl_employees.monthly_salary as monthly_salary",
+    "tbl_employees.daily_salary as daily_salary",
+    "tbl_employees.hour_salary as hour_salary",
+    "tbl_employees.identification_image_path as identification_image_path",
+    "tbl_employees.personal_image_path as personal_image_path"
+  )
+    .from("tbl_employees")
+    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .orderBy("tbl_employees.emp_id", "desc")
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
+
+router.post("/getActived", (req, res) => {
+  db.select(
+    "tbl_employees.emp_id as emp_id",
+    "tbl_employees.first_name as first_name",
+    "tbl_employees.last_name as last_name",
+    "tbl_employees.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_employees.phone as phone",
+    "tbl_employees.reg_date as reg_date",
+    "tbl_employees.salary_type",
+    "tbl_employees.active_status as active_status",
+    "tbl_employees.birth_date as birth_date",
+    "tbl_employees.monthly_salary as monthly_salary",
+    "tbl_employees.daily_salary as daily_salary",
+    "tbl_employees.hour_salary as hour_salary",
+    "tbl_employees.identification_image_path as identification_image_path",
+    "tbl_employees.personal_image_path as personal_image_path"
+  )
+    .from("tbl_employees")
+    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .where("tbl_employees.active_status", "1")
+    .orderBy("tbl_employees.emp_id", "desc")
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
+
+
+router.post("/getDeactived", (req, res) => {
+  db.select(
+    "tbl_employees.emp_id as emp_id",
+    "tbl_employees.first_name as first_name",
+    "tbl_employees.last_name as last_name",
+    "tbl_employees.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_employees.phone as phone",
+    "tbl_employees.reg_date as reg_date",
+    "tbl_employees.salary_type",
+    "tbl_employees.active_status as active_status",
+    "tbl_employees.birth_date as birth_date",
+    "tbl_employees.monthly_salary as monthly_salary",
+    "tbl_employees.daily_salary as daily_salary",
+    "tbl_employees.hour_salary as hour_salary",
+    "tbl_employees.identification_image_path as identification_image_path",
+    "tbl_employees.personal_image_path as personal_image_path"
+  )
+    .from("tbl_employees")
+    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .where("tbl_employees.active_status", "0")
+    .orderBy("tbl_employees.emp_id", "desc")
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
+
 router.post("/getNames/:st_id", (req, res) => {
   db("tbl_employees").where("st_id", req.params.st_id).andWhere("active_status", "1").andWhereRaw(
     "emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))",
