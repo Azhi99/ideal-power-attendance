@@ -557,7 +557,7 @@ router.post("/searchEmployee", (req, res) => {
 });
 
 router.post('/getEmployeeInfo/:phone', async (req,res)=>{
-  const [employee]= await db.raw('select * from employee_final_with_give_salary where phone="'+req.params.phone+'" limit 1')
+  const [{employee}]= await db.raw('select * from employee_final_with_give_salary where phone="'+req.params.phone+'" limit 1')
   //const [each_days]=await db.raw('select * from employee_month_info_each_days where phone="'+req.params.phone+'"')
   return res.status(200).json({
     employee,
