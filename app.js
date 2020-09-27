@@ -11,6 +11,7 @@ const employeeRouter = require("./routes/employees.js");
 const dailyStaffListRouter = require("./routes/daily_staff_list.js");
 const attendanceRouter = require('./routes/attendance');
 const indexRouter = require("./routes/indexPage.js");
+const giveSalaryRouter = require("./routes/gived_salary.js");
 
 const app = express();
 var port = process.env.PORT;
@@ -34,6 +35,7 @@ app.use("/engineer", enginnerRouter)
 app.use("/daily_staff_list", dailyStaffListRouter);
 app.use('/attendance',attendanceRouter);
 app.use('/index', indexRouter);
+app.use('/gived_salary', giveSalaryRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
