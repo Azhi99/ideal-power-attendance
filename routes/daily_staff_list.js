@@ -92,7 +92,7 @@ router.post("/createRestList", (req, res) => {
               db.raw("0 as worked_hours"),
               db.raw("0 as fine"),
               db.raw("null as fine_reason"),
-              db.raw("if(salary_type = 'Monthly', '0', '1') as absent"),
+              db.raw("if(salary_type = 'Monthly', '2', '1') as absent"),
               db.raw("'Rest' as location")
             ]).then((data) => {
               db("tbl_attendance").insert(data).then(() => {});
