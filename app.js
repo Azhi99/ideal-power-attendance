@@ -1,6 +1,7 @@
 const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
+const path = require("path");
 
 const jobRouter = require("./routes/job.js");
 const staffRouter = require("./routes/staff.js");
@@ -20,6 +21,7 @@ app.listen(port, () => {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
 app.use(cors());
 
@@ -32,3 +34,7 @@ app.use("/engineer", enginnerRouter)
 app.use("/daily_staff_list", dailyStaffListRouter);
 app.use('/attendance',attendanceRouter);
 app.use('/index', indexRouter);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
