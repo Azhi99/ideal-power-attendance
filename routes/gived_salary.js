@@ -52,4 +52,22 @@ router.post("/employeeInfo/:month/:year/:phone", (req, res) => {
     });
 });
 
+router.post("/getGivedSalary/:month/:year", (req, res) => {
+    db("employee_final_with_give_salary")
+        .where("date_to_m", req.params.month)
+        .andWhere("date_to_y", req.params.year)
+        .andWhere("gived_status", "1").select([
+            "emp_id",
+            "full_name",
+            "staff_name",
+            "salary_type",
+            "total_o_s as total_overtime",
+            "total_fine",
+            "gived_salary",
+            "gived_date"
+    ]).then((data) => {
+        return res.status(200).send(data);
+    });
+});
+
 module.exports = router;

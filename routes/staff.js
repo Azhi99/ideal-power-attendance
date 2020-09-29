@@ -74,16 +74,35 @@ router.post("/getData", (req, res) => {
     });
 });
 
-router.post("/getStaffReport", (req, res) => {
-  db.select(
-    "tbl_staffs.st_id as st_id",
-    "tbl_staffs.staff_name as staff_name",
-    db.raw("concat(tbl_engineers.first_name, ' ', tbl_engineers.last_name) as engineer")
-  ).from("tbl_staffs")
-   .join("tbl_engineers", "tbl_staffs.en_id", "=", "tbl_engineers.en_id")
-   .then((data) => {
-     return res.status(200).send(data);
-   });
+router.post("/getStaffReport", async (req, res) => {
+  var staffs = [];
+  var employees = [];
+  if(!req.body.en_id){
+    staffs = await db.select(
+      "tbl_staffs.st_id as st_id",
+      "tbl_staffs.staff_name as staff_name",
+      db.raw("concat(tbl_engineers.first_name, ' ', tbl_engineers.last_name) as engineer")
+    ).from("tbl_staffs")
+     .join("tbl_engineers", "tbl_staffs.en_id", "=", "tbl_engineers.en_id");
+
+     employees = await db("tbl_employees").select();
+
+  } else {
+    staffs = await db.select(
+      "tbl_staffs.st_id as st_id",
+      "tbl_staffs.staff_name as staff_name",
+      db.raw("concat(tbl_engineers.first_name, ' ', tbl_engineers.last_name) as engineer")
+    ).from("tbl_staffs")
+     .join("tbl_engineers", "tbl_staffs.en_id", "=", "tbl_engineers.en_id")
+     .where("tbl_staffs.en_id", req.body.en_id);
+
+    employees = await db("tbl_employees").whereRaw("st_id in (select st_id from tbl_staffs where en_id=?)", [req.body.en_id]).select();
+  }
+  
+  return res.status(200).json({
+    staffs,
+    employees
+  });
 });
 
 module.exports = router;

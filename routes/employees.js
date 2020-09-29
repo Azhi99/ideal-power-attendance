@@ -565,15 +565,15 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
   })
 })
 
-router.post('/topOvertime/:month/:year',async (req,res)=>{
- const [top_overtime]=await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_o desc',[req.params.month,req.params.year])
- const [top_absent]=await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_apsent desc',[req.params.month,req.params.year])
- const [top_fine]=await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_f desc',[req.params.month,req.params.year])
-return res.status(200).json({
-  top_overtime,
-  top_absent,
-  top_fine
-})
-})
+router.post('/topOvertime/:month/:year', async (req, res)=>{
+ const [top_overtime] = await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_o desc', [req.params.month, req.params.year])
+ const [top_absent] = await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_apsent desc', [req.params.month, req.params.year])
+ const [top_fine] = await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_f desc', [req.params.month, req.params.year])
+  return res.status(200).json({
+    top_overtime,
+    top_absent,
+    top_fine
+  });
+});
 
 module.exports = router;
