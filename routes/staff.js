@@ -105,4 +105,10 @@ router.post("/getStaffReport", async (req, res) => {
   });
 });
 
+router.post("/getByEngineer/:en_id", (req, res) => {
+  db("tbl_staffs").where("en_id", req.params.en_id).select().then((data) => {
+    return res.status(200).send(data);
+  });
+});
+
 module.exports = router;

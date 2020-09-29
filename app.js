@@ -2,6 +2,10 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const path = require("path");
+const session = require("express-session");
+const bcrypt = require("bcrypt")
+
+const db_user = require("./DB/userDBconfig.js");
 
 const jobRouter = require("./routes/job.js");
 const staffRouter = require("./routes/staff.js");
@@ -24,7 +28,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:8080'],
+  credentials: true
+}));
+
+app.use(session({
+  resave: false,
+  saveUninitialized: true,
+  secret: "suly_tech_staff"
+}));
 
 app.use("/job", jobRouter);
 app.use("/user", userRouter);
@@ -36,6 +49,58 @@ app.use("/daily_staff_list", dailyStaffListRouter);
 app.use('/attendance',attendanceRouter);
 app.use('/index', indexRouter);
 app.use('/gived_salary', giveSalaryRouter);
+
+app.post("/isLogged", (req, res) => {
+  if(req.session.isLogged == true) {
+    return res.status(200).send(true);
+  } 
+  return res.status(500).send(false);
+});
+
+app.post("/getLoggedInfo", (req, res) => {
+  if(req.session.isLogged == true) {
+    return res.status(200).json({
+      type: req.session.user_type,
+      username: req.session.full_name,
+      en_id: req.session.en_id || null
+    });
+  } 
+  return res.status(500).json({
+    message: "Not Logged"
+  });
+});
+
+app.post("/login", (req, res) => {
+  if(!req.session.isLogged){
+    db_user("tbl_users").where("username", (req.body.username).trim()).select().limit(1).then(([data]) => {
+      if(typeof data != "undefined"){
+        bcrypt.compare(req.body.password, data.password, (err, result) => {
+          if(result){
+            if(data.active_status == 1){
+              req.session.isLogged = true;
+              req.session.username = data.full_name;
+              req.session.user_type = data.role;
+              req.session.en_id = data.en_id;
+              return res.status(200).send(true);
+            } else {
+              return res.status(500).json({
+                message: "This Account is locked"
+              });
+            }
+          } else {
+            return res.status(500).json({
+              message: "Wrong password"
+            });
+          }
+        });
+      } else {
+        return res.status(500).json({
+          message: "Wrong phone number"
+        });
+      }
+    });
+  }
+});
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));

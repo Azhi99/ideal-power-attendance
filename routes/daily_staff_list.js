@@ -202,16 +202,17 @@ router.post("/getDailyList", (req, res) => {
     });
 });
 
-router.post('/dslReport/:month/:year/:st_id',(req,res)=>{
- db.raw('select * from dsl_each_month_by_staff where date_to_m=? and date_to_y=? and st_id=?',[req.params.month,req.params.year,req.params.st_id]).then(([data])=>{
-   return res.status(200).send(data)
- })
-})
+router.post('/dslReport/:month/:year/:st_id', (req, res)=>{
+ db.raw('select * from dsl_each_month_by_staff where date_to_m=? and date_to_y=? and st_id=?', [req.params.month,req.params.year,req.params.st_id]).then(([data])=>{
+  console.log(data); 
+  return res.status(200).send(data);
+ });
+});
 
-router.post('/dslEachAttendance/:dsl_id',(req,res)=>{
-  db.raw('select * from dsl_each_attendance where dsl_id=?',[req.params.dsl_id]).then(([data])=>{
-    return res.status(200).send(data)
-  })
-})
+router.post('/dslEachAttendance/:dsl_id', (req, res)=>{
+  db.raw('select * from dsl_each_attendance where dsl_id=?', [req.params.dsl_id]).then(([data])=>{
+    return res.status(200).send(data);
+  });
+});
 
 module.exports = router;
