@@ -61,7 +61,7 @@ app.post("/getLoggedInfo", (req, res) => {
   if(req.session.isLogged == true) {
     return res.status(200).json({
       type: req.session.user_type,
-      username: req.session.full_name,
+      username: req.session.username,
       en_id: req.session.en_id || null
     });
   } 
@@ -100,6 +100,11 @@ app.post("/login", (req, res) => {
       }
     });
   }
+});
+
+app.post("/logout", (req, res) => {
+  req.session.destroy();
+  return res.status(200).send(true);
 });
 
 app.get("*", (req, res) => {
