@@ -183,6 +183,27 @@ router.patch("/changeStaff/:at_id/:dsl_id", (req, res) => {
     });
 });
 
+router.patch("/returnEmployee/:at_id/:st_id", (req, res) => {
+    db("tbl_daily_staff_list").where("st_id", req.params.st_id).andWhere("work_date", req.body.work_date).select([
+        "dsl_id",
+        "location"
+    ]).limit(1).then(([{dsl_id, location}]) => {
+        db("tbl_attendance").where("at_id", req.params.at_id).update({
+            dsl_id,
+            location: location.split(",")[0]
+        }).then(() => {
+            return res.status(200).json({
+                message: "Employee Returned"
+            });
+        }).catch((err) => {
+            console.log(err);
+            return res.status(500).json({
+                message: err
+            });
+        });
+    });
+});
+
 router.delete("/deleteAttendance/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).delete().then(() => {
         return res.status(200).json({

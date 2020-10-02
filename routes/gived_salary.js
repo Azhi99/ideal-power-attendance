@@ -12,12 +12,16 @@ router.post("/addGiveSalary", (req, res) => {
         daily_salary: req.body.daily_salary,
         hour_salary: req.body.hour_salary,
         dollar_price: req.body.dollar_price,
-        gived_salary: req.body.gived_salary,
-        gived_date: db.fn.now(),
-        gived_status: "1"
-    }).then(() => {
-        return res.status(200).json({
-            message: "Salary Gived"
+        gived_status: "1",
+    }).then(([data]) => {
+        db("tbl_gived_salary_detail").insert({
+            gs_id: data,
+            gived_salary: req.body.gived_salary,
+            gived_date: db.fn.now()
+        }).then(() => {
+            return res.status(200).json({
+                message: "Salary Gived"
+            });
         });
     }).catch((err) => {
         if(err.errno == 1062){

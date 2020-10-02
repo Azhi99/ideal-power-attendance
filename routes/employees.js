@@ -557,13 +557,22 @@ router.post("/searchEmployee", (req, res) => {
 });
 
 router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
-  const [[employee]]= await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
-  const [each_days]=await db.raw('select * from employee_month_info_each_days where phone=? and date_to_m=? and date_to_y=? ORDER BY dsl_id', [req.params.phone,req.params.month,req.params.year])
+  var [gived_salary]  = await db("tbl_gived_salary")
+    .where("salary_month", req.params.month)
+    .andWhere("salary_year", req.params.year)
+    .andWhereRaw("emp_id = (select emp_id from tbl_employees where phone=?)", [req.params.phone])
+    .select(["gs_id"]).limit(1);
+  
+  const [[employee]] = await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
+  const [each_days] = await db.raw('select * from employee_month_info_each_days where phone=? and date_to_m=? and date_to_y=? ORDER BY dsl_id', [req.params.phone,req.params.month,req.params.year])
+  const [each_give_salary] = await db.raw("select * from tbl_gived_salary_detail where gs_id = ?", [(typeof gived_salary == "undefined" ? null: gived_salary.gs_id)]);
   return res.status(200).json({
+    gs_id: (typeof gived_salary == "undefined" ? null: gived_salary.gs_id),
     employee,
-    each_days
-  })
-})
+    each_days,
+    each_give_salary: each_give_salary || []
+  });
+});
 
 router.post('/topOvertime/:month/:year', async (req, res)=>{
  const [top_overtime] = await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_o desc', [req.params.month, req.params.year])
