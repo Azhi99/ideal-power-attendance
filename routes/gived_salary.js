@@ -74,4 +74,18 @@ router.post("/getGivedSalary/:month/:year", (req, res) => {
     });
 });
 
+router.post('/addGivedDetail',(req,res)=>{
+    db('tbl_gived_salary_detail').insert({
+        gs_id:req.body.gs_id,
+        gived_salary:req.body.gived_salary,
+        gived_date:db.fn.now()
+    }).then(()=>{
+        return res.status(200).send()
+    }).catch((err)=>{
+        return res.status(500).json({
+            err
+        })
+    })
+})
+
 module.exports = router;
