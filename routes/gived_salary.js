@@ -14,14 +14,9 @@ router.post("/addGiveSalary", (req, res) => {
         dollar_price: req.body.dollar_price,
         gived_status: "1",
     }).then(([data]) => {
-        db("tbl_gived_salary_detail").insert({
+        return res.status(200).json({
             gs_id: data,
-            gived_salary: req.body.gived_salary,
-            gived_date: db.fn.now()
-        }).then(() => {
-            return res.status(200).json({
-                message: "Salary Gived"
-            });
+            message: "Salary Gived"
         });
     }).catch((err) => {
         if(err.errno == 1062){
@@ -79,13 +74,16 @@ router.post('/addGivedDetail',(req,res)=>{
         gs_id:req.body.gs_id,
         gived_salary:req.body.gived_salary,
         gived_date:db.fn.now()
-    }).then(()=>{
-        return res.status(200).send()
+    }).then(([data])=>{
+        return res.status(200).json({
+            gsd_id: data,
+            message: "Salary inserted"
+        });
     }).catch((err)=>{
         return res.status(500).json({
-            err
-        })
-    })
-})
+            message: err
+        });
+    });
+});
 
 module.exports = router;
