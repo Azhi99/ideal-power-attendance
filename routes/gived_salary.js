@@ -62,8 +62,7 @@ router.post("/getGivedSalary/:month/:year", (req, res) => {
             "salary_type",
             "total_o_s as total_overtime",
             "total_fine",
-            "gived_salary",
-            "gived_date"
+            "gived_salary"
     ]).then((data) => {
         return res.status(200).send(data);
     });

@@ -203,8 +203,7 @@ router.post("/getDailyList", (req, res) => {
 });
 
 router.post('/dslReport/:month/:year/:st_id', (req, res)=>{
- db.raw('select * from dsl_each_month_by_staff where date_to_m=? and date_to_y=? and st_id=?', [req.params.month,req.params.year,req.params.st_id]).then(([data])=>{
-  console.log(data); 
+ db.raw('select * from dsl_each_month_by_staff where date_to_m=? and date_to_y=? and st_id=?', [req.params.month,req.params.year,req.params.st_id]).then(([data])=>{ 
   return res.status(200).send(data);
  });
 });
