@@ -34,7 +34,7 @@ app.use(cors({
 }));
 
 app.use(session({
-  resave: false,
+  resave: true,
   saveUninitialized: true,
   secret: "suly_tech_staff"
 }));
