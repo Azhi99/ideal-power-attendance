@@ -36,7 +36,8 @@ app.use(cors({
 app.use(session({
   resave: true,
   saveUninitialized: true,
-  secret: "suly_tech_staff"
+  secret: "suly_tech_staff",
+  maxAge: Date.now() + (30 * 86400 * 1000)
 }));
 
 app.use("/job", jobRouter);
