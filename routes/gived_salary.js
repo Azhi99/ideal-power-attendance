@@ -51,20 +51,27 @@ router.post("/employeeInfo/:month/:year/:phone", (req, res) => {
     });
 });
 
-router.post("/getGivedSalary/:month/:year", (req, res) => {
-    db("employee_final_with_give_salary")
-        .where("date_to_m", req.params.month)
-        .andWhere("date_to_y", req.params.year)
-        .andWhere("gived_status", "1").select([
-            "emp_id",
-            "full_name",
-            "staff_name",
-            "salary_type",
-            "total_o_s as total_overtime",
-            "total_fine",
-            "gived_salary"
-    ]).then((data) => {
-        return res.status(200).send(data);
+router.post("/getGivedSalary/:month/:year", async (req, res) => {
+    const employees = await db("employee_final_with_give_salary")
+                            .where("date_to_m", req.params.month)
+                            .andWhere("date_to_y", req.params.year)
+                            .andWhere("gived_status", "1").select([
+                                "emp_id",
+                                "full_name",
+                                "staff_name",
+                                "salary_type",
+                                "total_o_s as total_overtime",
+                                "total_fine",
+                                "gived_salary"
+                        ]);
+    const gived_salary_staffs = await db("total_gived_each_staff")
+                                    .where("date_to_m", req.params.month)
+                                    .andWhere("date_to_y", req.params.year)
+                                    .select();
+                                    
+    return res.status(200).json({
+        employees,
+        gived_salary_staffs
     });
 });
 
