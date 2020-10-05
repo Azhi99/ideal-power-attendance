@@ -2,7 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const path = require("path");
-const session = require("express-session");
+const session = require("client-sessions");
 const bcrypt = require("bcrypt")
 
 const db_user = require("./DB/userDBconfig.js");
@@ -34,9 +34,10 @@ app.use(cors({
 }));
 
 app.use(session({
-  resave: false,
-  saveUninitialized: true,
-  secret: "suly_tech_staff"
+  cookieName: "session",
+  secret: "suly_tech_staff",
+  duration: 60 * 60 * 1000,
+  activeDuration: 40 * 60 * 100
 }));
 
 app.use("/job", jobRouter);

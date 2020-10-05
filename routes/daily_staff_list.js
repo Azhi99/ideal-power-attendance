@@ -186,20 +186,34 @@ router.post("/getStaffs", (req, res) => {
    });
 });
 
-router.post("/getDailyList", (req, res) => {
-  db.select(
+router.post("/getDailyList", async (req, res) => {
+  const lists = await db.select(
     "tbl_daily_staff_list.dsl_id as dsl_id",
     "tbl_staffs.staff_name as staff_name",
     "tbl_daily_staff_list.user as user",
+    "tbl_daily_staff_list.st_id as st_id",
     "tbl_daily_staff_list.location as location",
     "tbl_daily_staff_list.note as note"
   )
     .from("tbl_daily_staff_list")
     .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
-    .where("tbl_daily_staff_list.work_date", new Date().toISOString().split("T")[0])
-    .then((data) => {
-      return res.status(200).send(data || []);
-    });
+    .where("tbl_daily_staff_list.work_date", new Date().toISOString().split("T")[0]);
+  
+  const list_details = await db.select(
+                              "tbl_attendance.at_id as at_id",
+                              "tbl_attendance.dsl_id as dsl_id",
+                              db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
+                              "tbl_attendance.absent as status",
+                              "tbl_attendance.location as location",
+                              "tbl_employees.st_id as st_id"
+                            )
+                            .from("tbl_attendance")
+                            .join("tbl_employees", "tbl_attendance.emp_id", "=", "tbl_employees.emp_id")
+                            .whereRaw("dsl_id in (select dsl_id from tbl_daily_staff_list where work_date=?)", [new Date().toISOString().split("T")[0]]);
+  return res.status(200).json({
+    lists: lists || [],
+    list_details: list_details || []
+  });
 });
 
 router.post('/dslReport/:month/:year/:st_id', (req, res)=>{
