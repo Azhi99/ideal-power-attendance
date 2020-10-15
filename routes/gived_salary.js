@@ -13,6 +13,8 @@ router.post("/addGiveSalary", (req, res) => {
         hour_salary: req.body.hour_salary,
         dollar_price: req.body.dollar_price,
         gived_status: "1",
+        food_money: req.body.food_money,
+        transport_money: req.body.transport_money
     }).then(([data]) => {
         return res.status(200).json({
             gs_id: data,

@@ -55,7 +55,11 @@ router.post("/addEmployee", createValidation, (req, res) => {
       hour_salary: req.body.hour_salary,
       identification_image_path,
       personal_image_path,
-      active_status:"1"
+      active_status:"1",
+      country: req.body.country,
+      food_money: req.body.food_money,
+      transport_money: req.body.transport_money,
+      expiry_passport: req.body.expiry_passport || null
     })
     .then(([data]) => {
       if (personal_image_path != null) {
@@ -140,6 +144,10 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           monthly_salary: req.body.monthly_salary,
           daily_salary: req.body.daily_salary,
           hour_salary: req.body.hour_salary,
+          country: req.body.country,
+          food_money: req.body.food_money,
+          transport_money: req.body.transport_money,
+          expiry_passport: req.body.expiry_passport || null
         })
         .then(() => {
           return res.status(200).json({
@@ -392,7 +400,11 @@ router.post("/getData", (req, res) => {
     "tbl_employees.daily_salary as daily_salary",
     "tbl_employees.hour_salary as hour_salary",
     "tbl_employees.identification_image_path as identification_image_path",
-    "tbl_employees.personal_image_path as personal_image_path"
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -425,7 +437,11 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.daily_salary as daily_salary",
     "tbl_employees.hour_salary as hour_salary",
     "tbl_employees.identification_image_path as identification_image_path",
-    "tbl_employees.personal_image_path as personal_image_path"
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -456,7 +472,11 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.daily_salary as daily_salary",
     "tbl_employees.hour_salary as hour_salary",
     "tbl_employees.identification_image_path as identification_image_path",
-    "tbl_employees.personal_image_path as personal_image_path"
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -472,6 +492,77 @@ router.post("/getActived", (req, res) => {
     });
 });
 
+router.post("/getIraq", (req, res) => {
+  db.select(
+    "tbl_employees.emp_id as emp_id",
+    "tbl_employees.first_name as first_name",
+    "tbl_employees.last_name as last_name",
+    "tbl_employees.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_employees.phone as phone",
+    "tbl_employees.reg_date as reg_date",
+    "tbl_employees.salary_type",
+    "tbl_employees.active_status as active_status",
+    "tbl_employees.birth_date as birth_date",
+    "tbl_employees.monthly_salary as monthly_salary",
+    "tbl_employees.daily_salary as daily_salary",
+    "tbl_employees.hour_salary as hour_salary",
+    "tbl_employees.identification_image_path as identification_image_path",
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.expiry_passport as expiry_passport"
+  )
+    .from("tbl_employees")
+    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .where("tbl_employees.country", "1")
+    .orderBy("tbl_employees.emp_id", "desc")
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
+
+router.post("/getForeign", (req, res) => {
+  db.select(
+    "tbl_employees.emp_id as emp_id",
+    "tbl_employees.first_name as first_name",
+    "tbl_employees.last_name as last_name",
+    "tbl_employees.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_employees.phone as phone",
+    "tbl_employees.reg_date as reg_date",
+    "tbl_employees.salary_type",
+    "tbl_employees.active_status as active_status",
+    "tbl_employees.birth_date as birth_date",
+    "tbl_employees.monthly_salary as monthly_salary",
+    "tbl_employees.daily_salary as daily_salary",
+    "tbl_employees.hour_salary as hour_salary",
+    "tbl_employees.identification_image_path as identification_image_path",
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.expiry_passport as expiry_passport"
+  )
+    .from("tbl_employees")
+    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .where("tbl_employees.country", "2")
+    .orderBy("tbl_employees.emp_id", "desc")
+    .then((data) => {
+      return res.status(200).send(data);
+    })
+    .catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
 
 router.post("/getDeactived", (req, res) => {
   db.select(
@@ -489,7 +580,11 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.daily_salary as daily_salary",
     "tbl_employees.hour_salary as hour_salary",
     "tbl_employees.identification_image_path as identification_image_path",
-    "tbl_employees.personal_image_path as personal_image_path"
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -540,7 +635,11 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.daily_salary as daily_salary",
     "tbl_employees.hour_salary as hour_salary",
     "tbl_employees.identification_image_path as identification_image_path",
-    "tbl_employees.personal_image_path as personal_image_path"
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -561,13 +660,21 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
     .where("salary_month", req.params.month)
     .andWhere("salary_year", req.params.year)
     .andWhereRaw("emp_id = (select emp_id from tbl_employees where phone=?)", [req.params.phone])
-    .select(["gs_id"]).limit(1);
+    .select([
+      "gs_id",
+      "monthly_salary",
+      "daily_salary",
+      "hour_salary",
+      "food_money",
+      "transport_money"
+    ]).limit(1);
   const gs_id = (typeof gived_salary == "undefined" ? null: gived_salary.gs_id);
   const [[employee]] = await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
   const [each_days] = await db.raw('select * from employee_month_info_each_days where phone=? and date_to_m=? and date_to_y=? ORDER BY dsl_id', [req.params.phone,req.params.month,req.params.year])
   const [each_give_salary] = await db.raw("select * from tbl_gived_salary_detail where gs_id = ?", [gs_id]);
   return res.status(200).json({
     gs_id,
+    gived_salary: gived_salary || null,
     employee,
     each_days,
     each_give_salary: each_give_salary || []
@@ -595,7 +702,5 @@ router.post('/getEmployeeBystaff/:st_id',(req,res)=>{
     });
   });
 });
-
-
 
 module.exports = router;
