@@ -3,7 +3,8 @@ require("dotenv").config();
 const cors = require("cors");
 const path = require("path");
 const session = require("client-sessions");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const rateLimit = require("express-rate-limit");
 
 const db_user = require("./DB/userDBconfig.js");
 
@@ -37,8 +38,8 @@ app.use(cors({
 app.use(session({
   cookieName: "session",
   secret: "suly_tech_staff",
-  duration: 60 * 60 * 1000,
-  activeDuration: 40 * 60 * 100
+  duration: 10 * 60 * 60 * 1000,
+  activeDuration: 8 * 60 * 60 * 1000
 }));
 
 app.use("/job", jobRouter);
@@ -73,7 +74,13 @@ app.post("/getLoggedInfo", (req, res) => {
   });
 });
 
-app.post("/login", (req, res) => {
+const loginLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: "You are tried more than 10 times in a hour, wiat until 1 hour"
+});
+
+app.post("/login", loginLimiter, (req, res) => {
   if(!req.session.isLogged){
     db_user("tbl_users").where("username", (req.body.username).trim()).select().limit(1).then(([data]) => {
       if(typeof data != "undefined"){
