@@ -10,6 +10,7 @@ router.post("/addList", (req, res) => {
       user: req.body.user,
       location: req.body.location,
       note: req.body.note,
+      food_number:0
     })
     .then(([data]) => {
       var dsl_id = data;
@@ -109,6 +110,7 @@ router.patch("/updateList/:dsl_id", (req, res) => {
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
     location: req.body.location,
     note: req.body.note,
+    food_number:req.body.food_number
   }).then(()=>{
       return res.status(200).json({
           message:"List Updated"
@@ -193,7 +195,8 @@ router.post("/getDailyList", async (req, res) => {
     "tbl_daily_staff_list.user as user",
     "tbl_daily_staff_list.st_id as st_id",
     "tbl_daily_staff_list.location as location",
-    "tbl_daily_staff_list.note as note"
+    "tbl_daily_staff_list.note as note",
+    "tbl_daily_staff_list.food_number as food_number"
   )
     .from("tbl_daily_staff_list")
     .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
@@ -227,5 +230,19 @@ router.post('/dslEachAttendance/:dsl_id', (req, res)=>{
     return res.status(200).send(data);
   });
 });
+
+router.patch('/setFoodNumber/:dsl_id',(req,res)=>{
+  db("tbl_daily_staff_list").where("dsl_id",req.params.dsl_id).update({
+    food_number:req.body.food_number
+  }).then(()=>{
+    return res.status(200).json({
+      message:"food number updated"
+    })
+  }).catch((err)=>{
+    return res.status(500).json({
+      err
+    })
+  })
+})
 
 module.exports = router;
