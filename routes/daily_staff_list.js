@@ -10,7 +10,7 @@ router.post("/addList", (req, res) => {
       user: req.body.user,
       location: req.body.location,
       note: req.body.note,
-      food_number:0
+      food_number: 0
     })
     .then(([data]) => {
       var dsl_id = data;
@@ -79,7 +79,8 @@ router.post("/createRestList", (req, res) => {
           work_date: req.body.work_date,
           user: req.body.user,
           location: "Rest",
-          note: null
+          note: null,
+          food_number: 0
         }).then(([data]) => {
           var dsl_id = data;
           db("tbl_employees")
@@ -231,18 +232,35 @@ router.post('/dslEachAttendance/:dsl_id', (req, res)=>{
   });
 });
 
-router.patch('/setFoodNumber/:dsl_id',(req,res)=>{
-  db("tbl_daily_staff_list").where("dsl_id",req.params.dsl_id).update({
+router.post('/getFoods', async (req, res) => {
+  const staff_foods = await db.select(
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_daily_staff_list.food_number as food_number",
+    "tbl_daily_staff_list.location as location"
+  ).from("tbl_daily_staff_list")
+   .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_daily_staff_list.st_id")
+   .where("tbl_daily_staff_list.work_date", new Date().toISOString().split("T")[0]);
+  
+  const [{total_foods}] = await db("tbl_daily_staff_list").where("work_date", new Date().toISOString().split("T")[0]).sum("food_number as total_foods");
+  
+  return res.status(200).json({
+    staff_foods,
+    total_foods
+  });
+});
+
+router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
+  db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
     food_number:req.body.food_number
-  }).then(()=>{
+  }).then(() => {
     return res.status(200).json({
       message:"food number updated"
-    })
-  }).catch((err)=>{
+    });
+  }).catch((err) => {
     return res.status(500).json({
       err
-    })
-  })
-})
+    });
+  });
+});
 
 module.exports = router;

@@ -38,8 +38,8 @@ app.use(cors({
 app.use(session({
   cookieName: "session",
   secret: "suly_tech_staff",
-  duration: 10 * 60 * 60 * 1000,
-  activeDuration: 8 * 60 * 60 * 1000
+  duration: 12 * 60 * 60 * 1000,
+  activeDuration: 10 * 60 * 60 * 1000
 }));
 
 app.use("/job", jobRouter);
@@ -66,7 +66,8 @@ app.post("/getLoggedInfo", (req, res) => {
     return res.status(200).json({
       type: req.session.user_type,
       username: req.session.username,
-      en_id: req.session.en_id || null
+      en_id: req.session.en_id || null,
+      user_id: req.session.user_id
     });
   } 
   return res.status(500).json({
@@ -91,6 +92,7 @@ app.post("/login", loginLimiter, (req, res) => {
               req.session.username = data.full_name;
               req.session.user_type = data.role;
               req.session.en_id = data.en_id;
+              req.session.user_id = data.user_id;
               return res.status(200).send(true);
             } else {
               return res.status(500).json({
