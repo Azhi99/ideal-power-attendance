@@ -674,7 +674,7 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
   const [each_give_salary] = await db.raw("select * from tbl_gived_salary_detail where gs_id = ?", [gs_id]);
   return res.status(200).json({
     gs_id,
-    gived_salary: gived_salary || null,
+    gived_salary: gived_salary || {},
     employee,
     each_days,
     each_give_salary: each_give_salary || []

@@ -166,20 +166,43 @@ router.patch("/updateAttendancesLocation", (req, res) => {
     });
 });
 
-router.patch("/changeStaff/:at_id/:dsl_id", (req, res) => {
-    db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).select(["location"]).limit(1).then(([{location}]) => {
-        db("tbl_attendance").where("at_id", req.params.at_id).update({
-            dsl_id: req.params.dsl_id,
-            location: location.split(",")[0]
-        }).then(() => {
-            return res.status(200).json({
-                message: "List changed"
+router.patch("/changeStaff/:at_id/:st_id/:work_date/:old_st_id", (req, res) => {
+    db("tbl_daily_staff_list").where("st_id", req.params.st_id).andWhere("work_date", req.params.work_date).select(["dsl_id as dsl_id"]).then(([dsl_id]) => {
+        if(typeof dsl_id != "undefined"){
+            dsl_id = dsl_id.dsl_id;
+            db("tbl_daily_staff_list").where("dsl_id", dsl_id).select(["location"]).limit(1).then(([{location}]) => {
+                db("tbl_attendance").where("at_id", req.params.at_id).update({
+                    dsl_id: dsl_id,
+                    location: location.split(",")[0]
+                }).then(() => {
+                    return res.status(200).json({
+                        message: "List changed"
+                    });
+                }).catch((err) => {
+                    return res.status(500).json({
+                        message: err
+                    });
+                });
             });
-        }).catch((err) => {
-            return res.status(500).json({
-                message: err
+        } else {
+            db("tbl_temp_attendance").insert({
+                st_id: req.params.st_id,
+                old_st_id: req.params.old_st_id,
+                emp_id: req.body.emp_id,
+                overtime: req.body.overtime,
+                worked_hours: req.body.worked_hours,
+                fine: req.body.fine,
+                fine_reason: req.body.fine_reason,
+                absent: req.body.absent,
+                work_date: req.body.work_date
+            }).then(() => {
+                db("tbl_attendance").where("at_id", req.params.at_id).delete().then(() => {
+                    return res.status(200).json({
+                        message: "List changed"
+                    });
+                });
             });
-        });
+        }
     });
 });
 

@@ -26,33 +26,51 @@ router.post("/addList", (req, res) => {
           db.raw("0 as fine"),
           db.raw("null as fine_reason"),
           db.raw("'0' as absent"),
-          db.raw("'"+ req.body.location.split(",")[0] +"' as location")
+          db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
+          db.raw(req.body.st_id + " as st_id")
         ])
         .then((data) => {
           db("tbl_attendance").insert(data).then(() => {
-              db.select(
-                "tbl_attendance.at_id as at_id",
-                "tbl_attendance.emp_id as emp_id",
-                db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
-                "tbl_employees.st_id as st_id",
-                "tbl_employees.salary_type as salary_type",
-                "tbl_attendance.overtime as overtime",
-                "tbl_attendance.worked_hours as worked_hours",
-                "tbl_attendance.fine as fine",
-                "tbl_attendance.fine_reason as fine_reason",
-                "tbl_attendance.absent as absent",
-                "tbl_attendance.location as location"
-              )
-                .from("tbl_attendance")
-                .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
-                .where("tbl_attendance.dsl_id", dsl_id)
-                .then((data) => {
-                  return res.status(200).json({
-                    message: "List created",
-                    dsl_id,
-                    employees: data,
+              db("tbl_temp_attendance").where("work_date", req.body.work_date).andWhere("st_id", req.body.st_id).select([
+                db.raw(dsl_id + " as dsl_id"),
+                "emp_id as emp_id",
+                "overtime as overtime",
+                "worked_hours as worked_hours",
+                "fine as fine",
+                "fine_reason as fine_reason",
+                db.raw("CONVERT(absent, CHAR) as absent"),
+                db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
+                "old_st_id as st_id"
+              ]).then((data) => {
+                if(data.length > 0){
+                  db("tbl_attendance").insert(data).then(() => {
+                    db("tbl_temp_attendance").where("st_id", req.body.st_id).andWhere("work_date", req.body.work_date).delete().then(() => { });
                   });
-                });
+                }
+                db.select(
+                  "tbl_attendance.at_id as at_id",
+                  "tbl_attendance.emp_id as emp_id",
+                  db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
+                  "tbl_attendance.st_id as st_id",
+                  "tbl_employees.salary_type as salary_type",
+                  "tbl_attendance.overtime as overtime",
+                  "tbl_attendance.worked_hours as worked_hours",
+                  "tbl_attendance.fine as fine",
+                  "tbl_attendance.fine_reason as fine_reason",
+                  "tbl_attendance.absent as absent",
+                  "tbl_attendance.location as location"
+                )
+                  .from("tbl_attendance")
+                  .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
+                  .where("tbl_attendance.dsl_id", dsl_id)
+                  .then((data) => {
+                    return res.status(200).json({
+                      message: "List created",
+                      dsl_id,
+                      employees: data,
+                    });
+                  });
+              });
             });
         });
     })
@@ -95,7 +113,8 @@ router.post("/createRestList", (req, res) => {
               db.raw("0 as fine"),
               db.raw("null as fine_reason"),
               db.raw("if(salary_type = 'Monthly', '2', '1') as absent"),
-              db.raw("'Rest' as location")
+              db.raw("'Rest' as location"),
+              db.raw(obj.st_id + " as st_id")
             ]).then((data) => {
               db("tbl_attendance").insert(data).then(() => {});
             });
@@ -157,7 +176,7 @@ router.post("/getListAndAttendance", async (req, res) => {
       "tbl_attendance.at_id as at_id",
       "tbl_attendance.emp_id as emp_id",
       db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
-      "tbl_employees.st_id as st_id",
+      "tbl_attendance.st_id as st_id",
       "tbl_employees.salary_type as salary_type",
       "tbl_attendance.overtime as overtime",
       "tbl_attendance.worked_hours as worked_hours",
