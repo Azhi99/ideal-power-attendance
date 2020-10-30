@@ -175,8 +175,12 @@ router.patch("/changeStaff/:at_id/:st_id/:work_date/:old_st_id", (req, res) => {
                     dsl_id: dsl_id,
                     location: location.split(",")[0]
                 }).then(() => {
-                    return res.status(200).json({
-                        message: "List changed"
+                    db("tbl_attendance").where("at_id", req.params.at_id).update({
+                        st_id: req.params.st_id
+                    }).then(() => {
+                        return res.status(200).json({
+                            message: "List changed"
+                        });
                     });
                 }).catch((err) => {
                     return res.status(500).json({
@@ -213,6 +217,7 @@ router.patch("/returnEmployee/:at_id/:st_id", (req, res) => {
     ]).limit(1).then(([{dsl_id, location}]) => {
         db("tbl_attendance").where("at_id", req.params.at_id).update({
             dsl_id,
+            st_id: req.params.st_id,
             location: location.split(",")[0]
         }).then(() => {
             return res.status(200).json({

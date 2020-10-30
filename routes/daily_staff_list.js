@@ -40,7 +40,7 @@ router.post("/addList", (req, res) => {
                 "fine_reason as fine_reason",
                 db.raw("CONVERT(absent, CHAR) as absent"),
                 db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
-                "old_st_id as st_id"
+                "st_id as st_id"
               ]).then((data) => {
                 if(data.length > 0){
                   db("tbl_attendance").insert(data).then(() => {
@@ -51,6 +51,7 @@ router.post("/addList", (req, res) => {
                   "tbl_attendance.at_id as at_id",
                   "tbl_attendance.emp_id as emp_id",
                   db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
+                  "tbl_employees.st_id as main_st_id",
                   "tbl_attendance.st_id as st_id",
                   "tbl_employees.salary_type as salary_type",
                   "tbl_attendance.overtime as overtime",
@@ -176,6 +177,7 @@ router.post("/getListAndAttendance", async (req, res) => {
       "tbl_attendance.at_id as at_id",
       "tbl_attendance.emp_id as emp_id",
       db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
+      "tbl_employees.st_id as main_st_id",
       "tbl_attendance.st_id as st_id",
       "tbl_employees.salary_type as salary_type",
       "tbl_attendance.overtime as overtime",
