@@ -7,11 +7,14 @@ router.post("/addAttendance", (req, res) => {
     db("tbl_attendance").insert({
         dsl_id: req.body.dsl_id,
         emp_id: req.body.emp_id,
-        over_time: 0,
+        overtime: 0,
         worked_hours: 8,
         fine: 0,
-        fine_reason: req.body.fine_reason,
-        absent: "0"
+        fine_reason: null,
+        absent: "0",
+        location: req.body.location,
+        st_id: req.body.st_id,
+        old_st_id: req.body.st_id
     }).then(([data]) => {
         return res.status(200).json({
             message: "Attendance Added",
@@ -24,33 +27,18 @@ router.post("/addAttendance", (req, res) => {
     });
 });
 
-router.post("/addOtherEmployee", (req, res) => {
-    db.raw(
-      "select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?) and emp_id = ?",
-      [req.body.work_date, req.body.emp_id]
-    ).then(([data]) => {
-        if(data.length != 0){
-            return res.status(500).json({
-                message: "This employee has in another staff for this day"
-            });
-        } else {
-            db("tbl_attendance").insert({
-                dsl_id: req.body.dsl_id,
-                emp_id: req.body.emp_id,
-                overtime: 0,
-                worked_hours: 8,
-                fine: 0,
-                fine_reason: null,
-                absent: "0",
-                location: req.body.location
-            }).then(([data]) => {
-                return res.status(200).json({
-                    message: "Attendance Added",
-                    at_id: data
-                });
-            });
-        }
-    });
+router.post("/getMissedEmployees", (req, res) => {
+    db("tbl_employees")
+      .where("st_id", req.body.st_id)
+      .andWhereRaw("emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))", [req.body.work_date])
+      .select([
+        "emp_id",
+        db.raw("concat(first_name, ' ', last_name) as full_name"),
+        "salary_type"
+      ])
+      .then((data) => {
+        return res.status(200).send(data);
+      });
 });
 
 router.patch("/setAbsent/:at_id", (req, res) => {
