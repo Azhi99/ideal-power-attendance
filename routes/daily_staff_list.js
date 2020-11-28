@@ -225,7 +225,7 @@ router.post("/getDailyList", async (req, res) => {
   )
     .from("tbl_daily_staff_list")
     .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
-    .where("tbl_daily_staff_list.work_date", new Date().toISOString().split("T")[0]);
+    .where("tbl_daily_staff_list.work_date", req.body.work_date);
   
   const list_details = await db.select(
                               "tbl_attendance.at_id as at_id",
@@ -239,20 +239,20 @@ router.post("/getDailyList", async (req, res) => {
                             )
                             .from("tbl_attendance")
                             .join("tbl_employees", "tbl_attendance.emp_id", "=", "tbl_employees.emp_id")
-                            .whereRaw("dsl_id in (select dsl_id from tbl_daily_staff_list where work_date=?)", [new Date().toISOString().split("T")[0]]);
+                            .whereRaw("dsl_id in (select dsl_id from tbl_daily_staff_list where work_date=?)", [req.body.work_date]);
   return res.status(200).json({
     lists: lists || [],
     list_details: list_details || []
   });
 });
 
-router.post('/dslReport/:month/:year/:st_id', (req, res)=>{
+router.post('/dslReport/:month/:year/:st_id', (req, res) => {
  db.raw('select * from dsl_each_month_by_staff where date_to_m=? and date_to_y=? and st_id=?', [req.params.month,req.params.year,req.params.st_id]).then(([data])=>{ 
   return res.status(200).send(data);
  });
 });
 
-router.post('/dslEachAttendance/:dsl_id', (req, res)=>{
+router.post('/dslEachAttendance/:dsl_id', (req, res) => {
   db.raw('select * from dsl_each_attendance where dsl_id=?', [req.params.dsl_id]).then(([data])=>{
     return res.status(200).send(data);
   });
@@ -265,9 +265,9 @@ router.post('/getFoods', async (req, res) => {
     "tbl_daily_staff_list.location as location"
   ).from("tbl_daily_staff_list")
    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_daily_staff_list.st_id")
-   .where("tbl_daily_staff_list.work_date", new Date().toISOString().split("T")[0]);
+   .where("tbl_daily_staff_list.work_date",  req.body.work_date);
   
-  const [{total_foods}] = await db("tbl_daily_staff_list").where("work_date", new Date().toISOString().split("T")[0]).sum("food_number as total_foods");
+  const [{total_foods}] = await db("tbl_daily_staff_list").where("work_date",  req.body.work_date).sum("food_number as total_foods");
   
   return res.status(200).json({
     staff_foods,
