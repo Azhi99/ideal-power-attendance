@@ -32,6 +32,36 @@ router.post("/addGiveSalary", (req, res) => {
     });
 });
 
+
+router.post('/addListOfEmployees/:st_id', (req, res) => {
+    db("tbl_employees")
+      .where("active_status", "1")
+      .andWhere("st_id", req.params.st_id)
+      .andWhereRaw("emp_id not in (select emp_id from tbl_gived_salary where salary_month=? and salary_year=?)", [req.body.salary_month, req.body.salary_year])
+      .select([
+        "emp_id",
+        db.raw(req.body.salary_month + " as salary_month"),
+        db.raw(req.body.salary_year + " as salary_year"),
+        "monthly_salary",
+        "daily_salary",
+        "hour_salary",
+        db.raw(req.body.dollar_price + " as dollar_price"),
+        db.raw("'1' as gived_status"),
+        "food_money",
+        "transport_money",
+      ]).then((data) => {
+        if(data.length > 0){
+            return res.status(200).json({
+                message: "success"
+            });
+        } else {
+            return res.status(500).json({
+                message: "All employees calculated"
+            });
+        }
+      });
+});
+
 router.post("/employeeInfo/:month/:year/:phone", (req, res) => {
     db.select(
         "tbl_gived_salary.gs_id"
