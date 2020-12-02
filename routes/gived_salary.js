@@ -50,15 +50,34 @@ router.post('/addListOfEmployees/:st_id', (req, res) => {
         "food_money",
         "transport_money",
       ]).then((data) => {
+        db("tbl_gived_salary").where("salary_month", req.body.salary_month).andWhere("salary_year", req.body.salary_year).update({
+            dollar_price: req.body.dollar_price
+        }).then(() => { });
         if(data.length > 0){
-            return res.status(200).json({
-                message: "success"
+            db("tbl_gived_salary").insert(data).then(() => {
+                db("pre_gived_salary")
+                .where("st_id", req.params.st_id)
+                .andWhere("salary_month", req.body.salary_month)
+                .andWhere("salary_year", req.body.salary_year)
+                .select().then((data) => {
+                    return res.status(200).send(data) || [];
+                });
             });
         } else {
             return res.status(500).json({
                 message: "All employees calculated"
             });
         }
+      });
+});
+
+router.post('/getPreGivedSalary/:st_id/:month/:year', (req, res) => {
+    db("pre_gived_salary")
+      .where("st_id", req.params.st_id)
+      .andWhere("salary_month", req.params.month)
+      .andWhere("salary_year", req.params.year)
+      .select().then((data) => {
+        return res.status(200).send(data) || [];
       });
 });
 
