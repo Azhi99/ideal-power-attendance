@@ -670,7 +670,7 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
     ]).limit(1);
   const gs_id = (typeof gived_salary == "undefined" ? null: gived_salary.gs_id);
   const [[employee]] = await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
-  const [each_days] = await db.raw('select * from employee_month_info_each_days where phone=? and date_to_m=? and date_to_y=? ORDER BY dsl_id', [req.params.phone,req.params.month,req.params.year])
+  const [each_days] = await db.raw('select * from employee_month_info_each_days where phone=? and date_to_m=? and date_to_y=? ORDER BY work_date', [req.params.phone,req.params.month,req.params.year])
   const [each_give_salary] = await db.raw("select * from tbl_gived_salary_detail where gs_id = ?", [gs_id]);
   return res.status(200).json({
     gs_id,
