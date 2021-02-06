@@ -199,6 +199,23 @@ router.patch("/changeStaff/:at_id/:st_id/:work_date/:old_st_id", (req, res) => {
     });
 });
 
+router.get("/getTransferedEmployees/:year/:month/:old_st_id", (req, res) => {
+    db.select(
+        "tbl_temp_attendance.t_at_id as t_at_id",
+        db.raw("CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) as employee"),
+        "tbl_staffs.staff_name as staff_name",
+        "tbl_temp_attendance.work_date as work_date"
+    ).from("tbl_temp_attendance")
+     .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_temp_attendance.emp_id")
+     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_temp_attendance.st_id")
+     .whereRaw("YEAR(tbl_temp_attendance.work_date) = ?", [req.params.year])
+     .andWhereRaw("MONTH(tbl_temp_attendance.work_date) = ?", [req.params.month])
+     .andWhere("tbl_temp_attendance.old_st_id", req.params.old_st_id)
+     .then((data) => {
+        return res.status(200).send(data);
+     });
+});
+
 router.patch("/returnEmployee/:at_id/:st_id", (req, res) => {
     db("tbl_daily_staff_list").where("st_id", req.params.st_id).andWhere("work_date", req.body.work_date).select([
         "dsl_id",
