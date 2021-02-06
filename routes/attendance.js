@@ -30,6 +30,7 @@ router.post("/addAttendance", (req, res) => {
 router.post("/getMissedEmployees", (req, res) => {
     db("tbl_employees")
       .where("st_id", req.body.st_id)
+      .andWhere("active_status", "1")
       .andWhereRaw("emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))", [req.body.work_date])
       .select([
         "emp_id",

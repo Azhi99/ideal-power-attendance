@@ -47,32 +47,58 @@ router.post("/addList", (req, res) => {
                 if(data.length > 0){
                   db("tbl_attendance").insert(data).then(() => {
                     db("tbl_temp_attendance").where("st_id", req.body.st_id).andWhere("work_date", req.body.work_date).delete().then(() => { });
+                    db.select(
+                      "tbl_attendance.at_id as at_id",
+                      "tbl_attendance.emp_id as emp_id",
+                      db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
+                      "tbl_attendance.old_st_id as main_st_id",
+                      "tbl_attendance.st_id as st_id",
+                      "tbl_employees.salary_type as salary_type",
+                      "tbl_attendance.overtime as overtime",
+                      "tbl_attendance.worked_hours as worked_hours",
+                      "tbl_attendance.fine as fine",
+                      "tbl_attendance.fine_reason as fine_reason",
+                      "tbl_attendance.absent as absent",
+                      "tbl_attendance.location as location"
+                    )
+                      .from("tbl_attendance")
+                      .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
+                      .where("tbl_attendance.dsl_id", dsl_id)
+                      .then((data) => {
+                        return res.status(200).json({
+                          message: "List created",
+                          dsl_id,
+                          employees: data,
+                        });
+                      });
                   });
-                }
-                db.select(
-                  "tbl_attendance.at_id as at_id",
-                  "tbl_attendance.emp_id as emp_id",
-                  db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
-                  "tbl_attendance.old_st_id as main_st_id",
-                  "tbl_attendance.st_id as st_id",
-                  "tbl_employees.salary_type as salary_type",
-                  "tbl_attendance.overtime as overtime",
-                  "tbl_attendance.worked_hours as worked_hours",
-                  "tbl_attendance.fine as fine",
-                  "tbl_attendance.fine_reason as fine_reason",
-                  "tbl_attendance.absent as absent",
-                  "tbl_attendance.location as location"
-                )
-                  .from("tbl_attendance")
-                  .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
-                  .where("tbl_attendance.dsl_id", dsl_id)
-                  .then((data) => {
-                    return res.status(200).json({
-                      message: "List created",
-                      dsl_id,
-                      employees: data,
+                } else {
+                  db.select(
+                    "tbl_attendance.at_id as at_id",
+                    "tbl_attendance.emp_id as emp_id",
+                    db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
+                    "tbl_attendance.old_st_id as main_st_id",
+                    "tbl_attendance.st_id as st_id",
+                    "tbl_employees.salary_type as salary_type",
+                    "tbl_attendance.overtime as overtime",
+                    "tbl_attendance.worked_hours as worked_hours",
+                    "tbl_attendance.fine as fine",
+                    "tbl_attendance.fine_reason as fine_reason",
+                    "tbl_attendance.absent as absent",
+                    "tbl_attendance.location as location"
+                  )
+                    .from("tbl_attendance")
+                    .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
+                    .where("tbl_attendance.dsl_id", dsl_id)
+                    .then((data) => {
+                      return res.status(200).json({
+                        message: "List created",
+                        dsl_id,
+                        employees: data,
+                      });
                     });
-                  });
+                }
+                
               });
             });
         });
