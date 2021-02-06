@@ -46,7 +46,7 @@ router.post("/addList", (req, res) => {
               ]).then((data) => {
                 if(data.length > 0){
                   db("tbl_attendance").insert(data).then(() => {
-                    db("tbl_temp_attendance").where("st_id", req.body.st_id).andWhere("work_date", req.body.work_date).delete().then(() => { });
+                    // db("tbl_temp_attendance").where("st_id", req.body.st_id).andWhere("work_date", req.body.work_date).delete().then(() => { });
                     db.select(
                       "tbl_attendance.at_id as at_id",
                       "tbl_attendance.emp_id as emp_id",
