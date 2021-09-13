@@ -703,6 +703,16 @@ router.post('/getEmployeeBystaff/:st_id',(req,res)=>{
   });
 });
 
+router.post('/getAllEmployeeBystaff/:st_id',(req,res)=>{
+  db.raw("select CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone, tbl_employees.active_status as active_status from tbl_employees where st_id=?",[req.params.st_id]).then(([data])=>{
+    return res.status(200).send(data);
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: err
+    });
+  });
+});
+
 router.post('/getDeactivedEmployeeBystaff/:st_id',(req,res)=>{
   db.raw("select CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone from tbl_employees where st_id=? and active_status = '0'",[req.params.st_id]).then(([data])=>{
     return res.status(200).send(data);
