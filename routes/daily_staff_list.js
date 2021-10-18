@@ -12,9 +12,22 @@ router.post("/addList", (req, res) => {
       note: req.body.note,
       food_number: 0
     })
-    .then(([data]) => {
+    .then(async ([data]) => {
       var dsl_id = data;
-      db("tbl_employees")
+      const [[{maxID}]] = await db.raw('select max(dsl_id) as maxID from tbl_daily_staff_list');
+      if(maxID < dsl_id) {
+        try {
+          await db('tbl_daily_staff_list').where('dsl_id', dsl_id).delete();
+          return res.status(500).send({
+            message: 'Error, Please try again'
+          });
+        } catch (error) {
+          return res.status(500).send({
+            message: error
+          });
+        }
+      } else {
+        db("tbl_employees")
         .where("st_id", req.body.st_id)
         .andWhere("active_status", "1")
         .andWhereRaw("emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))",
@@ -102,6 +115,7 @@ router.post("/addList", (req, res) => {
               });
             });
         });
+      }
     })
     .catch((err) => {
       return res.status(500).json({
@@ -128,26 +142,40 @@ router.post("/createRestList", (req, res) => {
           location: "Rest",
           note: null,
           food_number: 0
-        }).then(([data]) => {
+        }).then(async ([data]) => {
           var dsl_id = data;
-          db("tbl_employees")
-            .where("st_id", obj.st_id)
-            .andWhere("active_status", "1")
-            .andWhereRaw("emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))",
-              [req.body.work_date]).select([
-              "emp_id as emp_id",
-              db.raw(dsl_id + " as dsl_id"),
-              db.raw("0 as overtime"),
-              db.raw("0 as worked_hours"),
-              db.raw("0 as fine"),
-              db.raw("null as fine_reason"),
-              db.raw("if(salary_type = 'Monthly', '2', '1') as absent"),
-              db.raw("'Rest' as location"),
-              db.raw(obj.st_id + " as st_id"),
-              db.raw(obj.st_id + " as old_st_id")
-            ]).then((data) => {
-              db("tbl_attendance").insert(data).then(() => {});
-            });
+          const [[{maxID}]] = await db.raw('select max(dsl_id) as maxID from tbl_daily_staff_list');
+          if(maxID < dsl_id) {
+            try {
+              await db('tbl_daily_staff_list').where('dsl_id', dsl_id).delete();
+              return res.status(500).send({
+                message: 'Error, Please try again'
+              });
+            } catch (error) {
+              return res.status(500).send({
+                message: error
+              });
+            }
+          } else {
+            db("tbl_employees")
+              .where("st_id", obj.st_id)
+              .andWhere("active_status", "1")
+              .andWhereRaw("emp_id not in (select emp_id from tbl_attendance where dsl_id in (select dsl_id from tbl_daily_staff_list where work_date = ?))",
+                [req.body.work_date]).select([
+                "emp_id as emp_id",
+                db.raw(dsl_id + " as dsl_id"),
+                db.raw("0 as overtime"),
+                db.raw("0 as worked_hours"),
+                db.raw("0 as fine"),
+                db.raw("null as fine_reason"),
+                db.raw("if(salary_type = 'Monthly', '2', '1') as absent"),
+                db.raw("'Rest' as location"),
+                db.raw(obj.st_id + " as st_id"),
+                db.raw(obj.st_id + " as old_st_id")
+              ]).then((data) => {
+                db("tbl_attendance").insert(data).then(() => {});
+              });
+          }
         });
       });
       return res.status(200).json({
