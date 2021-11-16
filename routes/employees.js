@@ -694,7 +694,7 @@ router.post('/topOvertime/:month/:year', async (req, res)=>{
 
 
 router.post('/getEmployeeBystaff/:st_id',(req,res)=>{
-  db.raw("select CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone from tbl_employees where st_id=? and active_status = '1'",[req.params.st_id]).then(([data])=>{
+  db.raw("select tbl_employees.emp_id as emp_id, CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone, tbl_employees.salary_type from tbl_employees where st_id=? and active_status = '1'",[req.params.st_id]).then(([data])=>{
     return res.status(200).send(data);
   }).catch((err)=>{
     return res.status(500).json({
@@ -721,6 +721,47 @@ router.post('/getDeactivedEmployeeBystaff/:st_id',(req,res)=>{
       message: err
     });
   });
+});
+
+
+// Debt Routes
+
+router.post('/addDebtTransaction', async (req, res) => {
+  const [dtID] = await db('tbl_debt_transactions').insert({
+    emp_id: req.body.emp_id,
+    transactionAmount: req.body.transactionType == 'Minus' ? req.body.transactionAmount * -1 : req.body.transactionAmount,
+    transactionType: req.body.transactionType,
+    transactionDate: db.fn.now(),
+    note: req.body.note || null
+  });
+  return res.status(200).send({dtID});
+});
+
+router.patch('/updateDebtTransaction/:dtID', async (req, res) => {
+  try {
+    await db('tbl_debt_transactions').where('dtID', req.params.dtID).update({
+      transactionAmount: req.body.transactionType == 'Minus' ? req.body.transactionAmount * -1 : req.body.transactionAmount,
+      transactionType: req.body.transactionType,
+      note: req.body.note || null
+    });
+    return res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.delete('/deleteDebtTransaction/:dtID', async (req, res) => {
+  try {
+    await db('tbl_debt_transactions').where('dtID', req.params.dtID).delete();
+    return res.sendStatus(200);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.get('/getEmployeeTransaction/:emp_id', async (req, res) => {
+  const transactions = await db('tbl_debt_transactions').where('emp_id', req.params.emp_id).select().orderBy('dtID', 'desc');
+  return res.status(200).send(transactions);
 });
 
 module.exports = router;
