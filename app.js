@@ -54,6 +54,7 @@ app.use('/index', indexRouter);
 app.use('/gived_salary', giveSalaryRouter);
 app.use('/expirePassport', expirePassportRouter);
 
+
 app.post("/isLogged", (req, res) => {
   if(req.session.isLogged == true) {
     return res.status(200).send(true);
