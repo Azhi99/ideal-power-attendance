@@ -49,6 +49,13 @@ router.post('/addListOfEmployees/:st_id', (req, res) => {
         db.raw("'1' as gived_status"),
         "food_money",
         "transport_money",
+        "cabina_money",
+        "fine_money",
+        "expense_money",
+        "loan_money",
+        "accomodation_money",
+        "other_expense",
+        "other_minus",
       ]).then((data) => {
         db("tbl_gived_salary").where("salary_month", req.body.salary_month).andWhere("salary_year", req.body.salary_year).update({
             dollar_price: req.body.dollar_price

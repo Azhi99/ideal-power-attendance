@@ -7,6 +7,7 @@ router.post("/addStaff", (req, res) => {
     .insert({
       en_id: req.body.en_id,
       staff_name: req.body.staff_name,
+      show_staff: '1'
     })
     .then(([data]) => {
       return res.status(200).json({
@@ -34,6 +35,34 @@ router.patch("/updateStaff/:st_id", (req, res) => {
       });
     })
     .catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
+
+router.patch("/showOff/:st_id", (req, res) => {
+  db("tbl_staffs").where("st_id", req.params.st_id).update({
+      show_staff: '0'
+    }).then(() => {
+      return res.status(200).json({
+        message: "Staff Updated",
+      });
+    }).catch((err) => {
+      return res.status(500).json({
+        message: err,
+      });
+    });
+});
+
+router.patch("/showOn/:st_id", (req, res) => {
+  db("tbl_staffs").where("st_id", req.params.st_id).update({
+      show_staff: '1'
+    }).then(() => {
+      return res.status(200).json({
+        message: "Staff Updated",
+      });
+    }).catch((err) => {
       return res.status(500).json({
         message: err,
       });

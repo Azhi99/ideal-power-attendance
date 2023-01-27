@@ -168,7 +168,7 @@ router.post("/createRestList", (req, res) => {
                 db.raw("0 as worked_hours"),
                 db.raw("0 as fine"),
                 db.raw("null as fine_reason"),
-                db.raw("if(salary_type = 'Monthly', '2', '1') as absent"),
+                db.raw("'2' as absent"),
                 db.raw("'Rest' as location"),
                 db.raw(obj.st_id + " as st_id"),
                 db.raw(obj.st_id + " as old_st_id")

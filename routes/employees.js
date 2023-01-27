@@ -59,6 +59,13 @@ router.post("/addEmployee", createValidation, (req, res) => {
       country: req.body.country,
       food_money: req.body.food_money,
       transport_money: req.body.transport_money,
+      cabina_money: req.body.cabina_money,
+      expense_money: req.body.expense_money,
+      fine_money: req.body.fine_money,
+      loan_money: req.body.loan_money,
+      accomodation_money: req.body.accomodation_money,
+      other_expense: req.body.other_expense,
+      other_minus: req.body.other_minus,
       expiry_passport: req.body.expiry_passport || null
     })
     .then(([data]) => {
@@ -147,6 +154,13 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           country: req.body.country,
           food_money: req.body.food_money,
           transport_money: req.body.transport_money,
+          cabina_money: req.body.cabina_money,
+          expense_money: req.body.expense_money,
+          fine_money: req.body.fine_money,
+          loan_money: req.body.loan_money,
+          accomodation_money: req.body.accomodation_money,
+          other_expense: req.body.other_expense,
+          other_minus: req.body.other_minus,
           expiry_passport: req.body.expiry_passport || null
         })
         .then(() => {
@@ -404,6 +418,13 @@ router.post("/getData", (req, res) => {
     "tbl_employees.country as country",
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
     "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
@@ -441,6 +462,13 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.country as country",
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
     "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
@@ -476,6 +504,13 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.country as country",
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
     "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
@@ -512,6 +547,13 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.country as country",
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
     "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
@@ -548,6 +590,13 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.country as country",
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
     "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
@@ -584,6 +633,13 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.country as country",
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
     "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
@@ -639,6 +695,13 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.country as country",
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
     "tbl_employees.expiry_passport as expiry_passport"
   )
     .from("tbl_employees")
@@ -666,7 +729,14 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
       "daily_salary",
       "hour_salary",
       "food_money",
-      "transport_money"
+      "transport_money",
+      "cabina_money",
+      "expense_money",
+      "fine_money",
+      "loan_money",
+      "accomodation_money",
+      "other_expense",
+      "other_minus",
     ]).limit(1);
   const gs_id = (typeof gived_salary == "undefined" ? null: gived_salary.gs_id);
   const [[employee]] = await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
@@ -763,5 +833,37 @@ router.get('/getEmployeeTransaction/:emp_id', async (req, res) => {
   const transactions = await db('tbl_debt_transactions').where('emp_id', req.params.emp_id).select().orderBy('dtID', 'desc');
   return res.status(200).send(transactions);
 });
+
+router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, res) => {
+  const [salary_list] = await db.raw(`
+  SELECT
+      tbl_employees.emp_id,
+      concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as employee_full_name,
+      tbl_employees.salary_type,
+      tbl_employees.monthly_salary,
+      tbl_employees.daily_salary,
+      tbl_employees.hour_salary,
+      employee_final_with_give_salary.date_to_m,
+      employee_final_with_give_salary.date_to_y,
+      tbl_employees.st_id,
+      employee_final_with_give_salary.count_present,
+      employee_final_with_give_salary.total_o,
+      employee_final_with_give_salary.total_h_not_work,
+      (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
+      employee_final_with_give_salary.total_o_s,
+      employee_final_with_give_salary.food_money,
+      employee_final_with_give_salary.transport_money,
+      employee_final_with_give_salary.cabina_money,
+      employee_final_with_give_salary.expense_money,
+      employee_final_with_give_salary.fine_money,
+      employee_final_with_give_salary.loan_money,
+      employee_final_with_give_salary.accomodation_money,
+      employee_final_with_give_salary.other_expense,
+      employee_final_with_give_salary.other_minus
+      from tbl_employees JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
+      WHERE tbl_employees.st_id = ${req.params.staff_id} AND employee_final_with_give_salary.date_to_m = ${req.params.month} AND employee_final_with_give_salary.date_to_y = ${req.params.year}
+  `);
+  return res.status(200).send(salary_list);
+})
 
 module.exports = router;
