@@ -1,7 +1,7 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "9c8c352322642d9b7630",
-    "url": "/css/app.589f7fec.css"
+    "revision": "9a7822f248240eb1e038",
+    "url": "/css/app.9639cbc2.css"
   },
   {
     "revision": "4bafd636804289cec151",
@@ -12,16 +12,20 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/fonts/NRT-Reg.dc9a8bb1.ttf"
   },
   {
+    "revision": "9f1406b965f5e3bc69d8d7cb9292123b",
+    "url": "/img/Ideal power logo.9f1406b9.png"
+  },
+  {
     "revision": "cf01e118ab7e6921ed3e27d2cd0e3a41",
     "url": "/img/logo.cf01e118.png"
   },
   {
-    "revision": "ee9bf647cb55dfcc16c40ce17af655df",
+    "revision": "0eb3e5d2eae7a0a2b19affa5e45951a7",
     "url": "/index.html"
   },
   {
-    "revision": "9c8c352322642d9b7630",
-    "url": "/js/app.022e226b.js"
+    "revision": "9a7822f248240eb1e038",
+    "url": "/js/app.55ae8968.js"
   },
   {
     "revision": "4bafd636804289cec151",
