@@ -763,8 +763,31 @@ router.post('/topOvertime/:month/:year', async (req, res)=>{
 });
 
 
-router.post('/getEmployeeBystaff/:st_id',(req,res)=>{
-  db.raw("select tbl_employees.emp_id as emp_id, CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone, tbl_employees.salary_type from tbl_employees where st_id=? and active_status = '1'",[req.params.st_id]).then(([data])=>{
+router.post('/getEmployeeBystaff/:st_id/:month/:year',(req,res)=>{
+  // db.raw(`select 
+  //   tbl_employees.emp_id as emp_id, 
+  //   CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , 
+  //   tbl_employees.phone as phone, 
+  //   tbl_employees.salary_type 
+  //   from tbl_employees where st_id=? and active_status = '1'`,[req.params.st_id]).then(([data])=>{
+  //   return res.status(200).send(data);
+  // }).catch((err)=>{
+  //   return res.status(500).json({
+  //     message: err
+  //   });
+  // });
+  db.raw(`
+  select 
+    tbl_employees.emp_id as emp_id, 
+    CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , 
+    tbl_employees.phone as phone, 
+    tbl_employees.salary_type 
+    from tbl_employees where tbl_employees.emp_id in (
+      select emp_id from tbl_attendance where dsl_id in (
+          select dsl_id from tbl_daily_staff_list where MONTH(work_date) = ${req.params.month} and year(work_date) = ${req.params.year}
+        ) and old_st_id = ${req.params.st_id}
+    )
+  `).then(([data])=>{
     return res.status(200).send(data);
   }).catch((err)=>{
     return res.status(500).json({
