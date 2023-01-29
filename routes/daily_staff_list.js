@@ -10,7 +10,8 @@ router.post("/addList", (req, res) => {
       user: req.body.user,
       location: req.body.location,
       note: req.body.note,
-      food_number: 0
+      food_number: 0,
+      food_group: 'A'
     })
     .then(async ([data]) => {
       var dsl_id = data;
@@ -141,7 +142,8 @@ router.post("/createRestList", (req, res) => {
           user: req.body.user,
           location: "Rest",
           note: null,
-          food_number: 0
+          food_number: 0,
+          food_group: null
         }).then(async ([data]) => {
           var dsl_id = data;
           const [[{maxID}]] = await db.raw('select max(dsl_id) as maxID from tbl_daily_staff_list');
@@ -188,7 +190,8 @@ router.patch("/updateList/:dsl_id", (req, res) => {
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
     location: req.body.location,
     note: req.body.note,
-    food_number:req.body.food_number
+    food_number:req.body.food_number,
+    food_group:req.body.food_group
   }).then(()=>{
       return res.status(200).json({
           message:"List Updated"
@@ -275,7 +278,8 @@ router.post("/getDailyList", async (req, res) => {
     "tbl_daily_staff_list.st_id as st_id",
     "tbl_daily_staff_list.location as location",
     "tbl_daily_staff_list.note as note",
-    "tbl_daily_staff_list.food_number as food_number"
+    "tbl_daily_staff_list.food_number as food_number",
+    "tbl_daily_staff_list.food_group as food_group"
   )
     .from("tbl_daily_staff_list")
     .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
@@ -316,6 +320,7 @@ router.post('/getFoods', async (req, res) => {
   const staff_foods = await db.select(
     "tbl_staffs.staff_name as staff_name",
     "tbl_daily_staff_list.food_number as food_number",
+    "tbl_daily_staff_list.food_group as food_group",
     "tbl_daily_staff_list.location as location"
   ).from("tbl_daily_staff_list")
    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_daily_staff_list.st_id")
@@ -342,5 +347,78 @@ router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
     });
   });
 });
+
+router.patch('/setFoodGroup/:dsl_id', (req, res)=>{
+  db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
+    food_group:req.body.food_group
+  }).then(() => {
+    return res.status(200).json({
+      message:"food number updated"
+    });
+  }).catch((err) => {
+    return res.status(500).json({
+      err
+    });
+  });
+});
+
+router.get('/getFoodList/:month/:year', async (req, res) => {
+  const [saved] = await db.raw(`
+    SELECT 
+      tbl_foods_save.food_save_id,
+      tbl_foods_save.dsl_id,
+      tbl_daily_staff_list.st_id,
+      tbl_staffs.staff_name,
+      tbl_foods_save.food_group,
+      tbl_foods_save.food_number,
+      tbl_foods_save.price_A,
+      tbl_foods_save.price_B,
+      tbl_foods_save.price_C,
+      tbl_foods_save.price_D,
+      tbl_foods_save.price_E,
+      tbl_foods_save.month,
+      tbl_foods_save.year
+    FROM tbl_foods_save
+    JOIN tbl_daily_staff_list ON tbl_foods_save.dsl_id = tbl_daily_staff_list.dsl_id
+    JOIN tbl_staffs ON tbl_daily_staff_list.st_id = tbl_staffs.st_id
+    WHERE tbl_foods_save.month = ${req.params.month} AND tbl_foods_save.year = ${req.params.year}
+  `); 
+  if(saved.length > 0){
+    return res.status(200).send({
+      data: saved,
+      message: true
+    });
+  } else {
+    const [rows] = await db.raw(`
+      SELECT
+        tbl_daily_staff_list.dsl_id as dsl_id,
+        tbl_daily_staff_list.st_id as st_id,
+        tbl_staffs.staff_name as staff_name,
+        MONTH(tbl_daily_staff_list.work_date) as month,
+        YEAR(tbl_daily_staff_list.work_date) as year,
+        SUM(tbl_daily_staff_list.food_number) as food_number,
+        tbl_daily_staff_list.food_group as food_group,
+        0 as price_A,
+        0 as price_B,
+        0 as price_C,
+        0 as price_D,
+        0 as price_E
+          FROM tbl_daily_staff_list
+        JOIN tbl_staffs ON tbl_daily_staff_list.st_id = tbl_staffs.st_id
+        WHERE MONTH(tbl_daily_staff_list.work_date) = ${req.params.month} AND YEAR(tbl_daily_staff_list.work_date) = ${req.params.year}
+        GROUP BY tbl_daily_staff_list.st_id, MONTH(tbl_daily_staff_list.work_date), YEAR(tbl_daily_staff_list.work_date)
+    `);
+    
+    return res.status(200).send({
+      data: rows,
+      message: false
+    });
+  }
+})
+
+router.post('/saveFoodList', async (req, res) => {
+  await db('tbl_foods_save').insert(req.body.list);
+  return res.sendStatus(200);
+})
 
 module.exports = router;

@@ -871,6 +871,7 @@ router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, re
       tbl_employees.st_id,
       employee_final_with_give_salary.count_present,
       employee_final_with_give_salary.total_o,
+      employee_final_with_give_salary.total_fine,
       employee_final_with_give_salary.total_h_not_work,
       (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
       employee_final_with_give_salary.total_o_s,
@@ -883,8 +884,9 @@ router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, re
       employee_final_with_give_salary.accomodation_money,
       employee_final_with_give_salary.other_expense,
       employee_final_with_give_salary.other_minus
-      from tbl_employees JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
-      WHERE tbl_employees.st_id = ${req.params.staff_id} AND employee_final_with_give_salary.date_to_m = ${req.params.month} AND employee_final_with_give_salary.date_to_y = ${req.params.year}
+      from tbl_employees 
+      JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
+      WHERE tbl_employees.st_id = ${req.params.staff_id} AND employee_final_with_give_salary.date_to_m = ${req.params.month} AND employee_final_with_give_salary.date_to_y = ${req.params.year} 
   `);
   return res.status(200).send(salary_list);
 })
