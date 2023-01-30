@@ -872,6 +872,7 @@ router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, re
       employee_final_with_give_salary.count_present,
       employee_final_with_give_salary.total_o,
       employee_final_with_give_salary.total_fine,
+      employee_final_with_give_salary.total_f,
       employee_final_with_give_salary.total_h_not_work,
       (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
       employee_final_with_give_salary.total_o_s,
