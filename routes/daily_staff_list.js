@@ -431,4 +431,27 @@ router.post('/saveFoodList', async (req, res) => {
   return res.sendStatus(200);
 })
 
+router.get('/getFoodsByStaff/:month/:year/:st_id', (req, res) => {
+  db.raw(`
+    SELECT tbl_daily_staff_list.st_id,
+      tbl_staffs.staff_name,
+      tbl_daily_staff_list.food_group,
+      tbl_daily_staff_list.food_number,
+      tbl_daily_staff_list.datetime_food,
+      tbl_daily_staff_list.work_date,
+      tbl_daily_staff_list.dsl_id
+    FROM tbl_daily_staff_list
+    JOIN tbl_staffs ON tbl_daily_staff_list.st_id = tbl_staffs.st_id
+    WHERE tbl_daily_staff_list.st_id = ${req.params.st_id} AND MONTH(tbl_daily_staff_list.work_date) = ${req.params.month} AND YEAR(tbl_daily_staff_list.work_date) = ${req.params.year}
+  `).then(([data]) => {
+    return res.status(200).send(data);
+  })
+})
+
+router.delete('/deleteFoodList/:month/:year', (req, res) => {
+  db('tbl_foods_save').where('month', req.params.month).andWhere('year', req.params.year).del().then(() => {
+    return res.sendStatus(200);
+  })
+})
+
 module.exports = router;
