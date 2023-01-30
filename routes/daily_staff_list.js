@@ -11,7 +11,9 @@ router.post("/addList", (req, res) => {
       location: req.body.location,
       note: req.body.note,
       food_number: 0,
-      food_group: 'A'
+      food_group: null,
+      datetime_list: req.body.datetime_list,
+      datetime_food: null,
     })
     .then(async ([data]) => {
       var dsl_id = data;
@@ -143,7 +145,9 @@ router.post("/createRestList", (req, res) => {
           location: "Rest",
           note: null,
           food_number: 0,
-          food_group: null
+          food_group: null,
+          datetime_list: req.body.datetime_list,
+          datetime_food: null
         }).then(async ([data]) => {
           var dsl_id = data;
           const [[{maxID}]] = await db.raw('select max(dsl_id) as maxID from tbl_daily_staff_list');
@@ -191,7 +195,8 @@ router.patch("/updateList/:dsl_id", (req, res) => {
     location: req.body.location,
     note: req.body.note,
     food_number:req.body.food_number,
-    food_group:req.body.food_group
+    food_group:req.body.food_group,
+    datetime_list: req.body.datetime_list,
   }).then(()=>{
       return res.status(200).json({
           message:"List Updated"
@@ -336,7 +341,8 @@ router.post('/getFoods', async (req, res) => {
 
 router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
-    food_number:req.body.food_number
+    food_number:req.body.food_number,
+    datetime_food: req.body.datetime_food
   }).then(() => {
     return res.status(200).json({
       message:"food number updated"
@@ -350,7 +356,8 @@ router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
 
 router.patch('/setFoodGroup/:dsl_id', (req, res)=>{
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
-    food_group:req.body.food_group
+    food_group:req.body.food_group,
+    datetime_food: req.body.datetime_food
   }).then(() => {
     return res.status(200).json({
       message:"food number updated"
@@ -371,6 +378,7 @@ router.get('/getFoodList/:month/:year', async (req, res) => {
       tbl_staffs.staff_name,
       tbl_foods_save.food_group,
       tbl_foods_save.food_number,
+      tbl_foods_save.price_barzayakan,
       tbl_foods_save.price_A,
       tbl_foods_save.price_B,
       tbl_foods_save.price_C,
@@ -398,6 +406,7 @@ router.get('/getFoodList/:month/:year', async (req, res) => {
         YEAR(tbl_daily_staff_list.work_date) as year,
         SUM(tbl_daily_staff_list.food_number) as food_number,
         tbl_daily_staff_list.food_group as food_group,
+        0 as price_barzayakan,
         0 as price_A,
         0 as price_B,
         0 as price_C,

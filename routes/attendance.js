@@ -15,7 +15,10 @@ router.post("/addAttendance", (req, res) => {
         location: req.body.location,
         st_id: req.body.st_id,
         old_st_id: req.body.st_id
-    }).then(([data]) => {
+    }).then(async ([data]) => {
+        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            datetime_list: req.body.datetime_list
+        })
         return res.status(200).json({
             message: "Attendance Added",
             at_id: data
@@ -47,7 +50,10 @@ router.patch("/setAbsent/:at_id", (req, res) => {
         absent: "1",
         worked_hours: 0,
         overtime: 0
-    }).then(() => {
+    }).then(async () => {
+        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            datetime_list: req.body.datetime_list
+        })
         return res.status(200).json({
             message: "Absented"
         });
@@ -62,7 +68,10 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         absent: "0",
         worked_hours: 8
-    }).then(() => {
+    }).then(async () => {
+        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            datetime_list: req.body.datetime_list
+        })
         return res.status(200).json({
             message: "Absent canceled"
         });
@@ -78,7 +87,10 @@ router.patch("/setOff/:at_id", (req, res) => {
         absent: "2",
         worked_hours: 0,
         overtime: 0
-    }).then(() => {
+    }).then(async () => {
+        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            datetime_list: req.body.datetime_list
+        })
         return res.status(200).json({
             message: "Setted to Off"
         });
@@ -110,7 +122,10 @@ router.patch('/updateAttendance/:at_id',(req, res)=>{
 router.patch('/setWorkedHours/:at_id',(req, res)=>{
     db('tbl_attendance').where('at_id', req.params.at_id).update({
         worked_hours: req.body.worked_hours
-    }).then(()=>{
+    }).then(async ()=>{
+        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            datetime_list: req.body.datetime_list
+        })
         return res.status(200).json({
             message: 'Update'
         });
@@ -124,7 +139,10 @@ router.patch('/setWorkedHours/:at_id',(req, res)=>{
 router.patch('/setOvertime/:at_id',(req, res)=>{
     db('tbl_attendance').where('at_id', req.params.at_id).update({
         overtime: req.body.overtime
-    }).then(()=>{
+    }).then(async ()=>{
+        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            datetime_list: req.body.datetime_list
+        })
         return res.status(200).json({
             message: 'Update'
         });
@@ -138,7 +156,10 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
 router.patch("/setLocation/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         location: req.body.location
-    }).then(() => {
+    }).then(async () => {
+        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            datetime_list: req.body.datetime_list
+        })
         return res.status(200).json({
             message: "Updated"
         });
