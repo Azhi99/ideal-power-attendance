@@ -326,6 +326,7 @@ router.post('/getFoods', async (req, res) => {
     "tbl_staffs.staff_name as staff_name",
     "tbl_daily_staff_list.food_number as food_number",
     "tbl_daily_staff_list.food_group as food_group",
+    "tbl_daily_staff_list.datetime_food as datetime_food",
     "tbl_daily_staff_list.location as location"
   ).from("tbl_daily_staff_list")
    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_daily_staff_list.st_id")
