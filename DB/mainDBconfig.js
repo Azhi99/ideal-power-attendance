@@ -5,7 +5,8 @@ const db = require("knex")({
         host: process.env.HOST,
         user: process.env.USER,
         password: process.env.PASS,
-        database: process.env.MAIN_DB
+        database: process.env.MAIN_DB,
+        timezone: 'utc'
     }
 });
 
