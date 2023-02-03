@@ -18,6 +18,7 @@ const attendanceRouter = require('./routes/attendance');
 const indexRouter = require("./routes/indexPage.js");
 const giveSalaryRouter = require("./routes/gived_salary.js");
 const expirePassportRouter = require("./routes/expirePassport.js");
+const staffExpensesRouter = require("./routes/staff_expenses.js");
 
 const app = express();
 var port = process.env.PORT;
@@ -53,6 +54,7 @@ app.use('/attendance',attendanceRouter);
 app.use('/index', indexRouter);
 app.use('/gived_salary', giveSalaryRouter);
 app.use('/expirePassport', expirePassportRouter);
+app.use('/staff_expenses', staffExpensesRouter);
 
 
 app.post("/isLogged", (req, res) => {

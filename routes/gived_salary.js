@@ -78,6 +78,18 @@ router.post('/addListOfEmployees/:st_id', (req, res) => {
       });
 });
 
+router.delete('/deleteGiveSalary/:month/:year/:st_id', (req, res) => {
+    db.raw(`
+        delete from tbl_gived_salary where emp_id in (
+            select emp_id from tbl_employees where st_id=${req.params.st_id}
+        ) and salary_month=${req.params.month} and salary_year=${req.params.year}
+    `).then(() => {
+        res.sendStatus(200)
+    }).catch(() => {
+        res.sendStatus(500)
+    })
+})
+
 router.post('/getPreGivedSalary/:st_id/:month/:year', (req, res) => {
     db("pre_gived_salary")
       .where("st_id", req.params.st_id)

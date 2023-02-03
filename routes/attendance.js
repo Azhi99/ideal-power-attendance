@@ -11,6 +11,16 @@ router.post("/addAttendance", (req, res) => {
         worked_hours: 8,
         fine: 0,
         fine_reason: null,
+        expense: 0,
+        expense_reason: null,
+        transport: 0,
+        transport_reason: null,
+        food: 0,
+        food_reason: null,
+        loan: 0,
+        loan_reason: null,
+        accomodation: 0,
+        accomodation_reason: null,
         absent: "0",
         location: req.body.location,
         st_id: req.body.st_id,
@@ -107,7 +117,17 @@ router.patch("/setOff/:at_id", (req, res) => {
 router.patch('/updateAttendance/:at_id',(req, res)=>{
     db('tbl_attendance').where('at_id', req.params.at_id).update({
         fine:req.body.fine,
-        fine_reason:req.body.fine_reason
+        fine_reason:req.body.fine_reason || null,
+        expense: req.body.expense || 0,
+        expense_reason: req.body.expense_reason || null,
+        transport: req.body.transport || 0,
+        transport_reason: req.body.transport_reason || null,
+        food: req.body.food || 0,
+        food_reason: req.body.food_reason || null,
+        loan: req.body.loan || 0,
+        loan_reason: req.body.loan_reason || null,
+        accomodation: req.body.accomodation || 0,
+        accomodation_reason: req.body.accomodation_reason || null,
     }).then(()=>{
         return res.status(200).json({
             message:'Update'
@@ -207,6 +227,16 @@ router.patch("/changeStaff/:at_id/:st_id/:work_date/:old_st_id", (req, res) => {
                 worked_hours: req.body.worked_hours,
                 fine: req.body.fine,
                 fine_reason: req.body.fine_reason,
+                expense: req.body.expense || 0,
+                expense_reason: req.body.expense_reason || null,
+                transport: req.body.transport || 0,
+                transport_reason: req.body.transport_reason || null,
+                food: req.body.food || 0,
+                food_reason: req.body.food_reason || null,
+                loan: req.body.loan || 0,
+                loan_reason: req.body.loan_reason || null,
+                accomodation: req.body.accomodation || 0,
+                accomodation_reason: req.body.accomodation_reason || null,
                 absent: req.body.absent,
                 work_date: req.body.work_date
             }).then(() => {
