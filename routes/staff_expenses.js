@@ -4,24 +4,24 @@ const db = require("../DB/mainDBconfig.js");
 const router = express.Router();
 
 router.get('/all', async (req, res) => {
-    const rows = await db.select("*").table('staff_expenses')
+    const rows = await db.select("*").table('staff_expenses_view').orderBy('staff_expense_id', 'desc')
     return res.status(200).send(rows)
 })
 
 router.post('/create', async (req, res) => {
     const insert = await db('staff_expenses').insert(req.body)
-    const insertedData = await db.select("*").table('staff_expenses').where('staff_expense_id', insert[0])
+    const insertedData = await db.select("*").table('staff_expenses_view').where('staff_expense_id', insert[0])
         .then(data => {
-            return data
+            return data[0]
         })
     return res.status(200).send(insertedData)
 })
 
-router.put('/update/:id', async (req, res) => {
+router.patch('/update/:id', async (req, res) => {
     const update = await db('staff_expenses').where('staff_expense_id', req.params.id).update(req.body)
-    const updatedData = await db.select("*").table('staff_expenses').where('staff_expense_id', req.params.id)
+    const updatedData = await db.select("*").table('staff_expenses_view').where('staff_expense_id', req.params.id)
         .then(data => {
-            return data
+            return data[0]
         })
     return res.status(200).send(updatedData)
 })
@@ -33,7 +33,5 @@ router.delete('/delete/:id', (req, res) => {
         return res.sendStatus(500)
     })
 })
-
-router.delete('/delete_list', (req, res) => {})
 
 module.exports = router;
