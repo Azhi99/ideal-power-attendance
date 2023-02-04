@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "368b39473d3b370cfd64",
-    "url": "/css/app.712d3cfc.css"
+    "revision": "8b0bc6cd1e07e6455b41",
+    "url": "/css/app.a06b9fc9.css"
   },
   {
-    "revision": "ccaab24806a72f35516c",
+    "revision": "11e6b89213ccdc46c13c",
     "url": "/css/chunk-vendors.b5f4c9b6.css"
   },
   {
@@ -16,20 +16,24 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/Ideal power logo.9f1406b9.png"
   },
   {
+    "revision": "d2ad0bc0357859f23ead713ac61f02a7",
+    "url": "/img/footer.d2ad0bc0.png"
+  },
+  {
     "revision": "cf01e118ab7e6921ed3e27d2cd0e3a41",
     "url": "/img/logo.cf01e118.png"
   },
   {
-    "revision": "b27c9f44e488315b54e0f6e43e616d99",
+    "revision": "e461f8c95835356e283d8358f0d31ca6",
     "url": "/index.html"
   },
   {
-    "revision": "368b39473d3b370cfd64",
-    "url": "/js/app.d04da7bf.js"
+    "revision": "8b0bc6cd1e07e6455b41",
+    "url": "/js/app.353db07c.js"
   },
   {
-    "revision": "ccaab24806a72f35516c",
-    "url": "/js/chunk-vendors.8434b217.js"
+    "revision": "11e6b89213ccdc46c13c",
+    "url": "/js/chunk-vendors.d1c112d7.js"
   },
   {
     "revision": "fdcbedf4fcf82b1666fbcaab5586fb22",
