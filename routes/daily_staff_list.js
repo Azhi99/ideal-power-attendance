@@ -146,14 +146,14 @@ router.post("/addList", (req, res) => {
                     .from("tbl_attendance")
                     .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
                     .where("tbl_attendance.dsl_id", dsl_id)
-                    .then((data) => {
+                    .then( (data) => {
                       // await db('tbl_log').insert({
                       //   dsl_id,
                       //   st_id: req.body.st_id,
                       //   user: req.body.user,
                       //   datetime_log: req.body.datetime_log,
                       //   work: `
-                        
+                      //     دروستکردنی لیستی ${dsl_id} بۆ ${req.body.work_date} 
                       //   `
                       // });
                       return res.status(200).json({
