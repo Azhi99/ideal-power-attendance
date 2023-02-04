@@ -3,6 +3,15 @@ const db = require("../DB/mainDBconfig.js");
 
 const router = express.Router();
 
+router.get('/getDataByStaff/:st_id/:from/:to', async (req, res) => {
+    const rows = await db.raw(`
+        SELECT * FROM staff_expenses_view WHERE st_id = ${req.params.st_id} AND expense_date BETWEEN '${req.params.from}' AND '${req.params.to}'
+    `).then(data => {
+        return data[0]
+    });
+    return res.status(200).send(rows)
+})
+
 router.get('/all', async (req, res) => {
     const rows = await db.select("*").table('staff_expenses_view').orderBy('staff_expense_id', 'desc')
     return res.status(200).send(rows)
