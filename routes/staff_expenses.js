@@ -5,7 +5,9 @@ const router = express.Router();
 
 router.get('/getDataByStaff/:st_id/:from/:to', async (req, res) => {
     const rows = await db.raw(`
-        SELECT * FROM staff_expenses_view WHERE st_id = ${req.params.st_id} AND expense_date BETWEEN '${req.params.from}' AND '${req.params.to}'
+        SELECT * FROM staff_expenses_view 
+            WHERE st_id = ${req.params.st_id} AND expense_date BETWEEN '${req.params.from}' AND '${req.params.to}'
+            ORDER BY expense_date ASC
     `).then(data => {
         return data[0]
     });
