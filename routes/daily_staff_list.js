@@ -146,16 +146,16 @@ router.post("/addList", (req, res) => {
                     .from("tbl_attendance")
                     .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
                     .where("tbl_attendance.dsl_id", dsl_id)
-                    .then( (data) => {
-                      // await db('tbl_log').insert({
-                      //   dsl_id,
-                      //   st_id: req.body.st_id,
-                      //   user: req.body.user,
-                      //   datetime_log: req.body.datetime_log,
-                      //   work: `
-                      //     دروستکردنی لیستی ${dsl_id} بۆ ${req.body.work_date} 
-                      //   `
-                      // });
+                    .then(async (data) => {
+                      await db('tbl_log').insert({
+                        dsl_id,
+                        st_id: req.body.st_id,
+                        user: req.body.user,
+                        datetime_log: req.body.datetime_log,
+                        work: (`
+                          دروستکردنی لیستی ژمارە ${dsl_id} بۆ ${req.body.work_date} لەشوێنەکانی (${req.body.location}) بە تێبینی: ${req.body.note ? req.body.note : ''}
+                        `).trim()
+                      });
                       return res.status(200).json({
                         message: "List created",
                         dsl_id,
@@ -237,8 +237,17 @@ router.post("/createRestList", (req, res) => {
                 db.raw("'Rest' as location"),
                 db.raw(obj.st_id + " as st_id"),
                 db.raw(obj.st_id + " as old_st_id")
-              ]).then((data) => {
+              ]).then(async (data) => {
                 db("tbl_attendance").insert(data).then(() => {});
+                await db('tbl_log').insert({
+                  dsl_id,
+                  st_id: obj.st_id,
+                  user: req.body.user,
+                  datetime_log: req.body.datetime_log,
+                  work: (`
+                    دروست کردنی لیست بۆ ستافەکان بۆ ڕۆژی ${req.body.work_date} بە پشوو
+                  `).trim()
+                });
               });
           }
         });
@@ -256,14 +265,25 @@ router.patch("/updateList/:dsl_id", (req, res) => {
     food_number:req.body.food_number,
     food_group:req.body.food_group,
     datetime_list: req.body.datetime_list,
-  }).then(()=>{
-      return res.status(200).json({
-          message:"List Updated"
-      })
+  }).then(async ()=>{
+    await db('tbl_log').insert({
+      dsl_id: req.params.dsl_id,
+      st_id: req.body.st_id,
+      user: req.body.user,
+      datetime_log: req.body.datetime_log,
+      work: (`
+        گۆڕانکاری لە لیست
+        شوێنەکان: ${req.body.location}
+        تێبینی: ${req.body.note}
+      `).trim()
+    })
+    return res.status(200).json({
+        message:"List Updated"
+    })
   }).catch((err)=>{
-      return res.status(500).json({
-          message:err
-      })
+    return res.status(500).json({
+        message:err
+    })
   })
 });
 
@@ -414,7 +434,16 @@ router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
     food_number:req.body.food_number,
     datetime_food: req.body.datetime_food
-  }).then(() => {
+  }).then(async () => {
+    await db('tbl_log').insert({
+      dsl_id: req.params.dsl_id,
+      st_id: req.body.st_id,
+      user: req.body.user,
+      datetime_log: req.body.datetime_log,
+      work: (`
+        گۆڕینی ژمارەی خواردن بۆ ${req.body.food_number}
+      `).trim()
+    });
     return res.status(200).json({
       message:"food number updated"
     });
@@ -429,7 +458,16 @@ router.patch('/setFoodGroup/:dsl_id', (req, res)=>{
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
     food_group:req.body.food_group,
     datetime_food: req.body.datetime_food
-  }).then(() => {
+  }).then(async () => {
+    await db('tbl_log').insert({
+      dsl_id: req.params.dsl_id,
+      st_id: req.body.st_id,
+      user: req.body.user,
+      datetime_log: req.body.datetime_log,
+      work: (`
+        گۆڕینی گروپی خواردن بۆ ${req.body.food_group}
+      `).trim()
+    });
     return res.status(200).json({
       message:"food number updated"
     });

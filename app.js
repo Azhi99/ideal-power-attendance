@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
 
 const db_user = require("./DB/userDBconfig.js");
+const db = require("./DB/mainDBconfig.js"); 
 
 const jobRouter = require("./routes/job.js");
 const staffRouter = require("./routes/staff.js");
@@ -116,6 +117,22 @@ app.post("/login", loginLimiter, (req, res) => {
     });
   }
 });
+
+app.get('/getNames', (req, res) => {
+  db('names').select().first().then(data => {
+    return res.status(200).send(data)
+  })
+})
+
+app.post('/setNames', (req, res) => {
+  db('names').whereRaw('1=1').update({
+    manager: req.body.manager,
+    accountant: req.body.accountant,
+    kargeri: req.body.kargeri,
+  }).then(data => {
+    return res.sendStatus(200)
+  })
+})
 
 app.post("/logout", (req, res) => {
   req.session.destroy();

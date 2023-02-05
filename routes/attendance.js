@@ -29,6 +29,15 @@ router.post("/addAttendance", (req, res) => {
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list
         })
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            datetime_log: req.body.datetime_log,
+            work: (`
+                داخڵکردنی ${req.body.employee}
+            `).trim()
+        });
         return res.status(200).json({
             message: "Attendance Added",
             at_id: data
@@ -64,6 +73,14 @@ router.patch("/setAbsent/:at_id", (req, res) => {
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list
         })
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                غیاب کردنی ${req.body.employee}
+            `).trim()
+        })
         return res.status(200).json({
             message: "Absented"
         });
@@ -81,6 +98,14 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
     }).then(async () => {
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list
+        })
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                لابردنی غیابی ${req.body.employee}
+            `).trim()
         })
         return res.status(200).json({
             message: "Absent canceled"
@@ -100,6 +125,14 @@ router.patch("/setOff/:at_id", (req, res) => {
     }).then(async () => {
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list
+        })
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                پشووی ${req.body.employee}
+            `).trim()
         })
         return res.status(200).json({
             message: "Setted to Off"
@@ -128,7 +161,27 @@ router.patch('/updateAttendance/:at_id',(req, res)=>{
         loan_reason: req.body.loan_reason || null,
         accomodation: req.body.accomodation || 0,
         accomodation_reason: req.body.accomodation_reason || null,
-    }).then(()=>{
+    }).then(async ()=>{
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                گۆڕینی داتای ${req.body.employee}
+                غرامە: ${req.body.fine}
+                هۆکاری غەرامە: ${req.body.fine_reason || null}
+                خەرجی: ${req.body.expense}
+                هۆکاری خەرجی: ${req.body.expense_reason || null}
+                هاتووچۆ: ${req.body.transport}
+                هۆکاری هاتووچۆ: ${req.body.transport_reason || null}
+                خواردن: ${req.body.food}
+                هۆکاری خواردن: ${req.body.food_reason || null}
+                قەرز: ${req.body.loan}
+                هۆکاری قەرز: ${req.body.loan_reason || null}
+                ئیقامە: ${req.body.accomodation}
+                هۆکاری ئیقامە: ${req.body.accomodation_reason || null}
+            `).trim()
+        });
         return res.status(200).json({
             message:'Update'
         });
@@ -146,6 +199,14 @@ router.patch('/setWorkedHours/:at_id',(req, res)=>{
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list
         })
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                گۆڕینی کاتی کارکردنی ${req.body.employee} بۆ ${req.body.worked_hours} کاتژمێر
+            `).trim()
+        });
         return res.status(200).json({
             message: 'Update'
         });
@@ -163,6 +224,14 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list
         })
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                گۆڕینی کاتی زیادەی ${req.body.employee} بۆ ${req.body.worked_hours} کاتژمێر
+            `).trim()
+        });
         return res.status(200).json({
             message: 'Update'
         });
@@ -180,6 +249,14 @@ router.patch("/setLocation/:at_id", (req, res) => {
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list
         })
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                گۆڕینی شوێنی ${req.body.employee} بۆ ${req.body.location}
+            `).trim()
+        });
         return res.status(200).json({
             message: "Updated"
         });
@@ -189,7 +266,15 @@ router.patch("/setLocation/:at_id", (req, res) => {
 router.patch("/updateAttendancesLocation", (req, res) => {
     db("tbl_attendance").whereIn("at_id", req.body.emps).update({
         location: req.body.location
-    }).then(() => {
+    }).then(async () => {
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            work: (`
+                گۆڕینی شوێنەکانی کارکردنی بۆ ${req.body.location ? req.body.location : ""}
+            `).trim()
+        });
         return res.status(200).json({
             message: "Updated"
         });
