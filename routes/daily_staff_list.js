@@ -393,9 +393,16 @@ router.post("/getDailyList", async (req, res) => {
                             .from("tbl_attendance")
                             .join("tbl_employees", "tbl_attendance.emp_id", "=", "tbl_employees.emp_id")
                             .whereRaw("dsl_id in (select dsl_id from tbl_daily_staff_list where work_date=?)", [req.body.work_date]);
+  var list_history = []
+  if(lists.length > 0){
+    list_history = await db.raw(`
+      SELECT * FROM log_view WHERE dsl_id in (${lists.map((list) => list.dsl_id).join(",")}) ORDER BY datetime_log ASC
+    `).then(([data]) => data);
+  }
   return res.status(200).json({
     lists: lists || [],
-    list_details: list_details || []
+    list_details: list_details || [],
+    list_history: list_history || []
   });
 });
 
