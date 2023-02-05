@@ -77,6 +77,7 @@ router.patch("/setAbsent/:at_id", (req, res) => {
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 غیاب کردنی ${req.body.employee}
             `).trim()
@@ -103,6 +104,7 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 لابردنی غیابی ${req.body.employee}
             `).trim()
@@ -130,6 +132,7 @@ router.patch("/setOff/:at_id", (req, res) => {
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 پشووی ${req.body.employee}
             `).trim()
@@ -166,6 +169,7 @@ router.patch('/updateAttendance/:at_id',(req, res)=>{
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 گۆڕینی داتای ${req.body.employee}
                 غرامە: ${req.body.fine}
@@ -203,6 +207,7 @@ router.patch('/setWorkedHours/:at_id',(req, res)=>{
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 گۆڕینی کاتی کارکردنی ${req.body.employee} بۆ ${req.body.worked_hours} کاتژمێر
             `).trim()
@@ -228,6 +233,7 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 گۆڕینی کاتی زیادەی ${req.body.employee} بۆ ${req.body.worked_hours} کاتژمێر
             `).trim()
@@ -253,6 +259,7 @@ router.patch("/setLocation/:at_id", (req, res) => {
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 گۆڕینی شوێنی ${req.body.employee} بۆ ${req.body.location}
             `).trim()
@@ -271,6 +278,7 @@ router.patch("/updateAttendancesLocation", (req, res) => {
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
             user: req.body.user,
+            datetime_log: req.body.datetime_log,
             work: (`
                 گۆڕینی شوێنەکانی کارکردنی بۆ ${req.body.location ? req.body.location : ""}
             `).trim()
