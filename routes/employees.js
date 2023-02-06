@@ -816,6 +816,39 @@ router.post('/getDeactivedEmployeeBystaff/:st_id',(req,res)=>{
   });
 });
 
+router.get('/getEmployeeMonthDetail/:month/:year/:emp_id', async (req, res) => {
+  const rows = await db.raw(`
+    SELECT
+      tbl_employees.emp_id,
+      CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name,
+      tbl_daily_staff_list.dsl_id,
+      tbl_daily_staff_list.work_date,
+      tbl_attendance.fine,
+      tbl_attendance.fine_reason,
+      tbl_attendance.food,
+      tbl_attendance.food_reason,
+      tbl_attendance.expense,
+      tbl_attendance.expense_reason,
+      tbl_attendance.transport,
+      tbl_attendance.transport_reason,
+      tbl_attendance.loan,
+      tbl_attendance.loan_reason,
+      tbl_attendance.accomodation,
+      tbl_attendance.accomodation_reason
+        FROM tbl_attendance
+        INNER JOIN tbl_employees ON tbl_attendance.emp_id = tbl_employees.emp_id
+        INNER JOIN tbl_daily_staff_list ON tbl_attendance.dsl_id = tbl_daily_staff_list.dsl_id
+      WHERE tbl_attendance.dsl_id IN (
+        SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
+      ) AND tbl_attendance.emp_id = ${req.params.emp_id}
+      ORDER BY tbl_daily_staff_list.work_date ASC
+
+  `).then((data) => {
+    return data[0]
+  })
+  return res.status(200).send(rows);
+})
+
 
 // Debt Routes
 
