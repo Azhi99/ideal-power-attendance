@@ -895,9 +895,9 @@ router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, re
   SELECT
       tbl_employees.emp_id,
       concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as employee_full_name,
-      tbl_employees.salary_type,
-      tbl_employees.monthly_salary,
-      tbl_employees.daily_salary,
+      employee_final_with_give_salary.salary_type,
+      employee_final_with_give_salary.monthly_salary,
+      employee_final_with_give_salary.daily_salary,
       tbl_employees.hour_salary,
       employee_final_with_give_salary.date_to_m,
       employee_final_with_give_salary.date_to_y,
