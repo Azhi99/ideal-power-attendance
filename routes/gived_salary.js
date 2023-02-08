@@ -35,7 +35,13 @@ router.post("/addGiveSalary", (req, res) => {
 
 router.post('/addListOfEmployees/:st_id', (req, res) => {
     db("tbl_employees")
-      .where("active_status", "1")
+      .whereRaw(`
+        emp_id in (
+            select emp_id from tbl_attendance where dsl_id in (
+                select dsl_id from tbl_daily_staff_list where MONTH(work_date) = ${req.body.salary_month} and year(work_date) = ${req.body.salary_year}
+            ) and old_st_id = ${req.params.st_id}
+        )
+      `)
       .andWhere("st_id", req.params.st_id)
       .andWhereRaw("emp_id not in (select emp_id from tbl_gived_salary where salary_month=? and salary_year=?)", [req.body.salary_month, req.body.salary_year])
       .select([

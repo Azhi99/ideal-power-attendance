@@ -927,7 +927,42 @@ router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, re
       JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
       WHERE tbl_employees.st_id = ${req.params.staff_id} AND employee_final_with_give_salary.date_to_m = ${req.params.month} AND employee_final_with_give_salary.date_to_y = ${req.params.year} 
   `);
-  return res.status(200).send(salary_list);
+  const [zeros] = await db.raw(`
+    SELECT emp_id FROM salary_list_to_null WHERE month = ${req.params.month} AND year = ${req.params.year} AND st_id = ${req.params.staff_id}
+  `)
+  return res.status(200).send({
+    salary_list,
+    zeros
+  });
+})
+
+router.get('/getZeroList/:year/:month/:st_id', (req, res) => {
+  db.raw(`
+    SELECT emp_id FROM salary_list_to_null WHERE month = ${req.params.month} AND year = ${req.params.year} AND st_id = ${req.params.st_id}
+  `).then(([data]) => {
+    return res.status(200).send(data)
+  })
+})
+
+router.post('/addZeroList', (req, res) => {
+  db.raw(`
+    SELECT emp_id FROM salary_list_to_null WHERE month = ${req.body.list[0].month} AND year = ${req.body.list[0].year} AND st_id = ${req.body.list[0].st_id} AND emp_id = ${req.body.list[0].emp_id}
+  `).then(([data]) => {
+    if(data.length == 0) {
+      db('salary_list_to_null').insert(req.body.list).then(() => {
+        return res.sendStatus(200);
+      })
+    } else {
+      return res.sendStatus(200);
+    }
+  })
+  
+})
+
+router.delete('/deleteZeroList/:year/:month/:st_id/:emp_id', (req, res) => {
+  db('salary_list_to_null').where('year', req.params.year).andWhere('month', req.params.month).andWhere('st_id', req.params.st_id).andWhere('emp_id', req.params.emp_id).delete().then(() => {
+    return res.sendStatus(200);
+  })
 })
 
 module.exports = router;
