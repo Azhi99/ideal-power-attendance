@@ -406,6 +406,16 @@ router.post("/getDailyList", async (req, res) => {
   });
 });
 
+router.get('/getLogViewByDate/:date', (req, res) => {
+  db.raw(`select * from log_view where DATE(datetime_log) = '${new Date(req.params.date).toISOString().split('T')[0]}' ORDER BY datetime_log`).then(async ([data])=>{ 
+    const users = await db.raw(`select DISTINCT(user) from log_view where DATE(datetime_log) = '${new Date(req.params.date).toISOString().split('T')[0]}'`).then(r => r[0]);
+    return res.status(200).send({
+      rows: data,
+      users
+    });
+  });
+});
+
 router.post('/dslReport/:month/:year/:st_id', (req, res) => {
  db.raw('select * from dsl_each_month_by_staff where date_to_m=? and date_to_y=? and st_id=?', [req.params.month,req.params.year,req.params.st_id]).then(([data])=>{ 
   return res.status(200).send(data);
