@@ -796,6 +796,22 @@ router.post('/getEmployeeBystaff/:st_id/:month/:year',(req,res)=>{
   });
 });
 
+router.post('/getEmployeeBystaffForLoan/:st_id',(req,res)=>{
+  db.raw(`select 
+    tbl_employees.emp_id as emp_id, 
+    CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , 
+    tbl_employees.phone as phone, 
+    tbl_employees.salary_type 
+    from tbl_employees where st_id=? and active_status = '1'`,[req.params.st_id]).then(([data])=>{
+    return res.status(200).send(data);
+  }).catch((err)=>{
+    return res.status(500).json({
+      message: err
+    });
+  });
+  
+});
+
 router.post('/getAllEmployeeBystaff/:st_id',(req,res)=>{
   db.raw("select CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone, tbl_employees.active_status as active_status from tbl_employees where st_id=?",[req.params.st_id]).then(([data])=>{
     return res.status(200).send(data);
@@ -910,6 +926,8 @@ router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, re
       employee_final_with_give_salary.total_food,
       employee_final_with_give_salary.total_loan,
       employee_final_with_give_salary.total_accomodation,
+      employee_final_with_give_salary.loan_by_accomodation,
+      employee_final_with_give_salary.accomodation_by_accomodation,
       employee_final_with_give_salary.total_f,
       employee_final_with_give_salary.total_h_not_work,
       (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,

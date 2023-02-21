@@ -12,7 +12,8 @@ router.post("/getData", (req, res) => {
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`DAYNAME(tbl_employees.expiry_passport) IS NOT NULL`)
      .andWhereRaw(`tbl_employees.country <> '1'`)
-     .andWhereRaw(`tbl_employees.expiry_passport <= '${new Date().toISOString().split('T')[0]}'`)
+     .andWhereRaw(`tbl_employees.active_status = '1'`)
+     .andWhereRaw(`tbl_employees.expiry_passport <= NOW() + INTERVAL 60 DAY`)
      .then((data) => {
         return res.status(200).send(data);
      });
