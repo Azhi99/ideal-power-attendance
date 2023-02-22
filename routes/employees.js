@@ -66,7 +66,8 @@ router.post("/addEmployee", createValidation, (req, res) => {
       accomodation_money: req.body.accomodation_money,
       other_expense: req.body.other_expense,
       other_minus: req.body.other_minus,
-      expiry_passport: req.body.expiry_passport || null
+      expiry_passport: req.body.expiry_passport || null,
+      asaish_code: req.body.asaish_code || null
     })
     .then(([data]) => {
       if (personal_image_path != null) {
@@ -161,7 +162,8 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           accomodation_money: req.body.accomodation_money,
           other_expense: req.body.other_expense,
           other_minus: req.body.other_minus,
-          expiry_passport: req.body.expiry_passport || null
+          expiry_passport: req.body.expiry_passport || null,
+          asaish_code: req.body.asaish_code || null
         })
         .then(() => {
           return res.status(200).json({
@@ -425,7 +427,8 @@ router.post("/getData", (req, res) => {
     "tbl_employees.accomodation_money as accomodation_money",
     "tbl_employees.other_expense as other_expense",
     "tbl_employees.other_minus as other_minus",
-    "tbl_employees.expiry_passport as expiry_passport"
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -469,7 +472,8 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.accomodation_money as accomodation_money",
     "tbl_employees.other_expense as other_expense",
     "tbl_employees.other_minus as other_minus",
-    "tbl_employees.expiry_passport as expiry_passport"
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -511,7 +515,8 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.accomodation_money as accomodation_money",
     "tbl_employees.other_expense as other_expense",
     "tbl_employees.other_minus as other_minus",
-    "tbl_employees.expiry_passport as expiry_passport"
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -554,7 +559,8 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.accomodation_money as accomodation_money",
     "tbl_employees.other_expense as other_expense",
     "tbl_employees.other_minus as other_minus",
-    "tbl_employees.expiry_passport as expiry_passport"
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -597,7 +603,8 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.accomodation_money as accomodation_money",
     "tbl_employees.other_expense as other_expense",
     "tbl_employees.other_minus as other_minus",
-    "tbl_employees.expiry_passport as expiry_passport"
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -640,7 +647,8 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.accomodation_money as accomodation_money",
     "tbl_employees.other_expense as other_expense",
     "tbl_employees.other_minus as other_minus",
-    "tbl_employees.expiry_passport as expiry_passport"
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -702,7 +710,8 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.accomodation_money as accomodation_money",
     "tbl_employees.other_expense as other_expense",
     "tbl_employees.other_minus as other_minus",
-    "tbl_employees.expiry_passport as expiry_passport"
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -737,6 +746,7 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
       "accomodation_money",
       "other_expense",
       "other_minus",
+      "asaish_code",
     ]).limit(1);
   const gs_id = (typeof gived_salary == "undefined" ? null: gived_salary.gs_id);
   const [[employee]] = await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
@@ -761,7 +771,6 @@ router.post('/topOvertime/:month/:year', async (req, res)=>{
     top_fine
   });
 });
-
 
 router.post('/getEmployeeBystaff/:st_id/:month/:year',(req,res)=>{
   // db.raw(`select 
@@ -801,6 +810,7 @@ router.post('/getEmployeeBystaffForLoan/:st_id',(req,res)=>{
     tbl_employees.emp_id as emp_id, 
     CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , 
     tbl_employees.phone as phone, 
+    tbl_employees.country as country, 
     tbl_employees.salary_type 
     from tbl_employees where st_id=? and active_status = '1'`,[req.params.st_id]).then(([data])=>{
     return res.status(200).send(data);
@@ -864,6 +874,39 @@ router.get('/getEmployeeMonthDetail/:month/:year/:emp_id', async (req, res) => {
   })
   return res.status(200).send(rows);
 })
+
+router.get('/getEmployeeByEngineer/:en_id', (req, res) => {
+  db.raw(`
+    SELECT 
+      tbl_employees.emp_id,
+      tbl_employees.first_name,
+      tbl_employees.last_name,
+      tbl_staffs.staff_name,
+      tbl_employees.phone,
+      tbl_employees.active_status,
+      tbl_employees.salary_type
+    FROM tbl_employees
+    INNER JOIN tbl_staffs ON tbl_employees.st_id = tbl_staffs.st_id
+    WHERE tbl_employees.st_id IN (
+      SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
+    )
+  `).then(([data]) => {
+    return res.status(200).send(data)
+  }).catch((err) => {
+    return res.status(500).json({
+      message: err
+    });
+  }); 
+
+})
+
+router.get('/getById/:emp_id', (req, res) => {
+  db('tbl_employees').where('emp_id', req.params.emp_id).select().first().then((data) => {
+    return res.status(200).send({
+      data
+    })
+  });
+});
 
 
 // Debt Routes

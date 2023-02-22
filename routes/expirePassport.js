@@ -6,6 +6,7 @@ router.post("/getData", (req, res) => {
     db.select(
         db.raw("concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name"),
         "tbl_staffs.staff_name as staff_name",
+        "tbl_employees.st_id as st_id",
         "tbl_employees.country as country",
         "tbl_employees.expiry_passport as expire_date"
     ).from("tbl_employees")
