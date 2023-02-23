@@ -14,6 +14,8 @@ router.post('/create_list', (req, res) => {
             datetime_create: req.body.loan_accomodation.datetime_create,
             user: req.body.loan_accomodation.user,
             note: req.body.loan_accomodation.note,
+            la_date: req.body.loan_accomodation.la_date,
+            archived: req.body.loan_accomodation.archived,
         }).then(([la_id]) => {
             const loan_accomodation_detail = req.body.list.map((item) => {
                 return {
@@ -37,8 +39,8 @@ router.post('/create_list', (req, res) => {
     }
 })
 
-router.get('/all', (req, res) => {
-    db('loan_accomodation_view').select().orderBy('datetime_create', 'asc').then((data) => {
+router.get('/all/:archived', (req, res) => {
+    db('loan_accomodation_view').where('archived', req.params.archived).select().orderBy('datetime_create', 'asc').then((data) => {
         res.status(200).send(data)
     }).catch((err) => {
         res.status(500).send({
@@ -47,9 +49,9 @@ router.get('/all', (req, res) => {
     })
 })
 
-router.get('/getByEngineer/:en_id', (req, res) => {
+router.get('/getByEngineer/:en_id/:archived', (req, res) => {
     db.raw(`
-        SELECT * FROM loan_accomodation_view WHERE st_id IN (
+        SELECT * FROM loan_accomodation_view WHERE archived = ${req.params.archived} AND st_id IN (
             SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
         )
     `).then(r => {
@@ -113,6 +115,8 @@ router.patch('/update_list', (req, res) => {
         datetime_create: req.body.loan_accomodation.datetime_create,
         user: req.body.loan_accomodation.user,
         note: req.body.loan_accomodation.note,
+        la_date: req.body.loan_accomodation.la_date,
+        archived: req.body.loan_accomodation.archived,
     }).then(async () => {
         const new_data = await db('loan_accomodation_view').where('la_id', req.body.loan_accomodation.la_id).select().first()
         res.status(200).send({
