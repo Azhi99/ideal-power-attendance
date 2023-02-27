@@ -39,6 +39,29 @@ router.post('/create_list', (req, res) => {
     }
 })
 
+router.post('/getAllDetailByIds', async (req, res) => {
+    const [rows] = await db.raw(`
+        SELECT 
+            loan_accomodation_detail.lad_id,
+            loan_accomodation_detail.la_id,
+            loan_accomodation_detail.amount,
+            loan_accomodation_detail.month,
+            loan_accomodation_detail.year,
+            loan_accomodation.emp_id,
+            CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee_full_name,
+            loan_accomodation.la_type,
+            loan_accomodation.st_id,
+            tbl_staffs.staff_name,
+            loan_accomodation.salary_type
+        FROM loan_accomodation_detail
+        INNER JOIN loan_accomodation ON loan_accomodation_detail.la_id = loan_accomodation.la_id
+        INNER JOIN tbl_employees ON loan_accomodation.emp_id = tbl_employees.emp_id
+        INNER JOIN tbl_staffs ON loan_accomodation.st_id = tbl_staffs.st_id
+        WHERE loan_accomodation_detail.la_id IN (${req.body.ids.join(',')})
+    `);
+    res.status(200).send(rows)
+})
+
 router.get('/all/:archived', (req, res) => {
     db('loan_accomodation_view').where('archived', req.params.archived).select().orderBy('datetime_create', 'asc').then((data) => {
         res.status(200).send(data)

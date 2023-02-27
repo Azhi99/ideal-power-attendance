@@ -399,10 +399,42 @@ router.post("/getDailyList", async (req, res) => {
       SELECT * FROM log_view WHERE dsl_id in (${lists.map((list) => list.dsl_id).join(",")}) ORDER BY datetime_log ASC
     `).then(([data]) => data);
   }
+
+  let data = {}
+
+  data.staffs = await db.raw(`
+    SELECT 
+      st_id,
+      dsl_id
+    FROM tbl_daily_staff_list
+    WHERE work_date = '${new Date(req.body.work_date).toISOString().split('T')[0]}'
+  `).then(r => r[0]);
+
+  for(let i = 0; i < data.staffs.length; i++){
+    data.staffs[i].employees = await db.raw(`
+      SELECT 
+        tbl_attendance.emp_id,
+        tbl_attendance.overtime,
+        tbl_attendance.worked_hours,
+        tbl_attendance.absent,
+        tbl_attendance.location,
+        tbl_daily_staff_list.dsl_id,
+        tbl_daily_staff_list.st_id,
+        tbl_staffs.staff_name,
+        CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee_full_name
+      FROM tbl_attendance
+      JOIN tbl_daily_staff_list ON tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id
+      JOIN tbl_staffs ON tbl_staffs.st_id = tbl_daily_staff_list.st_id
+      JOIN tbl_employees ON tbl_employees.emp_id = tbl_attendance.emp_id
+      WHERE tbl_daily_staff_list.dsl_id = ${data.staffs[i].dsl_id}
+    `).then(r => r[0]);
+    
+  }
   return res.status(200).json({
     lists: lists || [],
     list_details: list_details || [],
-    list_history: list_history || []
+    list_history: list_history || [],
+    all_rows: data
   });
 });
 
@@ -414,6 +446,38 @@ router.get('/getLogViewByDate/:date', (req, res) => {
       users
     });
   });
+});
+
+router.get('/getAllDetailByDate/:date', async (req, res) => {
+  let data = {}
+
+  data.staffs = await db.raw(`
+    SELECT 
+      st_id,
+      dsl_id
+    FROM tbl_daily_staff_list
+    WHERE work_date = '${new Date(req.params.date).toISOString().split('T')[0]}'
+  `).then(r => r[0]);
+
+  for(let i = 0; i < data.staffs.length; i++){
+    data.staffs[i].employees = await db.raw(`
+      SELECT 
+        tbl_attendance.emp_id,
+        tbl_attendance.overtime,
+        tbl_attendance.worked_hours,
+        tbl_attendance.absent,
+        tbl_attendance.location
+        tbl_daily_staff_list.dsl_id,
+        tbl_daily_staff_list.st_id,
+        tbl_staffs.staff_name
+      FROM tbl_attendance
+      JOIN tbl_daily_staff_list ON tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id
+      JOIN tbl_staffs ON tbl_staffs.st_id = tbl_daily_staff_list.st_id
+      WHERE tbl_daily_staff_list.dsl_id = ${data.staffs[i].dsl_id}
+    `).then(r => r[0]);
+  }
+
+  return res.status(200).send(data);
 });
 
 router.post('/dslReport/:month/:year/:st_id', (req, res) => {
