@@ -746,7 +746,6 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
       "accomodation_money",
       "other_expense",
       "other_minus",
-      "asaish_code",
     ]).limit(1);
   const gs_id = (typeof gived_salary == "undefined" ? null: gived_salary.gs_id);
   const [[employee]] = await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
