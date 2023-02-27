@@ -51,7 +51,7 @@ router.get('/all/:archived', (req, res) => {
 
 router.get('/getByEngineer/:en_id/:archived', (req, res) => {
     db.raw(`
-        SELECT * FROM loan_accomodation_view WHERE archived = ${req.params.archived} AND st_id IN (
+        SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND st_id IN (
             SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
         )
     `).then(r => {
