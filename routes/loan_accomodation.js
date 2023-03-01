@@ -48,6 +48,7 @@ router.post('/getAllDetailByIds', async (req, res) => {
             loan_accomodation_detail.month,
             loan_accomodation_detail.year,
             loan_accomodation.emp_id,
+            loan_accomodation.note,
             CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee_full_name,
             loan_accomodation.la_type,
             loan_accomodation.st_id,

@@ -948,7 +948,7 @@ router.get('/getEmployeeTransaction/:emp_id', async (req, res) => {
   return res.status(200).send(transactions);
 });
 
-router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, res) => {
+router.post('/getSalaryListByMonthAndYear', async (req, res) => {
   const [salary_list] = await db.raw(`
   SELECT
       tbl_employees.emp_id,
@@ -985,10 +985,14 @@ router.get('/getSalaryListByMonthAndYear/:month/:year/:staff_id', async (req, re
       employee_final_with_give_salary.other_minus
       from tbl_employees 
       JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
-      WHERE tbl_employees.st_id = ${req.params.staff_id} AND employee_final_with_give_salary.date_to_m = ${req.params.month} AND employee_final_with_give_salary.date_to_y = ${req.params.year} 
+      WHERE employee_final_with_give_salary.emp_id IN (
+        select emp_id from tbl_attendance where dsl_id in (
+          select dsl_id from tbl_daily_staff_list where MONTH(work_date) = ${req.body.month} and year(work_date) = ${req.body.year}
+        ) and old_st_id = ${req.body.staff_id}
+      ) AND employee_final_with_give_salary.date_to_m = ${req.body.month} AND employee_final_with_give_salary.date_to_y = ${req.body.year} 
   `);
   const [zeros] = await db.raw(`
-    SELECT emp_id FROM salary_list_to_null WHERE month = ${req.params.month} AND year = ${req.params.year} AND st_id = ${req.params.staff_id}
+    SELECT emp_id FROM salary_list_to_null WHERE month = ${req.body.month} AND year = ${req.body.year} AND st_id = ${req.body.staff_id}
   `)
   return res.status(200).send({
     salary_list,
