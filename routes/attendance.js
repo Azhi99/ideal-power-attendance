@@ -197,55 +197,63 @@ router.patch('/updateAttendance/:at_id',(req, res)=>{
 });
 
 router.patch('/setWorkedHours/:at_id',(req, res)=>{
-    db('tbl_attendance').where('at_id', req.params.at_id).update({
-        worked_hours: req.body.worked_hours
-    }).then(async ()=>{
-        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-            datetime_list: req.body.datetime_list
-        })
-        await db('tbl_log').insert({
-            dsl_id: req.body.dsl_id,
-            st_id: req.body.st_id,
-            user: req.body.user,
-            datetime_log: req.body.datetime_log,
-            work: (`
-                گۆڕینی کاتی کارکردنی ${req.body.employee} بۆ ${req.body.worked_hours} کاتژمێر
-            `).trim()
+    db('tbl_attendance').where('at_id', req.params.at_id).select().first().then((data)=>{
+        db('tbl_attendance').where('at_id', req.params.at_id).update({
+            worked_hours: req.body.worked_hours
+        }).then(async ()=>{
+            await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+                datetime_list: req.body.datetime_list
+            })
+            if(data.worked_hours != req.body.worked_hours) {
+                await db('tbl_log').insert({
+                    dsl_id: req.body.dsl_id,
+                    st_id: req.body.st_id,
+                    user: req.body.user,
+                    datetime_log: req.body.datetime_log,
+                    work: (`
+                        گۆڕینی کاتی کارکردنی ${req.body.employee} لە ${data.worked_hours} بۆ ${req.body.worked_hours} کاتژمێر
+                    `).trim()
+                });
+            }
+            return res.status(200).json({
+                message: 'Update'
+            });
+        }).catch((err)=>{
+            return res.status(500).json({
+                message: err
+            });
         });
-        return res.status(200).json({
-            message: 'Update'
-        });
-    }).catch((err)=>{
-        return res.status(500).json({
-            message: err
-        });
-    });
+    })
 });
 
 router.patch('/setOvertime/:at_id',(req, res)=>{
-    db('tbl_attendance').where('at_id', req.params.at_id).update({
-        overtime: req.body.overtime
-    }).then(async ()=>{
-        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-            datetime_list: req.body.datetime_list
-        })
-        await db('tbl_log').insert({
-            dsl_id: req.body.dsl_id,
-            st_id: req.body.st_id,
-            user: req.body.user,
-            datetime_log: req.body.datetime_log,
-            work: (`
-                گۆڕینی کاتی زیادەی ${req.body.employee} بۆ ${req.body.worked_hours} کاتژمێر
-            `).trim()
+    db('tbl_attendance').where('at_id', req.params.at_id).select().first().then((data)=>{
+        db('tbl_attendance').where('at_id', req.params.at_id).update({
+            overtime: req.body.overtime
+        }).then(async ()=>{
+            await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+                datetime_list: req.body.datetime_list
+            })
+            if(data.overtime != req.body.overtime) {
+                await db('tbl_log').insert({
+                    dsl_id: req.body.dsl_id,
+                    st_id: req.body.st_id,
+                    user: req.body.user,
+                    datetime_log: req.body.datetime_log,
+                    work: (`
+                        گۆڕینی کاتی زیادەی ${req.body.employee} لە ${data.overtime} بۆ ${req.body.overtime} کاتژمێر
+                    `).trim()
+                });
+            }
+            return res.status(200).json({
+                message: 'Update'
+            });
+        }).catch((err)=>{
+            return res.status(500).json({
+                message: err
+            });
         });
-        return res.status(200).json({
-            message: 'Update'
-        });
-    }).catch((err)=>{
-        return res.status(500).json({
-            message: err
-        });
-    });
+    })
 });
 
 router.patch("/setLocation/:at_id", (req, res) => {

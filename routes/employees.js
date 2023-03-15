@@ -72,6 +72,7 @@ router.post("/addEmployee", createValidation, (req, res) => {
       car: req.body.car || null,
       car_number: req.body.car_number || null,
       living_location: req.body.living_location || null,
+      first_work_date: req.body.first_work_date || null,
     })
     .then(([data]) => {
       if (personal_image_path != null) {
@@ -172,6 +173,7 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           car: req.body.car || null,
           car_number: req.body.car_number || null,
           living_location: req.body.living_location || null,
+          first_work_date: req.body.first_work_date || null,
         })
         .then(() => {
           return res.status(200).json({
@@ -440,7 +442,8 @@ router.post("/getData", (req, res) => {
     "tbl_employees.phone2 as phone2",
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
-    "tbl_employees.living_location as living_location"
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -489,7 +492,8 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.phone2 as phone2",
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
-    "tbl_employees.living_location as living_location"
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -536,7 +540,8 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.phone2 as phone2",
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
-    "tbl_employees.living_location as living_location"
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -584,7 +589,8 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.phone2 as phone2",
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
-    "tbl_employees.living_location as living_location"
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -632,7 +638,8 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.phone2 as phone2",
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
-    "tbl_employees.living_location as living_location"
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -680,7 +687,8 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.phone2 as phone2",
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
-    "tbl_employees.living_location as living_location"
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -747,7 +755,8 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.phone2 as phone2",
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
-    "tbl_employees.living_location as living_location"
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
