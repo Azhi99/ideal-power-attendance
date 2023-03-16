@@ -151,49 +151,54 @@ router.patch("/setOff/:at_id", (req, res) => {
 
 
 router.patch('/updateAttendance/:at_id',(req, res)=>{
-    db('tbl_attendance').where('at_id', req.params.at_id).update({
-        fine:req.body.fine,
-        fine_reason:req.body.fine_reason || null,
-        expense: req.body.expense || 0,
-        expense_reason: req.body.expense_reason || null,
-        transport: req.body.transport || 0,
-        transport_reason: req.body.transport_reason || null,
-        food: req.body.food || 0,
-        food_reason: req.body.food_reason || null,
-        loan: req.body.loan || 0,
-        loan_reason: req.body.loan_reason || null,
-        accomodation: req.body.accomodation || 0,
-        accomodation_reason: req.body.accomodation_reason || null,
-    }).then(async ()=>{
-        await db('tbl_log').insert({
-            dsl_id: req.body.dsl_id,
-            st_id: req.body.st_id,
-            user: req.body.user,
-            datetime_log: req.body.datetime_log,
-            work: (`
+    db('tbl_attendance').where('at_id', req.params.at_id).select().first().then(async (data)=>{
+        db('tbl_attendance').where('at_id', req.params.at_id).update({
+            fine:req.body.fine,
+            fine_reason:req.body.fine_reason || null,
+            expense: req.body.expense || 0,
+            expense_reason: req.body.expense_reason || null,
+            transport: req.body.transport || 0,
+            transport_reason: req.body.transport_reason || null,
+            food: req.body.food || 0,
+            food_reason: req.body.food_reason || null,
+            loan: req.body.loan || 0,
+            loan_reason: req.body.loan_reason || null,
+            accomodation: req.body.accomodation || 0,
+            accomodation_reason: req.body.accomodation_reason || null,
+        }).then(async ()=>{
+            var work = (`
                 گۆڕینی داتای ${req.body.employee}
-                غرامە: ${req.body.fine}
-                هۆکاری غەرامە: ${req.body.fine_reason || null}
-                خەرجی: ${req.body.expense}
-                هۆکاری خەرجی: ${req.body.expense_reason || null}
-                هاتووچۆ: ${req.body.transport}
-                هۆکاری هاتووچۆ: ${req.body.transport_reason || null}
-                خواردن: ${req.body.food}
-                هۆکاری خواردن: ${req.body.food_reason || null}
-                قەرز: ${req.body.loan}
-                هۆکاری قەرز: ${req.body.loan_reason || null}
-                ئیقامە: ${req.body.accomodation}
-                هۆکاری ئیقامە: ${req.body.accomodation_reason || null}
-            `).trim()
+                ${data.fine != req.body.fine ? `غرامە لە ${Number(data.fine).toLocaleString()} بۆ ${Number(req.body.fine).toLocaleString()}` : ''}
+                ${data.fine_reason != req.body.fine_reason ? `هۆکاری غرامە لە ${data.fine_reason || ''} بۆ: ${req.body.fine_reason || ''}` : ''}
+                ${data.expense != req.body.expense ? `خەرجی لە ${Number(data.expense).toLocaleString()} بۆ ${Number(req.body.expense).toLocaleString()}` : ''}
+                ${data.expense_reason != req.body.expense_reason ? `هۆکاری خەرجی لە ${data.expense_reason || ''} بۆ: ${req.body.expense_reason || ''}` : ''}
+                ${data.transport != req.body.transport ? `هاتووچۆ لە ${Number(data.transport).toLocaleString()} بۆ ${Number(req.body.transport).toLocaleString()}` : ''}
+                ${data.transport_reason != req.body.transport_reason ? `هۆکاری هاتووچۆ لە ${data.transport_reason || ''} بۆ: ${req.body.transport_reason || ''}` : ''}
+                ${data.food != req.body.food ? `خواردن لە ${Number(data.food).toLocaleString()} بۆ ${Number(req.body.food).toLocaleString()}` : ''}
+                ${data.food_reason != req.body.food_reason ? `هۆکاری خواردن لە ${data.food_reason || ''} بۆ: ${req.body.food_reason || ''}` : ''}
+                ${data.loan != req.body.loan ? `قەرز لە ${Number(data.loan).toLocaleString()} بۆ ${Number(req.body.loan).toLocaleString()}` : ''}
+                ${data.loan_reason != req.body.loan_reason ? `هۆکاری قەرز لە ${data.loan_reason || ''} بۆ: ${req.body.loan_reason || ''}` : ''}
+                ${data.accomodation != req.body.accomodation ? `ئیقامە لە ${Number(data.accomodation).toLocaleString()} بۆ ${Number(req.body.accomodation).toLocaleString()}` : ''}
+                ${data.accomodation_reason != req.body.accomodation_reason ? `هۆکاری ئیقامە لە ${data.accomodation_reason || ''} بۆ: ${req.body.accomodation_reason || ''}` : ''}
+            `).trim();
+            if(work.split('\n').length > 1) {
+                await db('tbl_log').insert({
+                    dsl_id: req.body.dsl_id,
+                    st_id: req.body.st_id,
+                    user: req.body.user,
+                    datetime_log: req.body.datetime_log,
+                    work: work
+                });
+            }
+            return res.status(200).json({
+                message:'Update'
+            });
+        }).catch((err)=>{
+            return res.status(500).json({
+                message:err
+            });
         });
-        return res.status(200).json({
-            message:'Update'
-        });
-    }).catch((err)=>{
-        return res.status(500).json({
-            message:err
-        });
-    });
+    })
 });
 
 router.patch('/setWorkedHours/:at_id',(req, res)=>{

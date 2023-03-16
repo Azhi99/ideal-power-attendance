@@ -512,51 +512,59 @@ router.post('/getFoods', async (req, res) => {
 });
 
 router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
-  db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
-    food_number:req.body.food_number,
-    datetime_food: req.body.datetime_food
-  }).then(async () => {
-    await db('tbl_log').insert({
-      dsl_id: req.params.dsl_id,
-      st_id: req.body.st_id,
-      user: req.body.user,
-      datetime_log: req.body.datetime_log,
-      work: (`
-        گۆڕینی ژمارەی خواردن بۆ ${req.body.food_number}
-      `).trim()
+  db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).select().first().then((data) => {
+    db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
+      food_number:req.body.food_number,
+      datetime_food: req.body.datetime_food
+    }).then(async () => {
+      if(data.food_number != req.body.food_number) {
+        await db('tbl_log').insert({
+          dsl_id: req.params.dsl_id,
+          st_id: req.body.st_id,
+          user: req.body.user,
+          datetime_log: req.body.datetime_log,
+          work: (`
+            گۆڕینی ژمارەی خواردن لە ${data.food_number} بۆ ${req.body.food_number}
+          `).trim()
+        });
+      }
+      return res.status(200).json({
+        message:"food number updated"
+      });
+    }).catch((err) => {
+      return res.status(500).json({
+        err
+      });
     });
-    return res.status(200).json({
-      message:"food number updated"
-    });
-  }).catch((err) => {
-    return res.status(500).json({
-      err
-    });
-  });
+  })
 });
 
 router.patch('/setFoodGroup/:dsl_id', (req, res)=>{
-  db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
-    food_group:req.body.food_group,
-    datetime_food: req.body.datetime_food
-  }).then(async () => {
-    await db('tbl_log').insert({
-      dsl_id: req.params.dsl_id,
-      st_id: req.body.st_id,
-      user: req.body.user,
-      datetime_log: req.body.datetime_log,
-      work: (`
-        گۆڕینی گروپی خواردن بۆ ${req.body.food_group}
-      `).trim()
+  db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).select().first().then((data) => {
+    db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
+      food_group:req.body.food_group,
+      datetime_food: req.body.datetime_food
+    }).then(async () => {
+      if(data.food_group != req.body.food_group) {
+        await db('tbl_log').insert({
+          dsl_id: req.params.dsl_id,
+          st_id: req.body.st_id,
+          user: req.body.user,
+          datetime_log: req.body.datetime_log,
+          work: (`
+            گۆڕینی گروپی خواردن لە ${data.food_group} بۆ ${req.body.food_group}
+          `).trim()
+        });
+      }
+      return res.status(200).json({
+        message:"food number updated"
+      });
+    }).catch((err) => {
+      return res.status(500).json({
+        err
+      });
     });
-    return res.status(200).json({
-      message:"food number updated"
-    });
-  }).catch((err) => {
-    return res.status(500).json({
-      err
-    });
-  });
+  })
 });
 
 router.get('/getFoodList/:month/:year', async (req, res) => {
