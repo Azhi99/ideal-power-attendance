@@ -8,6 +8,7 @@ router.post("/getData", (req, res) => {
         "tbl_staffs.staff_name as staff_name",
         "tbl_employees.st_id as st_id",
         "tbl_employees.country as country",
+        "tbl_employees.phone as phone",
         "tbl_employees.active_status as active_status",
         "tbl_employees.expiry_passport as expire_date"
     ).from("tbl_employees")
