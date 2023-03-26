@@ -68,7 +68,20 @@ router.patch("/setAbsent/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         absent: "1",
         worked_hours: 0,
-        overtime: 0
+        overtime: 0,
+        fine: 0,
+        fine_reason: null,
+        location: '',
+        expense: 0,
+        expense_reason: null,
+        food: 0,
+        food_reason: null,
+        transport: 0,
+        transport_reason: null,
+        loan: 0,
+        loan_reason: null,
+        accomodation: 0,
+        accomodation_reason: null
     }).then(async () => {
         await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
             datetime_list: req.body.datetime_list

@@ -1046,6 +1046,58 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
   });
 })
 
+router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
+  const [salary_list] = await db.raw(`
+  SELECT
+      tbl_employees.emp_id,
+      concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as employee_full_name,
+      employee_final_with_give_salary.salary_type,
+      employee_final_with_give_salary.monthly_salary,
+      employee_final_with_give_salary.daily_salary,
+      tbl_employees.hour_salary,
+      employee_final_with_give_salary.date_to_m,
+      employee_final_with_give_salary.date_to_y,
+      tbl_employees.st_id,
+      employee_final_with_give_salary.count_present,
+      employee_final_with_give_salary.total_o,
+      employee_final_with_give_salary.total_fine,
+      employee_final_with_give_salary.total_expense,
+      employee_final_with_give_salary.total_transport,
+      employee_final_with_give_salary.total_food,
+      employee_final_with_give_salary.total_loan,
+      employee_final_with_give_salary.total_accomodation,
+      employee_final_with_give_salary.loan_by_accomodation,
+      employee_final_with_give_salary.accomodation_by_accomodation,
+      employee_final_with_give_salary.total_f,
+      employee_final_with_give_salary.total_h_not_work,
+      (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
+      employee_final_with_give_salary.total_o_s,
+      employee_final_with_give_salary.food_money,
+      employee_final_with_give_salary.transport_money,
+      employee_final_with_give_salary.cabina_money,
+      employee_final_with_give_salary.expense_money,
+      employee_final_with_give_salary.fine_money,
+      employee_final_with_give_salary.loan_money,
+      employee_final_with_give_salary.accomodation_money,
+      employee_final_with_give_salary.other_expense,
+      employee_final_with_give_salary.other_minus
+      from tbl_employees 
+      JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
+      WHERE employee_final_with_give_salary.emp_id IN (
+        select emp_id from tbl_attendance where dsl_id in (
+          select dsl_id from tbl_daily_staff_list where MONTH(work_date) = ${req.body.month} and year(work_date) = ${req.body.year}
+        ) 
+      ) AND employee_final_with_give_salary.date_to_m = ${req.body.month} AND employee_final_with_give_salary.date_to_y = ${req.body.year} 
+  `);
+  const [zeros] = await db.raw(`
+    SELECT emp_id, st_id FROM salary_list_to_null WHERE month = ${req.body.month} AND year = ${req.body.year}
+  `)
+  return res.status(200).send({
+    salary_list,
+    zeros
+  });
+})
+
 router.get('/getZeroList/:year/:month/:st_id', (req, res) => {
   db.raw(`
     SELECT emp_id FROM salary_list_to_null WHERE month = ${req.params.month} AND year = ${req.params.year} AND st_id = ${req.params.st_id}
