@@ -51,7 +51,7 @@ router.post("/addList", (req, res) => {
           db.raw("null as loan_reason"),
           db.raw("0 as accomodation"),
           db.raw("null as accomodation_reason"),
-          db.raw("'0' as absent"),
+          db.raw(`'${req.body.absent}' as absent`),
           db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
           db.raw(req.body.st_id + " as st_id"),
           db.raw(req.body.st_id + " as old_st_id"),
