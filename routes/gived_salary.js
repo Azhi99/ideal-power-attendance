@@ -62,6 +62,7 @@ router.post('/addListOfEmployees/:st_id', (req, res) => {
         "accomodation_money",
         "other_expense",
         "other_minus",
+        "salary_type"
       ]).then((data) => {
         db("tbl_gived_salary").where("salary_month", req.body.salary_month).andWhere("salary_year", req.body.salary_year).update({
             dollar_price: req.body.dollar_price
