@@ -38,6 +38,8 @@ router.post("/addList", (req, res) => {
           "emp_id as emp_id",
           db.raw(dsl_id + " as dsl_id"),
           db.raw("0 as overtime"),
+          // for fridays and holidays
+          // db.raw((req.body.absent == '1' || req.body.absent == '2' ? '0' : '8') + " as worked_hours"),
           db.raw((req.body.absent == '1' ? '0' : '8') + " as worked_hours"),
           db.raw("0 as fine"),
           db.raw("null as fine_reason"),
