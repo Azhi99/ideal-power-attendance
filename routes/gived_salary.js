@@ -169,4 +169,32 @@ router.post('/addGivedDetail',(req,res)=>{
     });
 });
 
+router.post('/changeAddedDays', (req,res) => {
+    db('tbl_gived_salary').where('gs_id', req.body.gs_id).update({
+        added_days: req.body.added_days
+    }).then(() => {
+        return res.status(200).json({
+            message: "Added Days Changed"
+        });
+    }).catch((err) => {
+        return res.status(500).json({
+            message: err
+        });
+    });
+})
+
+router.post('/changeAddedOvertime', (req,res) => {
+    db('tbl_gived_salary').where('gs_id', req.body.gs_id).update({
+        added_overtime: req.body.added_overtime
+    }).then(() => {
+        return res.status(200).json({
+            message: "Added Overtime Changed"
+        });
+    }).catch((err) => {
+        return res.status(500).json({
+            message: err
+        });
+    });
+})
+
 module.exports = router;

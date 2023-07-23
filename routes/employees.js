@@ -1016,6 +1016,7 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
       employee_final_with_give_salary.total_accomodation,
       employee_final_with_give_salary.loan_by_accomodation,
       employee_final_with_give_salary.accomodation_by_accomodation,
+      employee_final_with_give_salary.expense_by_accomodation,
       employee_final_with_give_salary.total_f,
       employee_final_with_give_salary.total_h_not_work,
       (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
@@ -1028,7 +1029,10 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
       employee_final_with_give_salary.loan_money,
       employee_final_with_give_salary.accomodation_money,
       employee_final_with_give_salary.other_expense,
-      employee_final_with_give_salary.other_minus
+      employee_final_with_give_salary.other_minus,
+      employee_final_with_give_salary.added_days,
+      employee_final_with_give_salary.added_overtime,
+      employee_final_with_give_salary.gs_id
       from tbl_employees 
       JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
       WHERE employee_final_with_give_salary.emp_id IN (
@@ -1062,7 +1066,7 @@ router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
         employee_final_with_give_salary.date_to_m,
         employee_final_with_give_salary.date_to_y,
         tbl_employees.st_id,
-        employee_final_with_give_salary.count_present,
+        (employee_final_with_give_salary.count_present + employee_final_with_give_salary.added_days) as count_present,
         employee_final_with_give_salary.total_o,
         employee_final_with_give_salary.total_fine,
         employee_final_with_give_salary.total_expense,
@@ -1072,9 +1076,10 @@ router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
         employee_final_with_give_salary.total_accomodation,
         employee_final_with_give_salary.loan_by_accomodation,
         employee_final_with_give_salary.accomodation_by_accomodation,
+        employee_final_with_give_salary.exense_by_accomodation,
         employee_final_with_give_salary.total_f,
         employee_final_with_give_salary.total_h_not_work,
-        (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
+        ((employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) + employee_final_with_give_salary.added_overtime) as total_hour,
         employee_final_with_give_salary.total_o_s,
         employee_final_with_give_salary.food_money,
         employee_final_with_give_salary.transport_money,

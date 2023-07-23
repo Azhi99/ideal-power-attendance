@@ -63,24 +63,54 @@ router.post('/getAllDetailByIds', async (req, res) => {
     res.status(200).send(rows)
 })
 
-router.get('/all/:archived', (req, res) => {
-    db('loan_accomodation_view').where('archived', req.params.archived).select().orderBy('datetime_create', 'asc').then((data) => {
-        res.status(200).send(data)
-    }).catch((err) => {
-        res.status(500).send({
-            err
+router.get('/all/:filter/:archived', (req, res) => {
+    if(req.params.filter === 'all') {
+        db('loan_accomodation_view').where('archived', req.params.archived).select().orderBy('datetime_create', 'asc').then((data) => {
+            res.status(200).send(data)
+        }).catch((err) => {
+            res.status(500).send({
+                err
+            })
         })
-    })
+    } else if(req.params.filter.split(',').length > 1) {
+        db.raw(`SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND la_type IN (${req.params.filter.split(',').map(obj => `'${obj}'`).join(',')})`).then(r => {
+            return res.status(200).send(r[0])
+        })
+    } else {
+        db('loan_accomodation_view').where('archived', req.params.archived).andWhere('la_type', req.params.filter).select().orderBy('datetime_create', 'asc').then((data) => {
+            res.status(200).send(data)
+        }).catch((err) => {
+            res.status(500).send({
+                err
+            })
+        })
+    }
 })
 
-router.get('/getByEngineer/:en_id/:archived', (req, res) => {
-    db.raw(`
-        SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND st_id IN (
+router.get('/getByEngineer/:filter/:en_id/:archived', (req, res) => {
+    if(req.params.filter === 'all') {
+        db.raw(`
+            SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND st_id IN (
+                SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
+            )
+        `).then(r => {
+            return res.status(200).send(r[0])
+        })
+    } else if(req.params.filter.split(',').length > 1) {
+        db.raw(`SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND la_type IN (${req.params.filter.split(',').map(obj => `'${obj}'`).join(',')}) AND st_id IN (
             SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
-        )
-    `).then(r => {
-        return res.status(200).send(r[0])
-    })
+        )`).then(r => {
+            return res.status(200).send(r[0])
+        })
+    } else {
+        db.raw(`
+            SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND la_type = '${req.params.filter}' AND st_id IN (
+                SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
+            )
+        `).then(r => {
+            return res.status(200).send(r[0])
+        })
+    }
 })
 
 router.get('/getByEmployee/:emp_id', (req, res) => {
