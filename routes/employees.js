@@ -1076,7 +1076,7 @@ router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
         employee_final_with_give_salary.total_accomodation,
         employee_final_with_give_salary.loan_by_accomodation,
         employee_final_with_give_salary.accomodation_by_accomodation,
-        employee_final_with_give_salary.exense_by_accomodation,
+        employee_final_with_give_salary.expense_by_accomodation,
         employee_final_with_give_salary.total_f,
         employee_final_with_give_salary.total_h_not_work,
         ((employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) + employee_final_with_give_salary.added_overtime) as total_hour,
