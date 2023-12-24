@@ -906,7 +906,7 @@ router.post('/getEmployeeBystaffForLoan/:st_id',(req,res)=>{
     tbl_employees.phone as phone, 
     tbl_employees.country as country, 
     tbl_employees.salary_type 
-    from tbl_employees where st_id=? and active_status = '1'`,[req.params.st_id]).then(([data])=>{
+    from tbl_employees where st_id=? ORDER BY active_status DESC`,[req.params.st_id]).then(([data])=>{
     return res.status(200).send(data);
   }).catch((err)=>{
     return res.status(500).json({
