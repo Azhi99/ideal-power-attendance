@@ -822,11 +822,11 @@ router.post("/searchEmployee", (req, res) => {
     })
 });
 
-router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
+router.post('/getEmployeeInfo/:id/:month/:year', async (req,res)=>{
   var [gived_salary]  = await db("tbl_gived_salary")
     .where("salary_month", req.params.month)
     .andWhere("salary_year", req.params.year)
-    .andWhereRaw("emp_id = (select emp_id from tbl_employees where phone=?)", [req.params.phone])
+    .andWhereRaw("emp_id = ?", [req.params.id])
     .select([
       "gs_id",
       "monthly_salary",
@@ -843,8 +843,8 @@ router.post('/getEmployeeInfo/:phone/:month/:year', async (req,res)=>{
       "other_minus",
     ]).limit(1);
   const gs_id = (typeof gived_salary == "undefined" ? null: gived_salary.gs_id);
-  const [[employee]] = await db.raw('select * from employee_final_with_give_salary where phone=? and date_to_m=? and date_to_y=? limit 1', [req.params.phone,req.params.month,req.params.year])
-  const [each_days] = await db.raw('select * from employee_month_info_each_days where phone=? and date_to_m=? and date_to_y=?', [req.params.phone,req.params.month,req.params.year])
+  const [[employee]] = await db.raw('select * from employee_final_with_give_salary where emp_id=? and date_to_m=? and date_to_y=? limit 1', [req.params.id,req.params.month,req.params.year])
+  const [each_days] = await db.raw('select * from employee_month_info_each_days where emp_id=? and date_to_m=? and date_to_y=?', [req.params.id,req.params.month,req.params.year])
   const [each_give_salary] = await db.raw("select * from tbl_gived_salary_detail where gs_id = ?", [gs_id]);
   return res.status(200).json({
     gs_id,
@@ -928,7 +928,7 @@ router.post('/getAllEmployeeBystaff/:st_id',(req,res)=>{
 });
 
 router.post('/getDeactivedEmployeeBystaff/:st_id',(req,res)=>{
-  db.raw("select CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone from tbl_employees where st_id=? and active_status = '0'",[req.params.st_id]).then(([data])=>{
+  db.raw("select CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone, tbl_employees.emp_id as emp_id from tbl_employees where st_id=? and active_status = '0'",[req.params.st_id]).then(([data])=>{
     return res.status(200).send(data);
   }).catch((err)=>{
     return res.status(500).json({
