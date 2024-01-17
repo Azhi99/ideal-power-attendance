@@ -73,6 +73,7 @@ router.post("/addEmployee", createValidation, (req, res) => {
       car_number: req.body.car_number || null,
       living_location: req.body.living_location || null,
       first_work_date: req.body.first_work_date || null,
+      job: req.body.job || null,
     })
     .then(([data]) => {
       if (personal_image_path != null) {
@@ -174,6 +175,7 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           car_number: req.body.car_number || null,
           living_location: req.body.living_location || null,
           first_work_date: req.body.first_work_date || null,
+          job: req.body.job || null,
         })
         .then(() => {
           return res.status(200).json({
@@ -443,7 +445,8 @@ router.post("/getData", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -493,7 +496,8 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -541,7 +545,8 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -590,7 +595,8 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -639,7 +645,8 @@ router.post("/getForReport", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -689,7 +696,8 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -738,7 +746,8 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -806,7 +815,8 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.car as car",
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
-    "tbl_employees.first_work_date as first_work_date"
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -1050,6 +1060,8 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
   SELECT
       tbl_employees.emp_id,
       concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as employee_full_name,
+      tbl_employees.job,
+      tbl_employees.country,
       employee_final_with_give_salary.salary_type,
       employee_final_with_give_salary.monthly_salary,
       employee_final_with_give_salary.daily_salary,
