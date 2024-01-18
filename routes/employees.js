@@ -928,7 +928,7 @@ router.post('/getEmployeeBystaffForLoan/:st_id',(req,res)=>{
 });
 
 router.post('/getAllEmployeeBystaff/:st_id',(req,res)=>{
-  db.raw("select CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone, tbl_employees.active_status as active_status from tbl_employees where st_id=?",[req.params.st_id]).then(([data])=>{
+  db.raw("select tbl_employees.emp_id as emp_id, CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name , tbl_employees.phone as phone, tbl_employees.active_status as active_status, tbl_employees.sort_code as sort_code from tbl_employees where st_id=?",[req.params.st_id]).then(([data])=>{
     return res.status(200).send(data);
   }).catch((err)=>{
     return res.status(500).json({
@@ -1062,6 +1062,7 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
       concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as employee_full_name,
       tbl_employees.job,
       tbl_employees.country,
+      tbl_employees.sort_code,
       employee_final_with_give_salary.salary_type,
       employee_final_with_give_salary.monthly_salary,
       employee_final_with_give_salary.daily_salary,
@@ -1180,6 +1181,17 @@ router.get('/getZeroList/:year/:month/:st_id', (req, res) => {
   `).then(([data]) => {
     return res.status(200).send(data)
   })
+})
+
+router.post('/saveEmployeesSort', async (req, res) => {
+  const list = req.body.list
+  for(let i = 0; i < list.length; i++) {
+    await db('tbl_employees').where('emp_id', list[i].emp_id).update({
+      sort_code: i
+    })
+  }
+
+  res.sendStatus(200);
 })
 
 router.post('/addZeroList', (req, res) => {
