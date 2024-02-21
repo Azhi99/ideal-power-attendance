@@ -1114,6 +1114,36 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
   });
 })
 
+router.post('/saveNoteZeroList/:month/:year/:st_id/:emp_id', async (req, res) => {
+  try {
+    await db('salary_list_to_null').where('month', req.params.month).andWhere('year', req.params.year).andWhere('st_id', req.params.st_id).andWhere('emp_id', req.params.emp_id).update({
+      note: req.body.note
+    });
+    return res.sendStatus(200);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+})
+
+router.post('/getZerosByMonthAndYear', async (req, res) => {
+  let query = ""
+  let arrQuery = []
+  if(req.body.staff_id) {
+    query = ` AND salary_list_to_null.st_id = ?`
+    arrQuery.push(req.body.staff_id)
+  }
+  const [zeros] = await db.raw(`
+    SELECT 
+      salary_list_to_null.*,
+      CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name
+      FROM salary_list_to_null 
+      JOIN tbl_employees ON (tbl_employees.emp_id = salary_list_to_null.emp_id)
+      WHERE salary_list_to_null.month = ? AND salary_list_to_null.year = ? ${query}
+  `, [req.body.month, req.body.year, ...arrQuery])
+  
+  return res.status(200).send(zeros);
+})
+
 router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
   const staffs = await db('tbl_staffs').where('show_staff', '1').select();
   const salary_list = [];
