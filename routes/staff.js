@@ -69,6 +69,17 @@ router.patch("/showOn/:st_id", (req, res) => {
     });
 });
 
+router.post('/saveStaffSort', async (req, res) => {
+  const list = req.body.list
+  for(let i = 0; i < list.length; i++) {
+    await db('tbl_staffs').where('st_id', list[i].st_id).update({
+      staff_sort_code: i
+    })
+  }
+
+  res.sendStatus(200);
+})
+
 router.delete("/deleteStaff/:st_id", (req, res) => {
   db("tbl_staffs")
     .where("st_id", req.params.st_id)
