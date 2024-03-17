@@ -380,7 +380,8 @@ router.post("/getDailyList", async (req, res) => {
   )
     .from("tbl_daily_staff_list")
     .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
-    .where("tbl_daily_staff_list.work_date", req.body.work_date);
+    .where("tbl_daily_staff_list.work_date", req.body.work_date)
+    .orderBy("tbl_staffs.staff_sort_code", "ASC");
   
   const list_details = await db.select(
                               "tbl_attendance.at_id as at_id",
