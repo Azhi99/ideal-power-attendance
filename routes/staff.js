@@ -69,6 +69,14 @@ router.patch("/showOn/:st_id", (req, res) => {
     });
 });
 
+router.post('/updateSpecialStaff/:st_id', async (req, res) => {
+  await db('tbl_staffs').where('st_id', req.params.st_id).update({
+    special_staff: req.body.special_staff
+  })
+
+  res.sendStatus(200);
+})
+
 router.post('/saveStaffSort', async (req, res) => {
   const list = req.body.list
   for(let i = 0; i < list.length; i++) {

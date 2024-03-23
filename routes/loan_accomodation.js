@@ -53,6 +53,8 @@ router.post('/getAllDetailByIds', async (req, res) => {
             loan_accomodation.la_type,
             loan_accomodation.st_id,
             tbl_staffs.staff_name,
+            tbl_staffs.staff_sort_code,
+            tbl_staffs.special_staff,
             loan_accomodation.salary_type
         FROM loan_accomodation_detail
         INNER JOIN loan_accomodation ON loan_accomodation_detail.la_id = loan_accomodation.la_id

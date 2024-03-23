@@ -326,6 +326,7 @@ router.post("/getListAndAttendance", async (req, res) => {
       "tbl_attendance.old_st_id as main_st_id",
       "tbl_attendance.st_id as st_id",
       "tbl_employees.salary_type as salary_type",
+      "tbl_employees.sort_code as sort_code",
       "tbl_attendance.overtime as overtime",
       "tbl_attendance.worked_hours as worked_hours",
       "tbl_attendance.fine as fine",
@@ -370,6 +371,7 @@ router.post("/getDailyList", async (req, res) => {
   const lists = await db.select(
     "tbl_daily_staff_list.dsl_id as dsl_id",
     "tbl_staffs.staff_name as staff_name",
+    "tbl_staffs.special_staff as special_staff",
     "tbl_daily_staff_list.user as user",
     "tbl_daily_staff_list.st_id as st_id",
     "tbl_daily_staff_list.location as location",
@@ -390,6 +392,7 @@ router.post("/getDailyList", async (req, res) => {
                               "tbl_attendance.absent as status",
                               "tbl_attendance.location as location",
                               "tbl_employees.st_id as st_id",
+                              "tbl_employees.sort_code as sort_code",
                               "tbl_attendance.overtime as overtime",
                               "tbl_attendance.worked_hours as worked_hours",
                             )
@@ -407,10 +410,13 @@ router.post("/getDailyList", async (req, res) => {
 
   data.staffs = await db.raw(`
     SELECT 
-      st_id,
-      dsl_id
+      tbl_daily_staff_list.st_id,
+      tbl_daily_staff_list.dsl_id,
+      tbl_staffs.special_staff
     FROM tbl_daily_staff_list
-    WHERE work_date = '${new Date(req.body.work_date).toISOString().split('T')[0]}'
+    JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_daily_staff_list.st_id)
+    WHERE tbl_daily_staff_list.work_date = '${new Date(req.body.work_date).toISOString().split('T')[0]}'
+    ORDER BY tbl_staffs.staff_sort_code
   `).then(r => r[0]);
 
   for(let i = 0; i < data.staffs.length; i++){
@@ -424,12 +430,14 @@ router.post("/getDailyList", async (req, res) => {
         tbl_daily_staff_list.dsl_id,
         tbl_daily_staff_list.st_id,
         tbl_staffs.staff_name,
+        tbl_employees.sort_code,
         CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee_full_name
       FROM tbl_attendance
       JOIN tbl_daily_staff_list ON tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id
       JOIN tbl_staffs ON tbl_staffs.st_id = tbl_daily_staff_list.st_id
       JOIN tbl_employees ON tbl_employees.emp_id = tbl_attendance.emp_id
       WHERE tbl_daily_staff_list.dsl_id = ${data.staffs[i].dsl_id}
+      ORDER BY tbl_employees.sort_code ASC
     `).then(r => r[0]);
     
   }

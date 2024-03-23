@@ -1160,6 +1160,7 @@ router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
         employee_final_with_give_salary.date_to_m,
         employee_final_with_give_salary.date_to_y,
         tbl_employees.st_id,
+        tbl_employees.sort_code,
         (employee_final_with_give_salary.count_present + employee_final_with_give_salary.added_days) as count_present,
         employee_final_with_give_salary.total_o,
         employee_final_with_give_salary.total_fine,
