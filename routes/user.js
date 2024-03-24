@@ -14,7 +14,7 @@ router.post("/getData", (req, res) => {
         "role",
         "phone",
         "active_status"
-    ]).then((data) => {
+    ]).orderBy('user_id', 'desc').then((data) => {
         return res.status(200).send(data);
     });
 });

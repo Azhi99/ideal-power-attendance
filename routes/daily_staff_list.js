@@ -393,6 +393,7 @@ router.post("/getDailyList", async (req, res) => {
                               "tbl_attendance.location as location",
                               "tbl_employees.st_id as st_id",
                               "tbl_employees.sort_code as sort_code",
+                              "tbl_employees.job as job",
                               "tbl_attendance.overtime as overtime",
                               "tbl_attendance.worked_hours as worked_hours",
                             )
@@ -412,6 +413,7 @@ router.post("/getDailyList", async (req, res) => {
     SELECT 
       tbl_daily_staff_list.st_id,
       tbl_daily_staff_list.dsl_id,
+      tbl_daily_staff_list.datetime_list,
       tbl_staffs.special_staff
     FROM tbl_daily_staff_list
     JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_daily_staff_list.st_id)
@@ -431,6 +433,7 @@ router.post("/getDailyList", async (req, res) => {
         tbl_daily_staff_list.st_id,
         tbl_staffs.staff_name,
         tbl_employees.sort_code,
+        tbl_employees.job,
         CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee_full_name
       FROM tbl_attendance
       JOIN tbl_daily_staff_list ON tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id
