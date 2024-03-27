@@ -3,6 +3,9 @@ const db = require("../DB/mainDBconfig.js");
 const router = express.Router();
 
 router.post("/addList", (req, res) => {
+  const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+  baghdadTime.setHours(baghdadTime.getHours() + 3)
+  req.body.datetime_list = baghdadTime
   db("tbl_daily_staff_list")
     .insert({
       st_id: req.body.st_id,
@@ -149,6 +152,9 @@ router.post("/addList", (req, res) => {
                     .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
                     .where("tbl_attendance.dsl_id", dsl_id)
                     .then(async (data) => {
+                      const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+                      baghdadTime.setHours(baghdadTime.getHours() + 3)
+                      req.body.datetime_log = baghdadTime
                       await db('tbl_log').insert({
                         dsl_id,
                         st_id: req.body.st_id,
@@ -241,6 +247,9 @@ router.post("/createRestList", (req, res) => {
                 db.raw(obj.st_id + " as old_st_id")
               ]).then(async (data) => {
                 db("tbl_attendance").insert(data).then(() => {});
+                const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                   dsl_id,
                   st_id: obj.st_id,
@@ -266,8 +275,11 @@ router.patch("/updateList/:dsl_id", (req, res) => {
     note: req.body.note,
     food_number:req.body.food_number,
     food_group:req.body.food_group,
-    datetime_list: req.body.datetime_list,
+    // datetime_list: req.body.datetime_list,
   }).then(async ()=>{
+    const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+    baghdadTime.setHours(baghdadTime.getHours() + 3)
+    req.body.datetime_log = baghdadTime
     await db('tbl_log').insert({
       dsl_id: req.params.dsl_id,
       st_id: req.body.st_id,
@@ -532,6 +544,9 @@ router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
       datetime_food: req.body.datetime_food
     }).then(async () => {
       if(data.food_number != req.body.food_number) {
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
           dsl_id: req.params.dsl_id,
           st_id: req.body.st_id,
@@ -560,10 +575,13 @@ router.patch('/setFoodGroup/:dsl_id', (req, res)=>{
       datetime_food: req.body.datetime_food
     }).then(async () => {
       if(data.food_group != req.body.food_group) {
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
           dsl_id: req.params.dsl_id,
           st_id: req.body.st_id,
-          user: req.body.user,
+          user: req.body.user,  
           datetime_log: req.body.datetime_log,
           work: (`
             گۆڕینی گروپی خواردن لە ${data.food_group} بۆ ${req.body.food_group}

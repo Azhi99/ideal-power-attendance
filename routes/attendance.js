@@ -26,9 +26,12 @@ router.post("/addAttendance", (req, res) => {
         st_id: req.body.st_id,
         old_st_id: req.body.st_id
     }).then(async ([data]) => {
-        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-            datetime_list: req.body.datetime_list
-        })
+        // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+        //     datetime_list: req.body.datetime_list
+        // })
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
@@ -83,9 +86,12 @@ router.patch("/setAbsent/:at_id", (req, res) => {
         accomodation: 0,
         accomodation_reason: null
     }).then(async () => {
-        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-            datetime_list: req.body.datetime_list
-        })
+        // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+        //     datetime_list: req.body.datetime_list
+        // })
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
@@ -110,9 +116,12 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
         absent: "0",
         worked_hours: 8
     }).then(async () => {
-        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-            datetime_list: req.body.datetime_list
-        })
+        // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+        //     datetime_list: req.body.datetime_list
+        // })
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
@@ -138,9 +147,12 @@ router.patch("/setOff/:at_id", (req, res) => {
         worked_hours: 0,
         overtime: 0
     }).then(async () => {
-        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-            datetime_list: req.body.datetime_list
-        })
+        // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+        //     datetime_list: req.body.datetime_list
+        // })
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
@@ -195,6 +207,9 @@ router.patch('/updateAttendance/:at_id',(req, res)=>{
                 ${data.accomodation_reason != req.body.accomodation_reason ? `هۆکاری ئیقامە لە ${data.accomodation_reason || ''} بۆ: ${req.body.accomodation_reason || ''}` : ''}
             `).trim();
             if(work.split('\n').length > 1) {
+                const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                     dsl_id: req.body.dsl_id,
                     st_id: req.body.st_id,
@@ -219,10 +234,13 @@ router.patch('/setWorkedHours/:at_id',(req, res)=>{
         db('tbl_attendance').where('at_id', req.params.at_id).update({
             worked_hours: req.body.worked_hours
         }).then(async ()=>{
-            await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-                datetime_list: req.body.datetime_list
-            })
+            // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            //     datetime_list: req.body.datetime_list
+            // })
             if(data.worked_hours != req.body.worked_hours) {
+                const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                     dsl_id: req.body.dsl_id,
                     st_id: req.body.st_id,
@@ -249,10 +267,13 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
         db('tbl_attendance').where('at_id', req.params.at_id).update({
             overtime: req.body.overtime
         }).then(async ()=>{
-            await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-                datetime_list: req.body.datetime_list
-            })
+            // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+            //     datetime_list: req.body.datetime_list
+            // })
             if(data.overtime != req.body.overtime) {
+                const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                     dsl_id: req.body.dsl_id,
                     st_id: req.body.st_id,
@@ -278,9 +299,12 @@ router.patch("/setLocation/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         location: req.body.location
     }).then(async () => {
-        await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
-            datetime_list: req.body.datetime_list
-        })
+        // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+        //     datetime_list: req.body.datetime_list
+        // })
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
@@ -300,6 +324,9 @@ router.patch("/updateAttendancesLocation", (req, res) => {
     db("tbl_attendance").whereIn("at_id", req.body.emps).update({
         location: req.body.location
     }).then(async () => {
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
             st_id: req.body.st_id,
