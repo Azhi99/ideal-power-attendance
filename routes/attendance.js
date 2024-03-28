@@ -30,7 +30,7 @@ router.post("/addAttendance", (req, res) => {
         //     datetime_list: req.body.datetime_list
         // })
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
@@ -90,7 +90,7 @@ router.patch("/setAbsent/:at_id", (req, res) => {
         //     datetime_list: req.body.datetime_list
         // })
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
@@ -120,7 +120,7 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
         //     datetime_list: req.body.datetime_list
         // })
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
@@ -151,7 +151,7 @@ router.patch("/setOff/:at_id", (req, res) => {
         //     datetime_list: req.body.datetime_list
         // })
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
@@ -208,7 +208,7 @@ router.patch('/updateAttendance/:at_id',(req, res)=>{
             `).trim();
             if(work.split('\n').length > 1) {
                 const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                baghdadTime.setHours(baghdadTime.getHours() - 4)
                 req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                     dsl_id: req.body.dsl_id,
@@ -239,7 +239,7 @@ router.patch('/setWorkedHours/:at_id',(req, res)=>{
             // })
             if(data.worked_hours != req.body.worked_hours) {
                 const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                baghdadTime.setHours(baghdadTime.getHours() - 4)
                 req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                     dsl_id: req.body.dsl_id,
@@ -272,7 +272,7 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
             // })
             if(data.overtime != req.body.overtime) {
                 const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                baghdadTime.setHours(baghdadTime.getHours() - 4)
                 req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                     dsl_id: req.body.dsl_id,
@@ -303,7 +303,7 @@ router.patch("/setLocation/:at_id", (req, res) => {
         //     datetime_list: req.body.datetime_list
         // })
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,
@@ -325,7 +325,7 @@ router.patch("/updateAttendancesLocation", (req, res) => {
         location: req.body.location
     }).then(async () => {
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
             dsl_id: req.body.dsl_id,

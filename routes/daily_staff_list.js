@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post("/addList", (req, res) => {
   const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-  baghdadTime.setHours(baghdadTime.getHours() + 3)
+  baghdadTime.setHours(baghdadTime.getHours() - 4)
   req.body.datetime_list = baghdadTime
   db("tbl_daily_staff_list")
     .insert({
@@ -153,7 +153,7 @@ router.post("/addList", (req, res) => {
                     .where("tbl_attendance.dsl_id", dsl_id)
                     .then(async (data) => {
                       const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-                      baghdadTime.setHours(baghdadTime.getHours() + 3)
+                      baghdadTime.setHours(baghdadTime.getHours() - 4)
                       req.body.datetime_log = baghdadTime
                       await db('tbl_log').insert({
                         dsl_id,
@@ -248,7 +248,7 @@ router.post("/createRestList", (req, res) => {
               ]).then(async (data) => {
                 db("tbl_attendance").insert(data).then(() => {});
                 const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-                baghdadTime.setHours(baghdadTime.getHours() + 3)
+                baghdadTime.setHours(baghdadTime.getHours() - 4)
                 req.body.datetime_log = baghdadTime
                 await db('tbl_log').insert({
                   dsl_id,
@@ -278,7 +278,7 @@ router.patch("/updateList/:dsl_id", (req, res) => {
     // datetime_list: req.body.datetime_list,
   }).then(async ()=>{
     const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-    baghdadTime.setHours(baghdadTime.getHours() + 3)
+    baghdadTime.setHours(baghdadTime.getHours() - 4)
     req.body.datetime_log = baghdadTime
     await db('tbl_log').insert({
       dsl_id: req.params.dsl_id,
@@ -545,7 +545,7 @@ router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
     }).then(async () => {
       if(data.food_number != req.body.food_number) {
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
           dsl_id: req.params.dsl_id,
@@ -576,7 +576,7 @@ router.patch('/setFoodGroup/:dsl_id', (req, res)=>{
     }).then(async () => {
       if(data.food_group != req.body.food_group) {
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-        baghdadTime.setHours(baghdadTime.getHours() + 3)
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
         req.body.datetime_log = baghdadTime
         await db('tbl_log').insert({
           dsl_id: req.params.dsl_id,
