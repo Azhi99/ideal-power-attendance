@@ -20,6 +20,7 @@ router.post("/addList", (req, res) => {
     })
     .then(async ([data]) => {
       var dsl_id = data;
+      const new_list = await db("tbl_daily_staff_list").where("dsl_id", dsl_id).select().first();
       const [[{maxID}]] = await db.raw('select max(dsl_id) as maxID from tbl_daily_staff_list');
       if(maxID < dsl_id) {
         try {
@@ -167,6 +168,7 @@ router.post("/addList", (req, res) => {
                       return res.status(200).json({
                         message: "List created",
                         dsl_id,
+                        datetime_list: new_list.datetime_list,
                         employees: data,
                       });
                     });
