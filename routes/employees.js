@@ -833,6 +833,49 @@ router.post("/searchEmployee", (req, res) => {
     })
 });
 
+router.post("/searchByID", (req, res) => {
+  db.select(
+    "tbl_employees.emp_id as emp_id",
+    "tbl_employees.first_name as first_name",
+    "tbl_employees.last_name as last_name",
+    "tbl_employees.st_id as st_id",
+    "tbl_staffs.staff_name as staff_name",
+    "tbl_employees.phone as phone",
+    "tbl_employees.reg_date as reg_date",
+    "tbl_employees.salary_type",
+    "tbl_employees.active_status as active_status",
+    "tbl_employees.birth_date as birth_date",
+    "tbl_employees.monthly_salary as monthly_salary",
+    "tbl_employees.daily_salary as daily_salary",
+    "tbl_employees.hour_salary as hour_salary",
+    "tbl_employees.identification_image_path as identification_image_path",
+    "tbl_employees.personal_image_path as personal_image_path",
+    "tbl_employees.country as country",
+    "tbl_employees.food_money as food_money",
+    "tbl_employees.transport_money as transport_money",
+    "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.expense_money as expense_money",
+    "tbl_employees.fine_money as fine_money",
+    "tbl_employees.loan_money as loan_money",
+    "tbl_employees.accomodation_money as accomodation_money",
+    "tbl_employees.other_expense as other_expense",
+    "tbl_employees.other_minus as other_minus",
+    "tbl_employees.expiry_passport as expiry_passport",
+    "tbl_employees.asaish_code as asaish_code",
+    "tbl_employees.phone2 as phone2",
+    "tbl_employees.car as car",
+    "tbl_employees.car_number as car_number",
+    "tbl_employees.living_location as living_location",
+    "tbl_employees.first_work_date as first_work_date",
+    "tbl_employees.job as job"
+  )
+    .from("tbl_employees")
+    .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
+    .where("tbl_employees.emp_id", "=", req.body.search_value).then((data) => {
+      return res.status(200).send(data);
+    })
+});
+
 router.post('/getEmployeeInfo/:id/:month/:year', async (req,res)=>{
   var [gived_salary]  = await db("tbl_gived_salary")
     .where("salary_month", req.params.month)
