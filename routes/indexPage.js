@@ -7,11 +7,13 @@ router.post("/", async (req, res) => {
     const [{noOfStaffLog}] = await db("tbl_staff_log_employee").count("* as noOfStaffLog");
     const [{noOfActiveLog}] = await db("tbl_active_log_employee").count("* as noOfActiveLog");
     const [{noOfExpired}] = await db("tbl_employees").where("expiry_passport", "<=", db.fn.now()).count("* as noOfExpired");
+    const cabinas = await db("cabinas").select("*");
     return res.status(200).json({
         noOfEmployees,
         noOfStaffLog,
         noOfActiveLog,
-        noOfExpired
+        noOfExpired,
+        cabinas
     });
 });
 

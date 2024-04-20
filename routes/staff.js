@@ -122,6 +122,23 @@ router.post("/getData", (req, res) => {
     });
 });
 
+router.post("/getStaffsAndCabinas", async (req, res) => {
+  try {
+    const staffs = await db("tbl_staffs").select();
+    const cabinas = await db("cabinas").select().where("cabina_status", "1")
+
+    return res.status(200).json({
+      staffs,
+      cabinas
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err,
+    });
+  
+  }
+});
+
 router.post("/getStaffReport", async (req, res) => {
   var staffs = [];
   var employees = [];

@@ -10,6 +10,7 @@ const db_user = require("./DB/userDBconfig.js");
 const db = require("./DB/mainDBconfig.js"); 
 
 const jobRouter = require("./routes/job.js");
+const cabinaRouter = require("./routes/cabinas.js");
 const staffRouter = require("./routes/staff.js");
 const userRouter = require("./routes/user.js");
 const enginnerRouter = require('./routes/engineer.js')
@@ -19,6 +20,7 @@ const attendanceRouter = require('./routes/attendance');
 const indexRouter = require("./routes/indexPage.js");
 const giveSalaryRouter = require("./routes/gived_salary.js");
 const expirePassportRouter = require("./routes/expirePassport.js");
+const expireAccomodationRouter = require("./routes/expireAccomodation.js");
 const staffExpensesRouter = require("./routes/staff_expenses.js");
 const loanAccomodationRouter = require("./routes/loan_accomodation.js");
 
@@ -46,6 +48,7 @@ app.use(session({
 }));
 
 app.use("/job", jobRouter);
+app.use("/cabina", cabinaRouter);
 app.use("/user", userRouter);
 app.use("/employee", employeeRouter);
 app.use("/staff", staffRouter);
@@ -56,6 +59,7 @@ app.use('/attendance',attendanceRouter);
 app.use('/index', indexRouter);
 app.use('/gived_salary', giveSalaryRouter);
 app.use('/expirePassport', expirePassportRouter);
+app.use('/expireAccomodation', expireAccomodationRouter);
 app.use('/staff_expenses', staffExpensesRouter);
 app.use('/loan_accomodation', loanAccomodationRouter);
 
