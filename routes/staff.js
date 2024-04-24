@@ -9,7 +9,13 @@ router.post("/addStaff", (req, res) => {
       staff_name: req.body.staff_name,
       show_staff: '1'
     })
-    .then(([data]) => {
+    .then(async ([data]) => {
+
+      const [[{ staff_sort_code }]] = await db.raw(`select IFNULL(max(staff_sort_code), 0) as staff_sort_code from tbl_staffs where show_staff = '1' `)
+      await db('tbl_staffs').where('st_id', data).update({
+        staff_sort_code: staff_sort_code + 1
+      })
+
       return res.status(200).json({
         message: "Staff Added",
         st_id: data,

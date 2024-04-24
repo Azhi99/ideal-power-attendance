@@ -82,6 +82,12 @@ router.get("/getEmployeeCabina/:month/:year/:cabina_id", async (req, res) => {
             saved_cabinas.expire_accomodation,
             saved_cabinas.price,
             tbl_employees.country,
+            tbl_employees.birth_date,
+            saved_cabinas.city,
+            saved_cabinas.passport_number,
+            saved_cabinas.accomodation_number,
+            saved_cabinas.job,
+            saved_cabinas.asaish_code,
             cabinas.cabina_name,
             tbl_staffs.staff_name
         FROM
@@ -107,6 +113,12 @@ router.get("/getEmployeeCabina/:month/:year/:cabina_id", async (req, res) => {
                 tbl_employees.expiry_passport,
                 tbl_employees.expire_accomodation,
                 tbl_employees.country,
+                tbl_employees.city,
+                tbl_employees.passport_number,
+                tbl_employees.accomodation_number,
+                tbl_employees.birth_date,
+                tbl_employees.job,
+                tbl_employees.asaish_code,
                 cabinas.cabina_id,
                 cabinas.cabina_name,
                 tbl_staffs.staff_name
@@ -135,7 +147,12 @@ router.post("/saveEmployeeCabina/:month/:year/:price/:cabina_id", async (req, re
                 tbl_employees.st_id as st_id,
                 tbl_employees.phone as phone,
                 tbl_employees.expiry_passport as expiry_passport,
-                tbl_employees.expire_accomodation as expire_accomodation
+                tbl_employees.expire_accomodation as expire_accomodation,
+                tbl_employees.city as city,
+                tbl_employees.job as job,
+                tbl_employees.asaish_code as asaish_code,
+                tbl_employees.passport_number as passport_number,
+                tbl_employees.accomodation_number as accomodation_number
             FROM
                 tbl_employees
             WHERE
@@ -157,6 +174,12 @@ router.post("/saveEmployeeCabina/:month/:year/:price/:cabina_id", async (req, re
                 saved_cabinas.expire_accomodation,
                 saved_cabinas.price,
                 tbl_employees.country,
+                tbl_employees.birth_date,
+                saved_cabinas.city,
+                saved_cabinas.job,
+                saved_cabinas.asaish_code,
+                saved_cabinas.passport_number,
+                saved_cabinas.accomodation_number,
                 cabinas.cabina_name,
                 tbl_staffs.staff_name
             FROM
@@ -187,6 +210,12 @@ router.delete("/deleteEmployeeCabina/:month/:year/:cabina_id", (req, res) => {
                 tbl_employees.expiry_passport,
                 tbl_employees.expire_accomodation,
                 tbl_employees.country,
+                tbl_employees.city,
+                tbl_employees.passport_number,
+                tbl_employees.accomodation_number,
+                tbl_employees.birth_date,
+                tbl_employees.job,
+                tbl_employees.asaish_code,
                 cabinas.cabina_id,
                 cabinas.cabina_name,
                 tbl_staffs.staff_name

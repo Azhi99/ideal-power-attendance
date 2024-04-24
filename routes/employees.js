@@ -64,6 +64,7 @@ router.post("/addEmployee", createValidation, (req, res) => {
       personal_image_path,
       active_status:"1",
       country: req.body.country,
+      city: req.body.city,
       food_money: req.body.food_money,
       transport_money: req.body.transport_money,
       cabina_money: req.body.cabina_money,
@@ -74,7 +75,9 @@ router.post("/addEmployee", createValidation, (req, res) => {
       other_expense: req.body.other_expense,
       other_minus: req.body.other_minus,
       expiry_passport: req.body.expiry_passport || null,
+      passport_number: req.body.passport_number || null,
       expire_accomodation: req.body.expire_accomodation || null,
+      accomodation_number: req.body.accomodation_number || null,
       asaish_code: req.body.asaish_code || null,
       phone2: req.body.phone2 || null,
       car: req.body.car || null,
@@ -83,7 +86,7 @@ router.post("/addEmployee", createValidation, (req, res) => {
       first_work_date: req.body.first_work_date || null,
       job: req.body.job || null,
     })
-    .then(([data]) => {
+    .then(async ([data]) => {
       if (personal_image_path != null) {
         req.files.personal_image.mv("./public/employee_images/" + req.files.personal_image.name, function (err) {
             if (err) {
@@ -114,6 +117,9 @@ router.post("/addEmployee", createValidation, (req, res) => {
           }
         );
       }
+      const [[{ sort_code }]] = await db.raw(`select IFNULL(max(sort_code), 0) as sort_code from tbl_employees where st_id = ${req.body.st_id} and active_status = '1'`);
+      await db("tbl_employees").where("emp_id", data).update({ sort_code: sort_code + 1 })
+      
       return res.status(200).json({
         message: "Employee Added",
         emp_id: data,
@@ -168,6 +174,7 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           daily_salary: req.body.daily_salary,
           hour_salary: req.body.hour_salary,
           country: req.body.country,
+          city: req.body.city,
           food_money: req.body.food_money,
           transport_money: req.body.transport_money,
           cabina_money: req.body.cabina_money,
@@ -178,7 +185,9 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           other_expense: req.body.other_expense,
           other_minus: req.body.other_minus,
           expiry_passport: req.body.expiry_passport || null,
+          passport_number: req.body.passport_number || null,
           expire_accomodation: req.body.expire_accomodation || null,
+          accomodation_number: req.body.accomodation_number || null,
           asaish_code: req.body.asaish_code || null,
           phone2: req.body.phone2 || null,
           car: req.body.car || null,
@@ -458,7 +467,11 @@ router.post("/getData", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
+
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -511,7 +524,10 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -562,7 +578,10 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -614,7 +633,10 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -666,7 +688,10 @@ router.post("/getForReport", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -719,7 +744,10 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -771,7 +799,10 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -842,7 +873,10 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -895,7 +929,10 @@ router.post("/searchByID", (req, res) => {
     "tbl_employees.car_number as car_number",
     "tbl_employees.living_location as living_location",
     "tbl_employees.first_work_date as first_work_date",
-    "tbl_employees.job as job"
+    "tbl_employees.job as job",
+    "tbl_employees.city as city",
+    "tbl_employees.passport_number as passport_number",
+    "tbl_employees.accomodation_number as accomodation_number",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -1153,6 +1190,7 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
       employee_final_with_give_salary.loan_by_accomodation,
       employee_final_with_give_salary.accomodation_by_accomodation,
       employee_final_with_give_salary.expense_by_accomodation,
+      employee_final_with_give_salary.fine_by_accomodation,
       employee_final_with_give_salary.total_f,
       employee_final_with_give_salary.total_h_not_work,
       (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
@@ -1244,6 +1282,7 @@ router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
         employee_final_with_give_salary.loan_by_accomodation,
         employee_final_with_give_salary.accomodation_by_accomodation,
         employee_final_with_give_salary.expense_by_accomodation,
+        employee_final_with_give_salary.fine_by_accomodation,
         employee_final_with_give_salary.total_f,
         employee_final_with_give_salary.total_h_not_work,
         ((employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) + employee_final_with_give_salary.added_overtime) as total_hour,
