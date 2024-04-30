@@ -47,6 +47,24 @@ router.post("/addUser", createValidation, (req, res) => {
     });
 });
 
+router.post('/getActived', (req, res) => {
+    user_db("tbl_users").where("active_status", "1").andWhere('user_id', '<>', '1').select([
+        "user_id",
+        "full_name",
+    ]).orderBy('user_id', 'desc').then((data) => {
+        return res.status(200).send(data);
+    });
+})
+
+router.post('/getSelf/:user_id', (req, res) => {
+    user_db("tbl_users").whereIn('user_id', [req.params.user_id, 55]).andWhere("active_status", "1").select([
+        "user_id",
+        "full_name",
+    ]).orderBy('user_id', 'desc').then((data) => {
+        return res.status(200).send(data);
+    });
+})
+
 router.patch("/updateUser/:user_id", updateValidation, async (req, res) => {
     const [{ noOfAdmins }] = await user_db("tbl_users")
                                     .where("user_id", "<>", "1")
