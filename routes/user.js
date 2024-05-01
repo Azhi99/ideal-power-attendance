@@ -47,13 +47,45 @@ router.post("/addUser", createValidation, (req, res) => {
     });
 });
 
-router.post('/getActived', (req, res) => {
-    user_db("tbl_users").where("active_status", "1").andWhere('user_id', '<>', '1').select([
+router.post('/getActived', async (req, res) => {
+    const users = await user_db("tbl_users").where("active_status", "1").andWhere('user_id', '<>', '1').select([
         "user_id",
         "full_name",
-    ]).orderBy('user_id', 'desc').then((data) => {
-        return res.status(200).send(data);
+        "en_id",
+    ]).orderBy('user_id', 'desc')
+
+    const engineers = await db.raw(`
+        SELECT
+            tbl_engineers.*
+        FROM
+            tbl_engineers
+            JOIN tbl_staffs ON (tbl_engineers.en_id = tbl_staffs.en_id)
+        WHERE tbl_staffs.show_staff = '1' AND tbl_staffs.special_staff = 'true'
+    `).then(d => {
+        return d[0]
+    })
+
+    const en_ids = engineers.map((en) => en.en_id)
+
+    const u = users.filter((user) => !en_ids.includes(user.en_id)).map(m => {
+        return {
+            user_id: m.user_id,
+            full_name: m.full_name,
+        }
+    })
+    const e = users.filter((user) => en_ids.includes(user.en_id)).map(m => {
+        return {
+            user_id: m.user_id,
+            full_name: m.full_name,
+        }
+    })
+
+    return res.status(200).send({
+        users: u,
+        engineers: e
     });
+
+
 })
 
 router.post('/getSelf/:user_id', (req, res) => {

@@ -2,24 +2,26 @@ const express = require("express");
 const db = require("../DB/mainDBconfig.js");
 const router = express.Router();
 
-router.post("/:user_id", async (req, res) => {
+router.post("/", async (req, res) => {
     const [{noOfEmployees}] = await db("tbl_employees").where("active_status", "1").count("* as noOfEmployees");
     const [{noOfStaffLog}] = await db("tbl_staff_log_employee").count("* as noOfStaffLog");
     const [{noOfActiveLog}] = await db("tbl_active_log_employee").count("* as noOfActiveLog");
     const [{noOfExpired}] = await db("tbl_employees").where("expiry_passport", "<=", db.fn.now()).count("* as noOfExpired");
     const cabinas = await db("cabinas").select("*");
+
     
     const notifications = await db.raw(`
         SELECT
             notifications.notification_id,
             notifications.text,
-            notifications.color
+            notifications.color,
+            notifications.username
         FROM
             notifications
         JOIN notifications_users ON (notifications.notification_id = notifications_users.notification_id)
         WHERE
-            notifications_users.user_id = ${req.params.user_id}
-            AND ((NOW() BETWEEN notifications.date_from AND notifications.date_to) OR DATE_FORMAT(NOW(), '%d') = notifications.day )
+            notifications_users.user_id = ${req.body.user_id}
+            AND ((DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN notifications.date_from AND notifications.date_to) OR DATE_FORMAT(NOW(), '%d') = notifications.day )
     `).then((data) => {
         return data[0];
     });
@@ -37,7 +39,9 @@ router.post("/:user_id", async (req, res) => {
 router.post("/getStaffLogChange", (req, res) => {
     db("view_staff_log").select().offset(req.body.offset).limit(20).then((data) => {
         return res.status(200).send(data);
-     });
+     }).catch((err) => {
+        console.log(err);
+     })
 });
 
 router.delete("/deleteStaffLog/:sle_id", (req, res) => {
