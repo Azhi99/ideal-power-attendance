@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
             notifications
         JOIN notifications_users ON (notifications.notification_id = notifications_users.notification_id)
         WHERE
-            notifications_users.user_id = ${req.body.user_id}
+            notifications_users.user_id = ${req.body.user_id} AND notifications.show_notification = 'true'
             AND ((DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN notifications.date_from AND notifications.date_to) OR DATE_FORMAT(NOW(), '%d') = notifications.day )
     `).then((data) => {
         return data[0];

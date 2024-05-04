@@ -130,6 +130,16 @@ router.post('/addNotification', (req, res) => {
     });
 })
 
+router.patch('/changeShow/:notification_id', (req, res) => {
+    db('notifications').where('notification_id', req.params.notification_id).update({
+        show_notification: req.body.show_notification
+    }).then(() => {
+        return res.status(200).json({
+            message: 'Notification shown'
+        });
+    });
+})
+
 router.patch('/updateNotification/:notification_id', (req, res) => {
     const body = req.body.notification
     let selected_users = req.body.selected_users

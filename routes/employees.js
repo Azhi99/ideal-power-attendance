@@ -1255,7 +1255,9 @@ router.post('/getZerosByMonthAndYear', async (req, res) => {
 })
 
 router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
-  const staffs = await db('tbl_staffs').where('show_staff', '1').select();
+  const special = req.body.special == 'normals' ? 'false' : 'true'
+
+  const staffs = await db('tbl_staffs').where('show_staff', '1').andWhere('special_staff', special).select();
   const salary_list = [];
   const zeros = [];
   const promises = staffs.map(async (staff) => {
