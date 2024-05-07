@@ -11,7 +11,22 @@ const {
 const router = express.Router();
 router.use(fileUpload());
 
-router.post("/addEmployee", createValidation, (req, res) => {
+router.post("/addEmployee", createValidation, async (req, res) => {
+  const exist = await db.raw(`
+    SELECT 
+      tbl_employees.*,
+      tbl_staffs.staff_name
+    FROM tbl_employees
+    JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_employees.st_id)
+    WHERE tbl_employees.first_name = ? AND tbl_employees.last_name = ?
+  `, [req.body.first_name, req.body.last_name])
+
+  if (exist[0].length > 0) {
+    return res.status(500).json({
+      message: "Employee exist on staff " + exist[0][0].staff_name + " with status " + (exist[0][0].active_status === "1" ? "Active" : "Deactive"),
+    });
+  }
+
   var personal_image_path = null;
   var identification_image_path = null;
   if (req.files && req.files.personal_image != null) {
