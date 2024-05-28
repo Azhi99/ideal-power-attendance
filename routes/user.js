@@ -89,7 +89,7 @@ router.post('/getActived', async (req, res) => {
 })
 
 router.post('/getSelf/:user_id', (req, res) => {
-    user_db("tbl_users").whereIn('user_id', [req.params.user_id, 55]).andWhere("active_status", "1").select([
+    user_db("tbl_users").whereIn('user_id', [req.params.user_id, 55, 72]).andWhere("active_status", "1").select([
         "user_id",
         "full_name",
     ]).orderBy('user_id', 'desc').then((data) => {
