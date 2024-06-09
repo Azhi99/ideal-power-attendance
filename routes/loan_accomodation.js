@@ -65,22 +65,33 @@ router.post('/getAllDetailByIds', async (req, res) => {
     res.status(200).send(rows)
 })
 
-router.get('/all/:filter/:archived', (req, res) => {
-    if(req.params.filter === 'all') {
-        db('loan_accomodation_view').where('archived', req.params.archived).select().orderBy('datetime_create', 'asc').then((data) => {
-            res.status(200).send(data)
+router.post('/all', (req, res) => {
+    let q = ''
+    if(req.body.month && req.body.year) {
+        q += `AND la_id IN (
+            SELECT la_id FROM loan_accomodation_detail WHERE month = ${req.body.month} AND year = ${req.body.year}
+        )`
+    }
+
+    if(req.body.filter === 'all') {
+        db.raw(`
+            SELECT * FROM loan_accomodation_view WHERE archived = '${req.body.archived}' ${q} ORDER BY datetime_create ASC    
+        `).then((data) => {
+            res.status(200).send(data[0])
         }).catch((err) => {
             res.status(500).send({
                 err
             })
         })
-    } else if(req.params.filter.split(',').length > 1) {
-        db.raw(`SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND la_type IN (${req.params.filter.split(',').map(obj => `'${obj}'`).join(',')})`).then(r => {
+    } else if(req.body.filter.split(',').length > 1) {
+        db.raw(`SELECT * FROM loan_accomodation_view WHERE archived = '${req.body.archived}' AND la_type IN (${req.body.filter.split(',').map(obj => `'${obj}'`).join(',')}) ${q}`).then(r => {
             return res.status(200).send(r[0])
         })
     } else {
-        db('loan_accomodation_view').where('archived', req.params.archived).andWhere('la_type', req.params.filter).select().orderBy('datetime_create', 'asc').then((data) => {
-            res.status(200).send(data)
+        db.raw(`
+            SELECT * FROM loan_accomodation_view WHERE archived = '${req.body.archived}' AND la_type = '${req.body.filter}' ${q} ORDER BY datetime_create ASC    
+        `).then((data) => {
+            res.status(200).send(data[0])
         }).catch((err) => {
             res.status(500).send({
                 err
