@@ -7,16 +7,24 @@ router.post('/getDataByStaff', async (req, res) => {
     let query = ''
 
     if(req.body.project_id) {
-        query = `AND project_id = ${req.body.project_id}`
+        query = ` AND project_id = ${req.body.project_id}`
     }
 
     if(req.body.location) {
-        query = `AND location = '${req.body.location}'`
+        query = ` AND location = '${req.body.location}'`
+    }
+
+    if(req.body.staff_id) {
+        query = ` AND st_id = ${req.body.staff_id}`
+    }
+
+    if(req.body.from && req.body.to) {
+        query = ` AND form BETWEEN '${req.body.from}' AND '${req.body.to}'`
     }
 
     const rows = await db.raw(`
         SELECT * FROM staff_expenses_view 
-            WHERE st_id = ${req.body.staff_id} AND form BETWEEN '${req.body.from}' AND '${req.body.to}' ${query}
+            WHERE 1=1 ${query}
             ORDER BY form ASC
     `).then(data => {
         return data[0]
