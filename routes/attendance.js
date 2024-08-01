@@ -8,7 +8,7 @@ router.post("/addAttendance", (req, res) => {
         dsl_id: req.body.dsl_id,
         emp_id: req.body.emp_id,
         overtime: 0,
-        worked_hours: 8,
+        worked_hours: (req.body.absent == '1' || req.body.absent == '2' ? '0' : '8'),
         fine: 0,
         fine_reason: null,
         expense: 0,
@@ -21,7 +21,7 @@ router.post("/addAttendance", (req, res) => {
         loan_reason: null,
         accomodation: 0,
         accomodation_reason: null,
-        absent: "0",
+        absent: req.body.absent,
         location: req.body.location,
         st_id: req.body.st_id,
         old_st_id: req.body.st_id

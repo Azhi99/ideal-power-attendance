@@ -11,6 +11,7 @@ router.post('/getData', (req, res) => {
         FROM
             notifications
         LEFT JOIN tbl_employees ON (notifications.emp_id = tbl_employees.emp_id)
+        ORDER BY notifications.notification_id DESC
     `).then(data => {
         return res.status(200).send(data[0]);
     }).catch((err) => {
@@ -30,6 +31,7 @@ router.post('/getDataByUser/:user_id', (req, res) => {
         LEFT JOIN tbl_employees ON (notifications.emp_id = tbl_employees.emp_id)
         WHERE
         notifications.user_id = ${req.params.user_id}
+        ORDER BY notifications.notification_id DESC
     `).then(data => {
         return res.status(200).send(data[0]);
     }).catch((err) => {
