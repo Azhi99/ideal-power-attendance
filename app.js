@@ -95,7 +95,7 @@ const loginLimiter = rateLimit({
   message: "You are tried more than 10 times in a hour, wiat until 1 hour"
 });
 
-app.post("/login", loginLimiter, (req, res) => {
+app.post("/login", (req, res) => {
   if(!req.session.isLogged){
     db_user("tbl_users").where("username", (req.body.username).trim()).select().limit(1).then(([data]) => {
       if(typeof data != "undefined"){
