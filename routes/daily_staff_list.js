@@ -392,7 +392,8 @@ router.post("/getDailyList", async (req, res) => {
     "tbl_daily_staff_list.note as note",
     "tbl_daily_staff_list.datetime_list as datetime_list",
     "tbl_daily_staff_list.food_number as food_number",
-    "tbl_daily_staff_list.food_group as food_group"
+    "tbl_daily_staff_list.food_group as food_group",
+    "tbl_daily_staff_list.supervisor_name as supervisor_name"
   )
     .from("tbl_daily_staff_list")
     .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
