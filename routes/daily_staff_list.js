@@ -111,7 +111,8 @@ router.post("/addList", (req, res) => {
                       "tbl_attendance.accomodation as accomodation",
                       "tbl_attendance.accomodation_reason as accomodation_reason",
                       "tbl_attendance.absent as absent",
-                      "tbl_attendance.location as location"
+                      "tbl_attendance.location as location",
+                      "tbl_attendance.work as work"
                     )
                       .from("tbl_attendance")
                       .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
@@ -147,7 +148,8 @@ router.post("/addList", (req, res) => {
                     "tbl_attendance.accomodation as accomodation",
                     "tbl_attendance.accomodation_reason as accomodation_reason",
                     "tbl_attendance.absent as absent",
-                    "tbl_attendance.location as location"
+                    "tbl_attendance.location as location",
+                    "tbl_attendance.work as work"
                   )
                     .from("tbl_attendance")
                     .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
@@ -356,7 +358,8 @@ router.post("/getListAndAttendance", async (req, res) => {
       "tbl_attendance.accomodation as accomodation",
       "tbl_attendance.accomodation_reason as accomodation_reason",
       "tbl_attendance.absent as absent",
-      "tbl_attendance.location as location"
+      "tbl_attendance.location as location",
+      "tbl_attendance.work as work"
     ).from("tbl_attendance")
      .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
      .where("tbl_attendance.dsl_id", dsl_list.dsl_id);

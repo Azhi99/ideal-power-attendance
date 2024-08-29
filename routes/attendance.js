@@ -172,7 +172,34 @@ router.patch("/setOff/:at_id", (req, res) => {
     });
 });
 
-
+router.patch('/setWork/:at_id',(req, res)=>{
+    db('tbl_attendance').where('at_id', req.params.at_id).update({
+        work: req.body.work || null
+    }).then(async ()=>{
+        // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
+        //     datetime_list: req.body.datetime_list
+        // })
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
+        req.body.datetime_log = baghdadTime
+        await db('tbl_log').insert({
+            dsl_id: req.body.dsl_id,
+            st_id: req.body.st_id,
+            user: req.body.user,
+            datetime_log: req.body.datetime_log,
+            work: (`
+                جۆری کاری ${req.body.employee} بۆ ${req.body.work || ''}
+            `).trim()
+        })
+        return res.status(200).json({
+            message:'Setted Work'
+        });
+    }).catch((err)=>{
+        return res.status(500).json({
+            message:err
+        });
+    });
+})
 
 
 router.patch('/updateAttendance/:at_id',(req, res)=>{
