@@ -1,6 +1,8 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const fs = require("fs");
+const path = require("path")
+const multer = require("multer");
 const db = require("../DB/mainDBconfig.js");
 const {
   createValidation,
@@ -8,152 +10,145 @@ const {
   checkID,
 } = require("../validators/employees.js");
 
+const storage = multer.diskStorage({
+  destination: './employee_images/',
+  filename: function (req, file, cb) {
+    cb(null, new Date().getTime() + path.extname(file.originalname))
+  }
+})
+
+const upload = multer({
+  storage,
+  fileFilter: function (req, file, cb) {
+    const mimeType = file.mimetype
+    if(['image/png', 'image/jpg', 'image/jpeg'].includes(mimeType)) {
+      return cb(null, true)
+    } else {
+      cb(null, false)
+      return cb(new Error('Invalid file type'))
+    }
+  }
+}).single('personal_image')
+
 const router = express.Router();
-router.use(fileUpload());
+// router.use(fileUpload());
 
-router.post("/addEmployee", createValidation, async (req, res) => {
-  const exist = await db.raw(`
-    SELECT 
-      tbl_employees.*,
-      tbl_staffs.staff_name
-    FROM tbl_employees
-    JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_employees.st_id)
-    WHERE tbl_employees.first_name = ? AND tbl_employees.last_name = ?
-  `, [req.body.first_name, req.body.last_name])
-
-  if (exist[0].length > 0) {
-    return res.status(500).json({
-      message: "Employee exist on staff " + exist[0][0].staff_name + " with status " + (exist[0][0].active_status === "1" ? "Active" : "Deactive"),
-    });
-  }
-
-  var personal_image_path = null;
-  var identification_image_path = null;
-  if (req.files && req.files.personal_image != null) {
-    var image_name = req.files.personal_image.name;
-    const ext = image_name.substring(image_name.lastIndexOf(".") + 1);
-    if (["jpg", "jpeg", "png"].includes(ext.toLowerCase())) {
-      req.files.personal_image.name = new Date().getTime() + "." + ext;
-      image_name = req.files.personal_image.name;
-      personal_image_path = "./employee_images/" + image_name;
-    } else {
+router.post("/addEmployee", async (req, res) => {
+  upload(req, res, async function (err) {
+    if(err instanceof multer.MulterError) {
       return res.status(500).json({
-        message: "Invalid image type",
+        message: err.message
+      })
+    } else if (err) {
+        // An unknown error occurred when uploading.
+        if (err.name == 'ExtensionError') {
+            res.status(400).json({
+                error: {
+                    message: err.message
+                }
+            }).end();
+        } else {
+            res.status(400).json({
+                error: {
+                    message: `unknown uploading error: ${err.message}`
+                }
+            }).end();
+        }
+        return;
+    }
+
+    let personal_image_path = null;
+    if(req.file) {
+      personal_image_path = req.file.filename
+    }
+
+    const exist = await db.raw(`
+      SELECT 
+        tbl_employees.*,
+        tbl_staffs.staff_name
+      FROM tbl_employees
+      JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_employees.st_id)
+      WHERE tbl_employees.first_name = ? AND tbl_employees.last_name = ?
+    `, [req.body.first_name, req.body.last_name])
+  
+    if (exist[0].length > 0) {
+      return res.status(500).json({
+        message: "Employee exist on staff " + exist[0][0].staff_name + " with status " + (exist[0][0].active_status === "1" ? "Active" : "Deactive"),
       });
     }
-  }
-  if (req.files && req.files.identification_image != null) {
-    var image_name = req.files.identification_image.name;
-    const ext = image_name.substring(image_name.lastIndexOf(".") + 1);
-    if (["jpg", "jpeg", "png"].includes(ext.toLowerCase())) {
-      req.files.identification_image.name = new Date().getTime() + "." + ext;
-      image_name = req.files.identification_image.name;
-      identification_image_path = "./employee_id_images/" + image_name;
-    } else {
-      return res.status(500).json({
-        message: "Invalid image type",
-      });
-    }
-  }
- 
-
-  for (const key in req.body) {
-    if (req.body[key] === "null") {
-      req.body[key] = null;
-    }
-  }
-
-  db("tbl_employees")
-    .insert({
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      st_id: req.body.st_id,
-      phone: req.body.phone,
-      birth_date: req.body.birth_date,
-      reg_date: db.fn.now(),
-      salary_type: req.body.salary_type,
-      monthly_salary: req.body.monthly_salary,
-      daily_salary: req.body.daily_salary,
-      hour_salary: req.body.hour_salary,
-      identification_image_path,
-      personal_image_path,
-      active_status:"1",
-      country: req.body.country,
-      city: req.body.city,
-      food_money: req.body.food_money,
-      transport_money: req.body.transport_money,
-      cabina_money: req.body.cabina_money,
-      expense_money: req.body.expense_money,
-      fine_money: req.body.fine_money,
-      loan_money: req.body.loan_money,
-      accomodation_money: req.body.accomodation_money,
-      other_expense: req.body.other_expense,
-      other_minus: req.body.other_minus,
-      expiry_passport: req.body.expiry_passport || null,
-      passport_number: req.body.passport_number || null,
-      expire_accomodation: req.body.expire_accomodation || null,
-      accomodation_number: req.body.accomodation_number || null,
-      asaish_code: req.body.asaish_code || null,
-      phone2: req.body.phone2 || null,
-      car: req.body.car || null,
-      car_number: req.body.car_number || null,
-      living_location: req.body.living_location || null,
-      first_work_date: req.body.first_work_date || null,
-      job: req.body.job || null,
-      blood_group: req.body.blood_group || null,
-    })
-    .then(async ([data]) => {
-      if (personal_image_path != null) {
-        req.files.personal_image.mv("./public/employee_images/" + req.files.personal_image.name, function (err) {
-            if (err) {
-              db("tbl_employees")
-                .where("emp_id", data)
-                .delete()
-                .then(() => {
-                  return res.status(500).json({
-                    message: err,
-                  });
-                });
-            }
-          }
-        );
+   
+    for (const key in req.body) {
+      if (req.body[key] === "null") {
+        req.body[key] = null;
       }
-      if (identification_image_path != null) {
-        req.files.identification_image.mv("./public/employee_id_images/" + req.files.identification_image.name, function (err) {
-            if (err) {
-              db("tbl_employees")
-                .where("emp_id", data)
-                .delete()
-                .then(() => {
-                  return res.status(500).json({
-                    message: err,
-                  });
-                });
-            }
-          }
-        );
-      }
-      const [[{ sort_code }]] = await db.raw(`select IFNULL(max(sort_code), 0) as sort_code from tbl_employees where st_id = ${req.body.st_id} and active_status = '1'`);
-      await db("tbl_employees").where("emp_id", data).update({ sort_code: sort_code + 1 })
-      
-      return res.status(200).json({
-        message: "Employee Added",
-        emp_id: data,
-        identification_image_path,
+    }
+  
+    db("tbl_employees")
+      .insert({
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        st_id: req.body.st_id,
+        phone: req.body.phone,
+        birth_date: req.body.birth_date,
+        reg_date: db.fn.now(),
+        salary_type: req.body.salary_type,
+        monthly_salary: req.body.monthly_salary,
+        daily_salary: req.body.daily_salary,
+        hour_salary: req.body.hour_salary,
+        identification_image_path: null,
         personal_image_path,
-      });
-    })
-    .catch((err) => {
-      if (err.errno === 1062) {
-        return res.status(500).json({
-          message: "The phone number already exist, please change it",
+        active_status:"1",
+        country: req.body.country,
+        city: req.body.city,
+        food_money: req.body.food_money,
+        transport_money: req.body.transport_money,
+        cabina_money: req.body.cabina_money,
+        expense_money: req.body.expense_money,
+        fine_money: req.body.fine_money,
+        loan_money: req.body.loan_money,
+        accomodation_money: req.body.accomodation_money,
+        other_expense: req.body.other_expense,
+        other_minus: req.body.other_minus,
+        expiry_passport: req.body.expiry_passport || null,
+        passport_number: req.body.passport_number || null,
+        expire_accomodation: req.body.expire_accomodation || null,
+        accomodation_number: req.body.accomodation_number || null,
+        asaish_code: req.body.asaish_code || null,
+        phone2: req.body.phone2 || null,
+        car: req.body.car || null,
+        car_number: req.body.car_number || null,
+        living_location: req.body.living_location || null,
+        first_work_date: req.body.first_work_date || null,
+        job: req.body.job || null,
+        blood_group: req.body.blood_group || null,
+        family_number_1: req.body.family_number_1 || null,
+        family_number_2: req.body.family_number_2 || null,
+      })
+      .then(async ([data]) => {
+        
+        const [[{ sort_code }]] = await db.raw(`select IFNULL(max(sort_code), 0) as sort_code from tbl_employees where st_id = ${req.body.st_id} and active_status = '1'`);
+        await db("tbl_employees").where("emp_id", data).update({ sort_code: sort_code + 1 })
+        
+        return res.status(200).json({
+          message: "Employee Added",
+          emp_id: data,
+          identification_image_path: null,
+          personal_image_path,
         });
-      }
-      return res.status(500).json({
-        message: err,
-      });
-    });
-});
+      })
+      .catch((err) => {
+        console.log(err)
+        if (err.errno === 1062) {
+          return res.status(500).json({
+            message: "The phone number already exist, please change it",
+          });
+        }
+        return res.status(500).json({
+          message: err,
+        })
+      })
+  })
+})
 
 /* 
     First select staff id of the employee as old staff id
@@ -212,6 +207,8 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           first_work_date: req.body.first_work_date || null,
           job: req.body.job || null,
           blood_group: req.body.blood_group || null,
+          family_number_1: req.body.family_number_1 || null,
+          family_number_2: req.body.family_number_2 || null,
         })
         .then(() => {
           return res.status(200).json({
@@ -269,58 +266,6 @@ router.patch("/updateIdentificationImage/:emp_id", checkID, (req, res) => {
               return res.status(200).json({
                 message: "Identification image updated",
                 identification_image_path: "./employee_id_images/" + image_name,
-              });
-            })
-            .catch((err) => {
-              return res.status(500).json({
-                message: err,
-              });
-            });
-        }
-      );
-    } else {
-      return res.status(500).json({
-        message: "Invalid image type",
-      });
-    }
-  } else {
-    return res.status(500).json({
-      message: "Select an image",
-    });
-  }
-});
-
-router.patch("/updatePersonalImage/:emp_id", checkID, (req, res) => {
-  if (req.files && req.files.personal_image != null) {
-    var image_name = req.files.personal_image.name;
-    const ext = image_name.substring(image_name.lastIndexOf(".") + 1);
-    if (["jpeg", "jpg", "png"].includes(ext.toLowerCase())) {
-      req.files.personal_image.name = new Date().getTime() + "." + ext;
-      image_name = req.files.personal_image.name;
-      req.files.personal_image.mv(
-        "./public/employee_images/" + image_name,
-        async function (err) {
-          if (err) {
-            return res.status(500).json({
-              message: err,
-            });
-          }
-          const [{ old_image }] = await db("tbl_employees")
-            .where("emp_id", req.params.emp_id)
-            .select(["personal_image_path as old_image"])
-            .limit(1);
-          if (old_image != null) {
-            fs.unlinkSync("./public" + old_image.slice(1));
-          }
-          db("tbl_employees")
-            .where("emp_id", req.params.emp_id)
-            .update({
-              personal_image_path: "./employee_images/" + image_name,
-            })
-            .then(() => {
-              return res.status(200).json({
-                message: "Personal image updated",
-                personal_image_path: "./employee_images/" + image_name,
               });
             })
             .catch((err) => {
@@ -421,32 +366,6 @@ router.delete("/deleteIdentificationImage/:emp_id", checkID, (req, res) => {
     });
 });
 
-router.delete("/deletePersonalImage/:emp_id", checkID, (req, res) => {
-  db("tbl_employees")
-    .where("emp_id", req.params.emp_id)
-    .select(["personal_image_path as image"])
-    .limit(1)
-    .then(([{ image }]) => {
-      if (image != null) {
-        fs.unlinkSync("./public" + image.slice(1));
-      }
-      db("tbl_employees")
-        .where("emp_id", req.params.emp_id)
-        .update({
-          personal_image_path: null,
-        })
-        .then(() => {
-          return res.status(200).json({
-            message: "Personal Image deleted",
-          });
-        })
-        .catch((err) => {
-          return res.status(500).json({
-            message: err,
-          });
-        });
-    });
-});
 
 router.post("/getData", (req, res) => {
   db.select(
@@ -489,6 +408,8 @@ router.post("/getData", (req, res) => {
     "tbl_employees.city as city",
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
 
   )
     .from("tbl_employees")
@@ -547,6 +468,8 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -602,6 +525,8 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -658,6 +583,8 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -714,6 +641,8 @@ router.post("/getForReport", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -771,6 +700,8 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -827,6 +758,8 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -902,6 +835,8 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -959,6 +894,8 @@ router.post("/searchByID", (req, res) => {
     "tbl_employees.passport_number as passport_number",
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.blood_group as blood_group",
+    "tbl_employees.family_number_1 as family_number_1",
+    "tbl_employees.family_number_2 as family_number_2",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -1382,6 +1319,68 @@ router.post('/addZeroList', (req, res) => {
 router.delete('/deleteZeroList/:year/:month/:st_id/:emp_id', (req, res) => {
   db('salary_list_to_null').where('year', req.params.year).andWhere('month', req.params.month).andWhere('st_id', req.params.st_id).andWhere('emp_id', req.params.emp_id).delete().then(() => {
     return res.sendStatus(200);
+  })
+})
+
+router.get('/personal_image/:name', (req, res) => {
+  return res.sendFile(path.join(__dirname, `../employee_images/${req.params.name}`));
+})
+
+router.post('/updatePersonalImage/:emp_id', async (req, res) => {
+  upload(req, res, async (err) => {
+    if(err instanceof multer.MulterError) {
+      return res.status(500).json({
+        message: err.message
+      })
+    } else if (err) {
+        // An unknown error occurred when uploading.
+        if (err.name == 'ExtensionError') {
+            res.status(400).json({
+                error: {
+                    message: err.message
+                }
+            }).end();
+        } else {
+            res.status(400).json({
+                error: {
+                    message: `unknown uploading error: ${err.message}`
+                }
+            }).end();
+        }
+        return;
+    }
+
+    let personal_image_path = null;
+    if(req.file) {
+      personal_image_path = req.file.filename
+    }
+
+    const old_data = await db('tbl_employees').where('emp_id', req.params.emp_id).select('personal_image_path').first()
+
+    db('tbl_employees').where('emp_id', req.params.emp_id).update({
+      personal_image_path
+    }).then(() => {
+      if(old_data.personal_image_path) {
+        fs.unlinkSync(path.join(__dirname, `../employee_images/${old_data.personal_image_path}`))
+      }
+      return res.status(200).send({
+        personal_image_path
+      })
+    })
+
+  })
+})
+
+router.delete('/deletePersonalImage/:emp_id', async (req, res) => {
+  const old_data = await db('tbl_employees').where('emp_id', req.params.emp_id).select('personal_image_path').first()
+
+  db('tbl_employees').where('emp_id', req.params.emp_id).update({
+    personal_image_path: null
+  }).then(() => {
+    if(old_data.personal_image_path) {
+      fs.unlinkSync(path.join(__dirname, `../employee_images/${old_data.personal_image_path}`))
+    }
+    return res.sendStatus(200)
   })
 })
 
