@@ -117,6 +117,7 @@ router.post("/addList", (req, res) => {
                       .from("tbl_attendance")
                       .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
                       .where("tbl_attendance.dsl_id", dsl_id)
+                      .orderBy("tbl_employees.sort_code", "ASC")
                       .then((data) => {
                         return res.status(200).json({
                           message: "List created",
@@ -154,6 +155,7 @@ router.post("/addList", (req, res) => {
                     .from("tbl_attendance")
                     .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
                     .where("tbl_attendance.dsl_id", dsl_id)
+                    .orderBy("tbl_employees.sort_code", "ASC")
                     .then(async (data) => {
                       const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
                       baghdadTime.setHours(baghdadTime.getHours() - 4)
