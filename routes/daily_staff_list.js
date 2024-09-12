@@ -414,6 +414,7 @@ router.post("/getDailyList", async (req, res) => {
                               "tbl_employees.st_id as st_id",
                               "tbl_employees.sort_code as sort_code",
                               "tbl_employees.job as job",
+                              "tbl_attendance.work as work",
                               "tbl_attendance.overtime as overtime",
                               "tbl_attendance.worked_hours as worked_hours",
                             )
@@ -449,6 +450,7 @@ router.post("/getDailyList", async (req, res) => {
         tbl_attendance.worked_hours,
         tbl_attendance.absent,
         tbl_attendance.location,
+        tbl_attendance.work,
         tbl_daily_staff_list.dsl_id,
         tbl_daily_staff_list.st_id,
         tbl_staffs.staff_name,
@@ -472,9 +474,9 @@ router.post("/getDailyList", async (req, res) => {
   });
 });
 
-router.get('/getLogViewByDate/:date', (req, res) => {
-  db.raw(`select * from log_view where DATE(datetime_log) = '${new Date(req.params.date).toISOString().split('T')[0]}' ORDER BY datetime_log`).then(async ([data])=>{ 
-    const users = await db.raw(`select DISTINCT(user) from log_view where DATE(datetime_log) = '${new Date(req.params.date).toISOString().split('T')[0]}'`).then(r => r[0]);
+router.get('/getLogViewByDate/:from/:to', (req, res) => {
+  db.raw(`select * from log_view where DATE(datetime_log) BETWEEN '${new Date(req.params.from).toISOString().split('T')[0]}' AND '${new Date(req.params.to).toISOString().split('T')[0]}' ORDER BY datetime_log`).then(async ([data])=>{ 
+    const users = await db.raw(`select DISTINCT(user) from log_view where DATE(datetime_log) BETWEEN '${new Date(req.params.from).toISOString().split('T')[0]}' AND '${new Date(req.params.to).toISOString().split('T')[0]}'`).then(r => r[0]);
     return res.status(200).send({
       rows: data,
       users
