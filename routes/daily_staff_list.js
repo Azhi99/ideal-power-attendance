@@ -402,7 +402,7 @@ router.post("/getDailyList", async (req, res) => {
   )
     .from("tbl_daily_staff_list")
     .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
-    .where("tbl_daily_staff_list.work_date", req.body.work_date)
+    .whereRaw("tbl_daily_staff_list.work_date BETWEEN ? AND ?", [req.body.work_date, req.body.work_date_to])
     .orderBy("tbl_staffs.staff_sort_code", "ASC");
   
   const list_details = await db.select(
@@ -420,7 +420,7 @@ router.post("/getDailyList", async (req, res) => {
                             )
                             .from("tbl_attendance")
                             .join("tbl_employees", "tbl_attendance.emp_id", "=", "tbl_employees.emp_id")
-                            .whereRaw("dsl_id in (select dsl_id from tbl_daily_staff_list where work_date=?)", [req.body.work_date]);
+                            .whereRaw("dsl_id in (select dsl_id from tbl_daily_staff_list where work_date BETWEEN ? AND ?)", [req.body.work_date, req.body.work_date_to]);
   var list_history = []
   if(lists.length > 0){
     list_history = await db.raw(`
@@ -438,7 +438,7 @@ router.post("/getDailyList", async (req, res) => {
       tbl_staffs.special_staff
     FROM tbl_daily_staff_list
     JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_daily_staff_list.st_id)
-    WHERE tbl_daily_staff_list.work_date = '${new Date(req.body.work_date).toISOString().split('T')[0]}'
+    WHERE tbl_daily_staff_list.work_date BETWEEN '${new Date(req.body.work_date).toISOString().split('T')[0]}' AND '${new Date(req.body.work_date_to).toISOString().split('T')[0]}'
     ORDER BY tbl_staffs.staff_sort_code
   `).then(r => r[0]);
 
