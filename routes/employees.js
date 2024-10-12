@@ -123,6 +123,7 @@ router.post("/addEmployee", async (req, res) => {
         blood_group: req.body.blood_group || null,
         family_number_1: req.body.family_number_1 || null,
         family_number_2: req.body.family_number_2 || null,
+        certificate: req.body.certificate || null,
       })
       .then(async ([data]) => {
         
@@ -209,6 +210,7 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           blood_group: req.body.blood_group || null,
           family_number_1: req.body.family_number_1 || null,
           family_number_2: req.body.family_number_2 || null,
+          certificate: req.body.certificate
         })
         .then(() => {
           return res.status(200).json({
@@ -410,6 +412,7 @@ router.post("/getData", (req, res) => {
     "tbl_employees.accomodation_number as accomodation_number",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate",
 
   )
     .from("tbl_employees")
@@ -470,6 +473,7 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -527,6 +531,7 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -585,6 +590,7 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -643,6 +649,7 @@ router.post("/getForReport", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -702,6 +709,7 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -760,6 +768,7 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -837,6 +846,7 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -896,6 +906,7 @@ router.post("/searchByID", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
+    "tbl_employees.certificate as certificate"
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
