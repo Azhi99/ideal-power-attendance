@@ -16,6 +16,7 @@ router.post("/getData", (req, res) => {
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
      .andWhereRaw(`tbl_employees.country <> '1'`)
+     .andWhereRaw(`tbl_staffs.show_staff = '1'`)
      .andWhereRaw(`tbl_employees.expiry_passport <= NOW() + INTERVAL 60 DAY`)
      .orderBy("tbl_employees.expiry_passport", "asc")
      .then((data) => {
@@ -37,6 +38,7 @@ router.post("/getSixMonthData", (req, res) => {
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
      .andWhereRaw(`tbl_employees.country <> '1'`)
+     .andWhereRaw(`tbl_staffs.show_staff = '1'`)
      .andWhereRaw(`tbl_employees.expiry_passport <= NOW() + INTERVAL 6 MONTH`)
      .orderBy("tbl_employees.expiry_passport", "asc")
      .then((data) => {
@@ -58,6 +60,7 @@ router.post("/getOneYearData", (req, res) => {
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
      .andWhereRaw(`tbl_employees.country <> '1'`)
+     .andWhereRaw(`tbl_staffs.show_staff = '1'`)
      .andWhereRaw(`tbl_employees.expiry_passport <= NOW() + INTERVAL 1 YEAR`)
      .orderBy("tbl_employees.expiry_passport", "asc")
      .then((data) => {
@@ -79,6 +82,7 @@ router.post("/getOneAndHalfYearData", (req, res) => {
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
      .andWhereRaw(`tbl_employees.country <> '1'`)
+     .andWhereRaw(`tbl_staffs.show_staff = '1'`)
      .andWhereRaw(`tbl_employees.expiry_passport <= NOW() + INTERVAL 1 YEAR + INTERVAL 6 MONTH`)
      .orderBy("tbl_employees.expiry_passport", "asc")
      .then((data) => {
@@ -100,6 +104,7 @@ router.post("/getAll", (req, res) => {
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
      .andWhereRaw(`tbl_employees.country <> '1'`)
+     .andWhereRaw(`tbl_staffs.show_staff = '1'`)
      .andWhereRaw(`STR_TO_DATE(tbl_employees.expiry_passport, '%Y-%m-%d') IS NOT NULL`)
      .orderBy("tbl_employees.expiry_passport", "asc")
      .then((data) => {

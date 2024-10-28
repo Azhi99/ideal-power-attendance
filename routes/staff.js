@@ -182,4 +182,28 @@ router.post("/getByEngineer/:en_id", (req, res) => {
   });
 });
 
+router.post('/addRemovedStaff', (req, res) => {
+  db('removed_staffs_from_passport_and_accomodations').insert({
+    st_id: req.body.st_id,
+    removed_from: req.body.removed_from,
+  }).then(() => {
+    return res.sendStatus(200);
+  }).catch((err) => {
+    console.log(err)
+    return res.status(500).json({
+      message: err,
+    });
+  });
+})
+
+router.delete('/deleteRemovedStaff/:st_id/:removed_from', (req, res) => {
+  db('removed_staffs_from_passport_and_accomodations').where('st_id', req.params.st_id).where('removed_from', req.params.removed_from).delete().then(() => {
+    return res.sendStatus(200)
+  }).catch((err) => {
+    return res.status(500).json({
+      message: err,
+    })
+  })
+})
+
 module.exports = router;

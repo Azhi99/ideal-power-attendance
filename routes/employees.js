@@ -17,6 +17,13 @@ const storage = multer.diskStorage({
   }
 })
 
+const documentsStorage = multer.diskStorage({
+  destination: './employee_documents/',
+  filename: function (req, file, cb) {
+    cb(null, new Date().getTime() + path.extname(file.originalname))
+  }
+})
+
 const upload = multer({
   storage,
   fileFilter: function (req, file, cb) {
@@ -29,6 +36,19 @@ const upload = multer({
     }
   }
 }).single('personal_image')
+
+const uploadDocuments = multer({
+  storage: documentsStorage,
+  fileFilter: function (req, file, cb) {
+    const mimeType = file.mimetype
+    if(['image/png', 'image/jpg', 'image/jpeg', 'application/pdf'].includes(mimeType)) {
+      return cb(null, true)
+    } else {
+      cb(null, false)
+      return cb(new Error('Invalid file type'))
+    }
+  }
+}).array('documents', 20)
 
 const router = express.Router();
 // router.use(fileUpload());
@@ -1393,6 +1413,86 @@ router.delete('/deletePersonalImage/:emp_id', async (req, res) => {
     }
     return res.sendStatus(200)
   })
+})
+
+router.post('/upload_documents/:emp_id', (req, res) => {
+  uploadDocuments(req, res, async (err) => {
+    if(err instanceof multer.MulterError) {
+      return res.status(500).json({
+        message: err.message
+      })
+    } else if (err) {
+        // An unknown error occurred when uploading.
+        if (err.name == 'ExtensionError') {
+            res.status(400).json({
+                error: {
+                    message: err.message
+                }
+            }).end();
+        } else {
+            res.status(400).json({
+                error: {
+                    message: `unknown uploading error: ${err.message}`
+                }
+            }).end();
+        }
+        return;
+    }
+
+    const documents = await Promise.all(req.files.map(f => {
+      return {
+        emp_id: req.params.emp_id,
+        employee_document: f.filename,
+        employee_document_virtual_name: f.filename,
+        document_type: ['image/png', 'image/jpg', 'image/JPG', 'image/jpeg'].includes(f.mimetype) ? 'image' : ['application/pdf'].includes(f.mimetype) ? 'pdf' : ''
+      }
+    }))
+
+    await db('employee_documents').insert(documents)
+
+    const new_documents = await db('employee_documents').where('emp_id', req.params.emp_id).select()
+
+    return res.status(200).send(new_documents)
+  })
+})
+
+router.get('/get_documents/:emp_id', async (req, res) => {
+  const documents = await db('employee_documents').where('emp_id', req.params.emp_id).select()
+  return res.status(200).send(documents)
+})
+
+router.get('/get_document_file/:name/:type', (req, res) => {
+  fs.readFile(path.join(__dirname, `../employee_documents/${req.params.name}`), async (err, data) => {
+    if(err) {
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+
+    res.setHeader('Content-Type', req.params.type == 'pdf' ? 'application/pdf' : 'image/*')
+
+    return res.status(200).send(data)
+  })
+})
+
+router.delete('/delete_document/:id', async (req, res) => {
+  const document = await db('employee_documents').where('employee_document_id', req.params.id).select().first()
+
+  fs.unlinkSync(path.join(__dirname, `../employee_documents/${document.employee_document}`))
+
+  await db('employee_documents').where('employee_document_id', req.params.id).delete()
+
+  return res.sendStatus(200)
+})
+
+router.patch('/edit_document_name/:id', async (req, res) => {
+  await db('employee_documents').where('employee_document_id', req.params.id).update({
+    employee_document_virtual_name: req.body.employee_document_virtual_name
+  })
+
+  const document = await db('employee_documents').where('employee_document_id', req.params.id).select().first()
+
+  return res.status(200).send(document)
 })
 
 module.exports = router;

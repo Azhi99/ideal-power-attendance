@@ -30,13 +30,19 @@ router.post("/", async (req, res) => {
         return data[0];
     });
 
+    const removed_staffs_from_passport_and_accomodations = await db('removed_staffs_from_passport_and_accomodations').select('')
+    const removed_staff_from_passport = removed_staffs_from_passport_and_accomodations.filter(f => f.removed_from == 'passport').map(m => m.st_id)
+    const removed_staff_from_accomodations = removed_staffs_from_passport_and_accomodations.filter(f => f.removed_from == 'accomodation').map(m => m.st_id)
+
     return res.status(200).json({
         noOfEmployees,
         noOfStaffLog,
         noOfActiveLog,
         noOfExpired,
         cabinas,
-        notifications
+        notifications,
+        removed_staff_from_passport,
+        removed_staff_from_accomodations
     });
 });
 
