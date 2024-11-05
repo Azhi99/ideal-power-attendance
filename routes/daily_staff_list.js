@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post("/addList", (req, res) => {
   const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-  baghdadTime.setHours(baghdadTime.getHours() - 4)
+  baghdadTime.setHours(baghdadTime.getHours() - 5)
   req.body.datetime_list = baghdadTime
   db("tbl_daily_staff_list")
     .insert({
