@@ -12,7 +12,8 @@ router.post("/getData", (req, res) => {
         "tbl_employees.accomodation_number as accomodation_number",
         "tbl_employees.phone as phone",
         "tbl_employees.active_status as active_status",
-        "tbl_employees.expiry_passport as expire_date"
+        "tbl_employees.expiry_passport as expire_date",
+        "tbl_employees.expire_accomodation as expire_accomodation"
     ).from("tbl_employees")
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
@@ -35,7 +36,8 @@ router.post("/getSixMonthData", (req, res) => {
         "tbl_employees.accomodation_number as accomodation_number",
         "tbl_employees.phone as phone",
         "tbl_employees.active_status as active_status",
-        "tbl_employees.expiry_passport as expire_date"
+        "tbl_employees.expiry_passport as expire_date",
+        "tbl_employees.expire_accomodation as expire_accomodation"
     ).from("tbl_employees")
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
@@ -58,7 +60,8 @@ router.post("/getOneYearData", (req, res) => {
         "tbl_employees.accomodation_number as accomodation_number",
         "tbl_employees.phone as phone",
         "tbl_employees.active_status as active_status",
-        "tbl_employees.expiry_passport as expire_date"
+        "tbl_employees.expiry_passport as expire_date",
+        "tbl_employees.expire_accomodation as expire_accomodation"
     ).from("tbl_employees")
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
@@ -81,7 +84,8 @@ router.post("/getOneAndHalfYearData", (req, res) => {
         "tbl_employees.accomodation_number as accomodation_number",
         "tbl_employees.phone as phone",
         "tbl_employees.active_status as active_status",
-        "tbl_employees.expiry_passport as expire_date"
+        "tbl_employees.expiry_passport as expire_date",
+        "tbl_employees.expire_accomodation as expire_accomodation"
     ).from("tbl_employees")
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)
@@ -104,7 +108,8 @@ router.post("/getAll", (req, res) => {
         "tbl_employees.accomodation_number as accomodation_number",
         "tbl_employees.phone as phone",
         "tbl_employees.active_status as active_status",
-        "tbl_employees.expiry_passport as expire_date"
+        "tbl_employees.expiry_passport as expire_date",
+        "tbl_employees.expire_accomodation as expire_accomodation"
     ).from("tbl_employees")
      .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
      .whereRaw(`tbl_employees.expiry_passport IS NOT NULL`)

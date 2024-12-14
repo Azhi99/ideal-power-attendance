@@ -634,6 +634,7 @@ router.post("/getForReport", (req, res) => {
     "tbl_employees.st_id as st_id",
     "tbl_employees.cabina_id as cabina_id",
     "tbl_staffs.staff_name as staff_name",
+    "tbl_staffs.special_staff as special_staff",
     "tbl_employees.phone as phone",
     "tbl_employees.reg_date as reg_date",
     "tbl_employees.salary_type",
@@ -674,8 +675,10 @@ router.post("/getForReport", (req, res) => {
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
     .where("tbl_employees.active_status", "=", req.query.active_status.toString())
+    .andWhere("tbl_staffs.show_staff", "=", "1")
     .andWhere("tbl_employees.st_id", req.query.st_id ? "=" : "<>", req.query.st_id || "0")
-    .orderBy("tbl_employees.emp_id", "desc")
+    .orderBy("tbl_staffs.staff_sort_code", "asc")
+    .orderBy("tbl_employees.sort_code", "asc")
     .then((data) => {
       return res.status(200).send(data);
     })
