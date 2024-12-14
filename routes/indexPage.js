@@ -3,7 +3,18 @@ const db = require("../DB/mainDBconfig.js");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-    const [{noOfEmployees}] = await db("tbl_employees").where("active_status", "1").count("* as noOfEmployees");
+    const [{noOfEmployees}] = await db.raw(`
+        SELECT
+            COUNT(tbl_employees.emp_id) as noOfEmployees
+        FROM
+            tbl_employees
+            JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_employees.st_id)
+        WHERE
+            tbl_staffs.show_staff = '1'
+            AND tbl_employees.active_status = '1'
+    `).then(d => {
+        return d[0]
+    })
     const [{noOfStaffLog}] = await db("tbl_staff_log_employee").count("* as noOfStaffLog");
     const [{noOfActiveLog}] = await db("tbl_active_log_employee").count("* as noOfActiveLog");
     const [{noOfExpired}] = await db("tbl_employees").where("expiry_passport", "<=", db.fn.now()).count("* as noOfExpired");
