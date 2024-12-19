@@ -635,6 +635,7 @@ router.post("/getForReport", (req, res) => {
       tbl_employees.st_id as st_id,
       tbl_employees.cabina_id as cabina_id,
       tbl_staffs.staff_name as staff_name,
+      tbl_staffs.special_staff as special_staff,
       tbl_employees.phone as phone,
       tbl_employees.reg_date as reg_date,
       tbl_employees.salary_type,
