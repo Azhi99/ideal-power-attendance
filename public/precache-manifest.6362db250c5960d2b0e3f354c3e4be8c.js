@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/60c5b64719b1dd3bf6e9.worker.js"
   },
   {
-    "revision": "d01b7c5be6ebb4df4656",
+    "revision": "2faf9f72dab81effd173",
     "url": "/css/app.41d86af4.css"
   },
   {
@@ -22,10 +22,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "008554fc1e0682d66172",
     "url": "/css/chunk-331e44ac.972d0f75.css"
-  },
-  {
-    "revision": "759023b2c5dfcdda889a",
-    "url": "/css/chunk-35807b03.e3ed63f0.css"
   },
   {
     "revision": "346092b792fad2ed1853",
@@ -46,6 +42,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "1b7f7ae16d5622bebc61",
     "url": "/css/chunk-7a683150.4f7a61f8.css"
+  },
+  {
+    "revision": "8b661aa2989fe8e31bd5",
+    "url": "/css/chunk-7fa60285.141b2864.css"
   },
   {
     "revision": "edba58fac658b7ac407d",
@@ -100,12 +100,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/user2.bfd4000e.jpg"
   },
   {
-    "revision": "dd490fb5c66472bf5af5c26f84d72ef9",
+    "revision": "eaa1dc4365acad77895c8cb6010788bc",
     "url": "/index.html"
   },
   {
-    "revision": "d01b7c5be6ebb4df4656",
-    "url": "/js/app.e14467c4.js"
+    "revision": "2faf9f72dab81effd173",
+    "url": "/js/app.89f1f272.js"
   },
   {
     "revision": "34ebb4002020f594e550",
@@ -126,10 +126,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "008554fc1e0682d66172",
     "url": "/js/chunk-331e44ac.02d59aaa.js"
-  },
-  {
-    "revision": "759023b2c5dfcdda889a",
-    "url": "/js/chunk-35807b03.8875756a.js"
   },
   {
     "revision": "346092b792fad2ed1853",
@@ -154,6 +150,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "1b7f7ae16d5622bebc61",
     "url": "/js/chunk-7a683150.8e7f574c.js"
+  },
+  {
+    "revision": "8b661aa2989fe8e31bd5",
+    "url": "/js/chunk-7fa60285.86ac0d3f.js"
   },
   {
     "revision": "edba58fac658b7ac407d",
