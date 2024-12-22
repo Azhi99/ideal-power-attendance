@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/60c5b64719b1dd3bf6e9.worker.js"
   },
   {
-    "revision": "2faf9f72dab81effd173",
+    "revision": "62b5840e704a46e7ff50",
     "url": "/css/app.41d86af4.css"
   },
   {
@@ -22,6 +22,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "008554fc1e0682d66172",
     "url": "/css/chunk-331e44ac.972d0f75.css"
+  },
+  {
+    "revision": "b185c054871d77f94e7b",
+    "url": "/css/chunk-349731cf.685607b7.css"
   },
   {
     "revision": "346092b792fad2ed1853",
@@ -44,16 +48,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/css/chunk-7a683150.4f7a61f8.css"
   },
   {
-    "revision": "8b661aa2989fe8e31bd5",
-    "url": "/css/chunk-7fa60285.141b2864.css"
-  },
-  {
-    "revision": "edba58fac658b7ac407d",
-    "url": "/css/chunk-7fbc898a.c3c03f05.css"
-  },
-  {
     "revision": "815d9f92aaf342ca63a1",
     "url": "/css/chunk-85b072e8.d7909984.css"
+  },
+  {
+    "revision": "f1be84f721543158fa5e",
+    "url": "/css/chunk-b05ae74c.d743a39e.css"
   },
   {
     "revision": "ff038a79459d50601506",
@@ -100,12 +100,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/user2.bfd4000e.jpg"
   },
   {
-    "revision": "eaa1dc4365acad77895c8cb6010788bc",
+    "revision": "c51c6c25e629d51340a5b35d86c01fd4",
     "url": "/index.html"
   },
   {
-    "revision": "2faf9f72dab81effd173",
-    "url": "/js/app.89f1f272.js"
+    "revision": "62b5840e704a46e7ff50",
+    "url": "/js/app.3e50fa0e.js"
   },
   {
     "revision": "34ebb4002020f594e550",
@@ -126,6 +126,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "008554fc1e0682d66172",
     "url": "/js/chunk-331e44ac.02d59aaa.js"
+  },
+  {
+    "revision": "b185c054871d77f94e7b",
+    "url": "/js/chunk-349731cf.41cd4431.js"
   },
   {
     "revision": "346092b792fad2ed1853",
@@ -152,16 +156,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/js/chunk-7a683150.8e7f574c.js"
   },
   {
-    "revision": "8b661aa2989fe8e31bd5",
-    "url": "/js/chunk-7fa60285.86ac0d3f.js"
-  },
-  {
-    "revision": "edba58fac658b7ac407d",
-    "url": "/js/chunk-7fbc898a.f67027dc.js"
-  },
-  {
     "revision": "815d9f92aaf342ca63a1",
     "url": "/js/chunk-85b072e8.0e82b225.js"
+  },
+  {
+    "revision": "f1be84f721543158fa5e",
+    "url": "/js/chunk-b05ae74c.934addc0.js"
   },
   {
     "revision": "ff038a79459d50601506",
