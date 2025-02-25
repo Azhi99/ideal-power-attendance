@@ -1007,6 +1007,7 @@ router.post('/getEmployeeBystaff/:st_id/:month/:year',(req,res)=>{
           select dsl_id from tbl_daily_staff_list where MONTH(work_date) = ${req.params.month} and year(work_date) = ${req.params.year}
         ) and old_st_id = ${req.params.st_id}
     )
+        ORDER BY tbl_employees.sort_code ASC
   `).then(([data])=>{
     return res.status(200).send(data);
   }).catch((err)=>{

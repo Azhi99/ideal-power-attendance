@@ -61,6 +61,7 @@ router.post("/addList", (req, res) => {
           db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
           db.raw(req.body.st_id + " as st_id"),
           db.raw(req.body.st_id + " as old_st_id"),
+          db.raw(`${req.body.work_project_id ? req.body.work_project_id : 'null'} as work_project_id`),
         ])
         .then((data) => {
           db("tbl_attendance").insert(data).then(() => {
@@ -81,6 +82,7 @@ router.post("/addList", (req, res) => {
                 "loan_reason as loan_reason",
                 "accomodation as accomodation",
                 "accomodation_reason as accomodation_reason",
+                "work_project_id as work_project_id",
                 db.raw("CONVERT(absent, CHAR) as absent"),
                 db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
                 "st_id as st_id",
@@ -112,10 +114,13 @@ router.post("/addList", (req, res) => {
                       "tbl_attendance.accomodation_reason as accomodation_reason",
                       "tbl_attendance.absent as absent",
                       "tbl_attendance.location as location",
-                      "tbl_attendance.work as work"
+                      "tbl_attendance.work as work",
+                      "tbl_attendance.work_project_id as work_project_id",
+                      "work_projects.work_project_name as work_project_name"
                     )
                       .from("tbl_attendance")
                       .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
+                      .leftJoin("work_projects", "tbl_attendance.work_project_id", "=", "work_projects.work_project_id")
                       .where("tbl_attendance.dsl_id", dsl_id)
                       .orderBy("tbl_employees.sort_code", "ASC")
                       .then((data) => {
@@ -150,10 +155,13 @@ router.post("/addList", (req, res) => {
                     "tbl_attendance.accomodation_reason as accomodation_reason",
                     "tbl_attendance.absent as absent",
                     "tbl_attendance.location as location",
-                    "tbl_attendance.work as work"
+                    "tbl_attendance.work as work",
+                    "tbl_attendance.work_project_id as work_project_id",
+                    "work_projects.work_project_name as work_project_name"
                   )
                     .from("tbl_attendance")
                     .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
+                    .leftJoin("work_projects", "tbl_attendance.work_project_id", "=", "work_projects.work_project_id")
                     .where("tbl_attendance.dsl_id", dsl_id)
                     .orderBy("tbl_employees.sort_code", "ASC")
                     .then(async (data) => {
@@ -361,9 +369,12 @@ router.post("/getListAndAttendance", async (req, res) => {
       "tbl_attendance.accomodation_reason as accomodation_reason",
       "tbl_attendance.absent as absent",
       "tbl_attendance.location as location",
-      "tbl_attendance.work as work"
+      "tbl_attendance.work as work",
+      "tbl_attendance.work_project_id as work_project_id",
+      "work_projects.work_project_name as work_project_name"
     ).from("tbl_attendance")
      .join("tbl_employees", "tbl_employees.emp_id", "=", "tbl_attendance.emp_id")
+      .leftJoin("work_projects", "tbl_attendance.work_project_id", "=", "work_projects.work_project_id")
      .where("tbl_attendance.dsl_id", dsl_list.dsl_id);
   }
   return res.status(200).json({
@@ -417,9 +428,11 @@ router.post("/getDailyList", async (req, res) => {
                               "tbl_attendance.work as work",
                               "tbl_attendance.overtime as overtime",
                               "tbl_attendance.worked_hours as worked_hours",
+                              "work_projects.work_project_name as work_project_name",
                             )
                             .from("tbl_attendance")
                             .join("tbl_employees", "tbl_attendance.emp_id", "=", "tbl_employees.emp_id")
+                            .leftJoin("work_projects", "tbl_attendance.work_project_id", "=", "work_projects.work_project_id")
                             .whereRaw("dsl_id in (select dsl_id from tbl_daily_staff_list where work_date BETWEEN ? AND ?)", [req.body.work_date, req.body.work_date_to]);
   var list_history = []
   if(lists.length > 0){
@@ -451,6 +464,7 @@ router.post("/getDailyList", async (req, res) => {
         tbl_attendance.absent,
         tbl_attendance.location,
         tbl_attendance.work,
+        work_projects.work_project_name,
         tbl_daily_staff_list.dsl_id,
         tbl_daily_staff_list.st_id,
         tbl_staffs.staff_name,
@@ -461,6 +475,7 @@ router.post("/getDailyList", async (req, res) => {
       JOIN tbl_daily_staff_list ON tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id
       JOIN tbl_staffs ON tbl_staffs.st_id = tbl_daily_staff_list.st_id
       JOIN tbl_employees ON tbl_employees.emp_id = tbl_attendance.emp_id
+      LEFT JOIN work_projects ON work_projects.work_project_id = tbl_attendance.work_project_id
       WHERE tbl_daily_staff_list.dsl_id = ${data.staffs[i].dsl_id}
       ORDER BY tbl_employees.sort_code ASC
     `).then(r => r[0]);
@@ -502,7 +517,7 @@ router.get('/getAllDetailByDate/:date', async (req, res) => {
         tbl_attendance.overtime,
         tbl_attendance.worked_hours,
         tbl_attendance.absent,
-        tbl_attendance.location
+        tbl_attendance.location,
         tbl_daily_staff_list.dsl_id,
         tbl_daily_staff_list.st_id,
         tbl_staffs.staff_name

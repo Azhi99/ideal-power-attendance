@@ -322,6 +322,20 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
     })
 });
 
+router.patch('/setWorkPorject/:at_id',(req, res) => {
+    db('tbl_attendance').where('at_id', req.params.at_id).update({
+        work_project_id: req.body.work_project_id
+    }).then(async () => {
+        return res.status(200).json({
+            message: 'Updated'
+        })
+    }).catch((err) => {
+        return res.status(500).json({
+            message: err
+        })
+    })
+})
+
 router.patch("/setLocation/:at_id", (req, res) => {
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         location: req.body.location
