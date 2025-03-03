@@ -2,10 +2,14 @@ const express = require("express");
 const db = require("../DB/mainDBconfig.js");
 const router = express.Router();
 
-router.post("/addList", (req, res) => {
+router.post("/addList", async (req, res) => {
   const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
   baghdadTime.setHours(baghdadTime.getHours() - 5)
   req.body.datetime_list = baghdadTime
+
+  const work_project = await db('staff_work_projects').where('st_id', req.body.st_id).select().first()
+  const work_project_id = work_project ? (work_project.work_project_id || null) : null
+
   db("tbl_daily_staff_list")
     .insert({
       st_id: req.body.st_id,
@@ -61,7 +65,7 @@ router.post("/addList", (req, res) => {
           db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
           db.raw(req.body.st_id + " as st_id"),
           db.raw(req.body.st_id + " as old_st_id"),
-          db.raw(`${req.body.work_project_id ? req.body.work_project_id : 'null'} as work_project_id`),
+          db.raw(`${work_project_id || 'null'} as work_project_id`),
         ])
         .then((data) => {
           db("tbl_attendance").insert(data).then(() => {

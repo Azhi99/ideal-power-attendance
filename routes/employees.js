@@ -144,6 +144,7 @@ router.post("/addEmployee", async (req, res) => {
         family_number_1: req.body.family_number_1 || null,
         family_number_2: req.body.family_number_2 || null,
         certificate: req.body.certificate || null,
+        office: req.body.office || 'false',
       })
       .then(async ([data]) => {
         
@@ -230,7 +231,8 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           blood_group: req.body.blood_group || null,
           family_number_1: req.body.family_number_1 || null,
           family_number_2: req.body.family_number_2 || null,
-          certificate: req.body.certificate
+          certificate: req.body.certificate,
+          office: req.body.office || 'false',
         })
         .then(() => {
           return res.status(200).json({
@@ -433,6 +435,7 @@ router.post("/getData", (req, res) => {
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
 
   )
     .from("tbl_employees")
@@ -493,7 +496,8 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
-    "tbl_employees.certificate as certificate"
+    "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -610,7 +614,8 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
-    "tbl_employees.certificate as certificate"
+    "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -671,7 +676,8 @@ router.post("/getForReport", (req, res) => {
       tbl_employees.blood_group as blood_group,
       tbl_employees.family_number_1 as family_number_1,
       tbl_employees.family_number_2 as family_number_2,
-      tbl_employees.certificate as certificate
+      tbl_employees.certificate as certificate,
+      tbl_employees.office as office
     FROM tbl_employees
     JOIN tbl_staffs ON tbl_staffs.st_id = tbl_employees.st_id
     WHERE 
@@ -733,7 +739,8 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
-    "tbl_employees.certificate as certificate"
+    "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -792,7 +799,8 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
-    "tbl_employees.certificate as certificate"
+    "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -870,7 +878,8 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
-    "tbl_employees.certificate as certificate"
+    "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -930,7 +939,8 @@ router.post("/searchByID", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
-    "tbl_employees.certificate as certificate"
+    "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -1220,6 +1230,62 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
   return res.status(200).send({
     salary_list,
     zeros
+  });
+})
+
+router.post('/getOfficeSalary', async (req, res) => {
+  const [salary_list] = await db.raw(`
+  SELECT
+      tbl_employees.emp_id,
+      concat(tbl_employees.first_name, ' ', tbl_employees.last_name) as employee_full_name,
+      tbl_employees.job,
+      tbl_employees.country,
+      tbl_employees.sort_code,
+      employee_final_with_give_salary.salary_type,
+      employee_final_with_give_salary.monthly_salary,
+      employee_final_with_give_salary.daily_salary,
+      tbl_employees.hour_salary,
+      employee_final_with_give_salary.date_to_m,
+      employee_final_with_give_salary.date_to_y,
+      tbl_employees.st_id,
+      employee_final_with_give_salary.count_present,
+      employee_final_with_give_salary.total_o,
+      employee_final_with_give_salary.total_fine,
+      employee_final_with_give_salary.total_expense,
+      employee_final_with_give_salary.total_transport,
+      employee_final_with_give_salary.total_food,
+      employee_final_with_give_salary.total_loan,
+      employee_final_with_give_salary.total_accomodation,
+      employee_final_with_give_salary.loan_by_accomodation,
+      employee_final_with_give_salary.accomodation_by_accomodation,
+      employee_final_with_give_salary.expense_by_accomodation,
+      employee_final_with_give_salary.fine_by_accomodation,
+      employee_final_with_give_salary.total_f,
+      employee_final_with_give_salary.total_h_not_work,
+      (employee_final_with_give_salary.total_o - employee_final_with_give_salary.total_h_not_work) as total_hour,
+      employee_final_with_give_salary.total_o_s,
+      employee_final_with_give_salary.food_money,
+      employee_final_with_give_salary.transport_money,
+      employee_final_with_give_salary.cabina_money,
+      employee_final_with_give_salary.expense_money,
+      employee_final_with_give_salary.fine_money,
+      employee_final_with_give_salary.loan_money,
+      employee_final_with_give_salary.accomodation_money,
+      employee_final_with_give_salary.other_expense,
+      employee_final_with_give_salary.other_minus,
+      employee_final_with_give_salary.added_days,
+      employee_final_with_give_salary.added_overtime,
+      employee_final_with_give_salary.gs_id
+      from tbl_employees 
+      JOIN employee_final_with_give_salary ON (tbl_employees.emp_id = employee_final_with_give_salary.emp_id)
+      WHERE tbl_employees.office = 'true' AND employee_final_with_give_salary.date_to_m = ${req.body.month} AND employee_final_with_give_salary.date_to_y = ${req.body.year} 
+  `);
+  const [zeros] = await db.raw(`
+    SELECT emp_id FROM salary_list_to_null WHERE month = ${req.body.month} AND year = ${req.body.year}
+  `)
+  return res.status(200).send({
+    salary_list,
+    zeros: []
   });
 })
 
