@@ -150,6 +150,9 @@ router.post("/addEmployee", async (req, res) => {
         
         const [[{ sort_code }]] = await db.raw(`select IFNULL(max(sort_code), 0) as sort_code from tbl_employees where st_id = ${req.body.st_id} and active_status = '1'`);
         await db("tbl_employees").where("emp_id", data).update({ sort_code: sort_code + 1 })
+
+        const [[{ office_sort_code }]] = await db.raw(`select IFNULL(max(office_sort_code), 0) as office_sort_code from tbl_employees`);
+        await db("tbl_employees").where("emp_id", data).update({ office_sort_code: office_sort_code + 1 })
         
         return res.status(200).json({
           message: "Employee Added",
@@ -310,6 +313,20 @@ router.patch("/updateIdentificationImage/:emp_id", checkID, (req, res) => {
     });
   }
 });
+
+router.get('/getOfficeEmployees', (req, res) => {
+  db.raw(`
+    SELECT  
+      tbl_employees.emp_id as emp_id,
+      CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) as full_name,
+      tbl_employees.office_sort_code as sort_code
+      FROM tbl_employees
+      WHERE tbl_employees.office = 'true' AND tbl_employees.active_status = '1'
+      ORDER BY tbl_employees.office_sort_code  ASC
+  `).then(data => {
+    return res.status(200).send(data[0])
+  })
+})
 
 router.patch("/deactiveEmployee/:emp_id", checkID, (req, res) => {
   db("tbl_employees")
@@ -695,6 +712,17 @@ router.post("/getForReport", (req, res) => {
       });
     });
 });
+
+router.post('/saveSortOffice', async (req, res) => {
+  const list = req.body.list
+  for(let i = 0; i < list.length; i++) {
+      await db('tbl_employees').where('emp_id', list[i].emp_id).update({
+          office_sort_code: i
+      })
+  }
+
+  return res.sendStatus(200);
+})
 
 router.post("/getForeign", (req, res) => {
   db.select(
@@ -1245,6 +1273,7 @@ router.post('/getOfficeSalary', async (req, res) => {
       employee_final_with_give_salary.monthly_salary,
       employee_final_with_give_salary.daily_salary,
       tbl_employees.hour_salary,
+      tbl_employees.office_sort_code,
       employee_final_with_give_salary.date_to_m,
       employee_final_with_give_salary.date_to_y,
       tbl_employees.st_id,

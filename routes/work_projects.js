@@ -3,7 +3,7 @@ const db = require("../DB/mainDBconfig.js");
 const router = express.Router();
 
 router.post("/getData", (req, res) => {
-    db("work_projects").select("*").then((data) => {
+    db("work_projects").select("*").orderBy('sort_code', 'asc').then((data) => {
         return res.status(200).send(data);
     }).catch((err) => {
         return res.status(500).json({
@@ -145,7 +145,12 @@ router.post("/addProject", (req, res) => {
     db("work_projects").insert({
         work_project_name: req.body.work_project_name,
         work_project_status: req.body.work_project_status
-    }).then((data) => {
+    }).then(async (data) => {
+        const [[{ sort_code }]] = await db.raw(`select IFNULL(max(sort_code), 0) as sort_code from work_projects where work_project_status = 'enabled' `)
+        await db('work_projects').where('work_project_id', data).update({
+            sort_code: sort_code + 1
+        })
+            
         return res.status(200).json({
             message: "Project Added",
             work_project_id: data[0]
@@ -211,6 +216,8 @@ router.get('/getStaffProjects', async (req, res) => {
                 staff_work_projects.st_id,
                 staff_work_projects.work_project_id,
                 tbl_staffs.staff_name,
+                tbl_staffs.special_staff,
+                tbl_staffs.staff_sort_code,
                 work_projects.work_project_name
             FROM
                 staff_work_projects 
@@ -231,6 +238,17 @@ router.patch('/updateStaffProject/:staff_work_project_id', async (req, res) => {
     return res.status(200).json({
         message: 'Staff Project Updated'
     })
+})
+
+router.post('/saveSortProjects', async (req, res) => {
+    const list = req.body.list
+    for(let i = 0; i < list.length; i++) {
+        await db('work_projects').where('work_project_id', list[i].work_project_id).update({
+            sort_code: i
+        })
+    }
+
+    return res.sendStatus(200);
 })
 
 module.exports = router
