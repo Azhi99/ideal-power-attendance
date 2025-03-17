@@ -1209,6 +1209,7 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
       tbl_employees.job,
       tbl_employees.country,
       tbl_employees.sort_code,
+      tbl_employees.office,
       employee_final_with_give_salary.salary_type,
       employee_final_with_give_salary.monthly_salary,
       employee_final_with_give_salary.daily_salary,
@@ -1255,10 +1256,38 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
   const [zeros] = await db.raw(`
     SELECT emp_id FROM salary_list_to_null WHERE month = ${req.body.month} AND year = ${req.body.year} AND st_id = ${req.body.staff_id}
   `)
+
+  const [astopaki] = await db.raw(`
+    SELECT * FROM astopaki WHERE st_id = ? AND month = ? AND YEAR = ?
+  `, [req.body.staff_id, req.body.month, req.body.year])
+
   return res.status(200).send({
     salary_list,
-    zeros
+    zeros,
+    astopaki
   });
+})
+
+router.post('/addAstopaki', (req, res) => {
+  db('astopaki').insert({
+    emp_id: req.body.emp_id,
+    st_id: req.body.st_id,
+    month: req.body.month,
+    year: req.body.year
+  }).then(() => {
+    return res.sendStatus(200)
+  }).catch((err) => {
+    return res.status(500).send(err)
+  })
+})
+
+router.delete('/deleteAstopaki/:emp_id/:st_id/:month/:year', (req, res) => {
+  const {emp_id, st_id, month, year} = req.params
+  db.raw(`DELETE FROM astopaki WHERE emp_id = ? AND st_id = ? AND month = ? AND YEAR = ?`, [emp_id, st_id, month, year]).then(() => {
+    return res.sendStatus(200)
+  }).catch(e => {
+    return res.status(500).send(e)
+  })
 })
 
 router.post('/getOfficeSalary', async (req, res) => {
