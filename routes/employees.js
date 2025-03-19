@@ -123,6 +123,7 @@ router.post("/addEmployee", async (req, res) => {
         food_money: req.body.food_money,
         transport_money: req.body.transport_money,
         cabina_money: req.body.cabina_money,
+        guarantee: req.body.guarantee,
         expense_money: req.body.expense_money,
         fine_money: req.body.fine_money,
         loan_money: req.body.loan_money,
@@ -214,6 +215,7 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           food_money: req.body.food_money,
           transport_money: req.body.transport_money,
           cabina_money: req.body.cabina_money,
+          guarantee: req.body.guarantee,
           expense_money: req.body.expense_money,
           fine_money: req.body.fine_money,
           loan_money: req.body.loan_money,
@@ -430,6 +432,7 @@ router.post("/getData", (req, res) => {
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
     "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.guarantee as guarantee",
     "tbl_employees.expense_money as expense_money",
     "tbl_employees.fine_money as fine_money",
     "tbl_employees.loan_money as loan_money",
@@ -492,6 +495,7 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
     "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.guarantee as guarantee",
     "tbl_employees.expense_money as expense_money",
     "tbl_employees.fine_money as fine_money",
     "tbl_employees.loan_money as loan_money",
@@ -551,6 +555,7 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
     "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.guarantee as guarantee",
     "tbl_employees.expense_money as expense_money",
     "tbl_employees.fine_money as fine_money",
     "tbl_employees.loan_money as loan_money",
@@ -610,6 +615,7 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
     "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.guarantee as guarantee",
     "tbl_employees.expense_money as expense_money",
     "tbl_employees.fine_money as fine_money",
     "tbl_employees.loan_money as loan_money",
@@ -672,6 +678,7 @@ router.post("/getForReport", (req, res) => {
       tbl_employees.food_money as food_money,
       tbl_employees.transport_money as transport_money,
       tbl_employees.cabina_money as cabina_money,
+      "tbl_employees.guarantee as guarantee",
       tbl_employees.expense_money as expense_money,
       tbl_employees.fine_money as fine_money,
       tbl_employees.loan_money as loan_money,
@@ -746,6 +753,7 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
     "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.guarantee as guarantee",
     "tbl_employees.expense_money as expense_money",
     "tbl_employees.fine_money as fine_money",
     "tbl_employees.loan_money as loan_money",
@@ -806,6 +814,7 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
     "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.guarantee as guarantee",
     "tbl_employees.expense_money as expense_money",
     "tbl_employees.fine_money as fine_money",
     "tbl_employees.loan_money as loan_money",
@@ -946,6 +955,7 @@ router.post("/searchByID", (req, res) => {
     "tbl_employees.food_money as food_money",
     "tbl_employees.transport_money as transport_money",
     "tbl_employees.cabina_money as cabina_money",
+    "tbl_employees.guarantee as guarantee",
     "tbl_employees.expense_money as expense_money",
     "tbl_employees.fine_money as fine_money",
     "tbl_employees.loan_money as loan_money",
@@ -1236,6 +1246,7 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
       employee_final_with_give_salary.food_money,
       employee_final_with_give_salary.transport_money,
       employee_final_with_give_salary.cabina_money,
+      employee_final_with_give_salary.guarantee,
       employee_final_with_give_salary.expense_money,
       employee_final_with_give_salary.fine_money,
       employee_final_with_give_salary.loan_money,
@@ -1325,6 +1336,7 @@ router.post('/getOfficeSalary', async (req, res) => {
       employee_final_with_give_salary.food_money,
       employee_final_with_give_salary.transport_money,
       employee_final_with_give_salary.cabina_money,
+      employee_final_with_give_salary.guarantee,
       employee_final_with_give_salary.expense_money,
       employee_final_with_give_salary.fine_money,
       employee_final_with_give_salary.loan_money,
@@ -1341,9 +1353,15 @@ router.post('/getOfficeSalary', async (req, res) => {
   const [zeros] = await db.raw(`
     SELECT emp_id FROM salary_list_to_null WHERE month = ${req.body.month} AND year = ${req.body.year}
   `)
+
+  const [astopaki] = await db.raw(`
+    SELECT * FROM astopaki  WHERE month = ? AND YEAR = ?
+  `, [ req.body.month, req.body.year])
+
   return res.status(200).send({
     salary_list,
-    zeros: []
+    zeros: [],
+    astopaki
   });
 })
 
@@ -1415,6 +1433,7 @@ router.post('/getSalaryListByMonthAndYearForTotal', async (req, res) => {
         employee_final_with_give_salary.food_money,
         employee_final_with_give_salary.transport_money,
         employee_final_with_give_salary.cabina_money,
+        employee_final_with_give_salary.guarantee,
         employee_final_with_give_salary.expense_money,
         employee_final_with_give_salary.fine_money,
         employee_final_with_give_salary.loan_money,

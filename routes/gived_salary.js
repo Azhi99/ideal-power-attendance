@@ -56,6 +56,7 @@ router.post('/addListOfEmployees/:st_id', (req, res) => {
         "food_money",
         "transport_money",
         "cabina_money",
+        "guarantee",
         "fine_money",
         "expense_money",
         "loan_money",
