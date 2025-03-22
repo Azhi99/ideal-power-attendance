@@ -65,7 +65,7 @@ router.post("/addList", async (req, res) => {
           db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
           db.raw(req.body.st_id + " as st_id"),
           db.raw(req.body.st_id + " as old_st_id"),
-          db.raw(`${work_project_id || 'null'} as work_project_id`),
+          db.raw(`${req.body.absent == '1' ? 'null' : (work_project_id || 'null')} as work_project_id`),
         ])
         .then((data) => {
           db("tbl_attendance").insert(data).then(() => {

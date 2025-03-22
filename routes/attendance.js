@@ -3,7 +3,13 @@ const db = require("../DB/mainDBconfig.js");
 
 const router = express.Router();
 
-router.post("/addAttendance", (req, res) => {
+router.post("/addAttendance", async (req, res) => {
+    const dslData = await db("tbl_daily_staff_list").where("dsl_id", req.body.dsl_id).select().first();
+
+    const staff_work_project = await db("staff_work_projects").where("st_id", dslData.st_id).select().first()
+
+    const work_project_id = req.body.absent == '1' ? null : (staff_work_project ? staff_work_project.work_project_id : null)
+
     db("tbl_attendance").insert({
         dsl_id: req.body.dsl_id,
         emp_id: req.body.emp_id,
@@ -24,7 +30,8 @@ router.post("/addAttendance", (req, res) => {
         absent: req.body.absent,
         location: req.body.location,
         st_id: req.body.st_id,
-        old_st_id: req.body.st_id
+        old_st_id: req.body.st_id,
+        work_project_id
     }).then(async ([data]) => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -43,7 +50,8 @@ router.post("/addAttendance", (req, res) => {
         });
         return res.status(200).json({
             message: "Attendance Added",
-            at_id: data
+            at_id: data,
+            work_project_id
         });
     }).catch((err) => {
         return res.status(500).json({
@@ -112,10 +120,18 @@ router.patch("/setAbsent/:at_id", (req, res) => {
     });
 });
 
-router.patch("/cancelAbsent/:at_id", (req, res) => {
+router.patch("/cancelAbsent/:at_id", async (req, res) => {
+    const attendanceData = await db("tbl_attendance").where("at_id", req.params.at_id).select().first();
+    const dslData = await db("tbl_daily_staff_list").where("dsl_id", attendanceData.dsl_id).select().first();
+
+    const staff_work_project = await db("staff_work_projects").where("st_id", dslData.st_id).select().first()
+
+    const work_project_id = staff_work_project ? staff_work_project.work_project_id : null
+
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         absent: "0",
-        worked_hours: 8
+        worked_hours: 8,
+        work_project_id
     }).then(async () => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -133,7 +149,8 @@ router.patch("/cancelAbsent/:at_id", (req, res) => {
             `).trim()
         })
         return res.status(200).json({
-            message: "Absent canceled"
+            message: "Absent canceled",
+            work_project_id
         });
     }).catch((err) => {
         return res.status(500).json({

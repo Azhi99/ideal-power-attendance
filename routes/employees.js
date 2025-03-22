@@ -678,7 +678,7 @@ router.post("/getForReport", (req, res) => {
       tbl_employees.food_money as food_money,
       tbl_employees.transport_money as transport_money,
       tbl_employees.cabina_money as cabina_money,
-      "tbl_employees.guarantee as guarantee",
+      tbl_employees.guarantee as guarantee,
       tbl_employees.expense_money as expense_money,
       tbl_employees.fine_money as fine_money,
       tbl_employees.loan_money as loan_money,
