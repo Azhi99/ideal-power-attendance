@@ -1,11 +1,12 @@
 const express = require("express");
 const db = require("../DB/mainDBconfig.js");
 const router = express.Router();
+const momenttz = require('moment-timezone');
 
 router.post("/addList", async (req, res) => {
   const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
-  baghdadTime.setHours(baghdadTime.getHours() - 5)
-  req.body.datetime_list = baghdadTime
+  baghdadTime.setHours(baghdadTime.getHours() - 4)
+  req.body.datetime_list = momenttz().tz('Asia/Baghdad').format('YYYY-MM-DD HH:mm:ss');
 
   const work_project = await db('staff_work_projects').where('st_id', req.body.st_id).select().first()
   const work_project_id = work_project ? (work_project.work_project_id || null) : null
