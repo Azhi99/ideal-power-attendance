@@ -403,23 +403,50 @@ router.post("/getStaffs", (req, res) => {
 });
 
 router.post("/getDailyList", async (req, res) => {
-  const lists = await db.select(
-    "tbl_daily_staff_list.dsl_id as dsl_id",
-    "tbl_staffs.staff_name as staff_name",
-    "tbl_staffs.special_staff as special_staff",
-    "tbl_daily_staff_list.user as user",
-    "tbl_daily_staff_list.st_id as st_id",
-    "tbl_daily_staff_list.location as location",
-    "tbl_daily_staff_list.note as note",
-    "tbl_daily_staff_list.datetime_list as datetime_list",
-    "tbl_daily_staff_list.food_number as food_number",
-    "tbl_daily_staff_list.food_group as food_group",
-    "tbl_daily_staff_list.supervisor_name as supervisor_name"
-  )
-    .from("tbl_daily_staff_list")
-    .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
-    .whereRaw("tbl_daily_staff_list.work_date BETWEEN ? AND ?", [req.body.work_date, req.body.work_date_to])
-    .orderBy("tbl_staffs.staff_sort_code", "ASC");
+  // const lists = await db.select(
+  //   "tbl_daily_staff_list.dsl_id as dsl_id",
+  //   "tbl_staffs.staff_name as staff_name",
+  //   "tbl_staffs.special_staff as special_staff",
+  //   "tbl_daily_staff_list.user as user",
+  //   "tbl_daily_staff_list.st_id as st_id",
+  //   "tbl_daily_staff_list.location as location",
+  //   "tbl_daily_staff_list.note as note",
+  //   "tbl_daily_staff_list.datetime_list as datetime_list",
+  //   "tbl_daily_staff_list.food_number as food_number",
+  //   "tbl_daily_staff_list.food_group as food_group",
+  //   "tbl_daily_staff_list.supervisor_name as supervisor_name",
+  //   `GROUP_CONCAT(work_projects.work_project_name, ", ") as projects`
+  // )
+  //   .from("tbl_daily_staff_list")
+  //   .join("tbl_staffs", "tbl_daily_staff_list.st_id", "=", "tbl_staffs.st_id")
+  //   .join("tbl_attendance", "tbl_daily_staff_list.dsl_id", "=", "tbl_attendance.dsl_id")
+  //   .leftJoin("work_projects", "tbl_attendance.work_project_id", "=", "work_projects.work_project_id")
+  //   .whereRaw("tbl_daily_staff_list.work_date BETWEEN ? AND ?", [req.body.work_date, req.body.work_date_to])
+  //   .groupBy("tbl_daily_staff_list.dsl_id")
+  //   .orderBy("tbl_staffs.staff_sort_code", "ASC")
+
+    const [lists] = await db.raw(`
+      SELECT
+        tbl_daily_staff_list.dsl_id as dsl_id,
+        tbl_staffs.staff_name as staff_name,
+        tbl_staffs.special_staff as special_staff,
+        tbl_daily_staff_list.user as user,
+        tbl_daily_staff_list.st_id as st_id,
+        tbl_daily_staff_list.location as location,
+        tbl_daily_staff_list.note as note,
+        tbl_daily_staff_list.datetime_list as datetime_list,
+        tbl_daily_staff_list.food_number as food_number,
+        tbl_daily_staff_list.food_group as food_group,
+        tbl_daily_staff_list.supervisor_name as supervisor_name,
+        GROUP_CONCAT(DISTINCT work_projects.work_project_name ORDER BY work_projects.work_project_name SEPARATOR ", ") AS projects
+      FROM tbl_daily_staff_list
+      JOIN tbl_staffs ON tbl_daily_staff_list.st_id = tbl_staffs.st_id
+      JOIN tbl_attendance ON tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id
+      LEFT JOIN work_projects ON tbl_attendance.work_project_id = work_projects.work_project_id
+      WHERE tbl_daily_staff_list.work_date BETWEEN ? AND ?
+      GROUP BY tbl_daily_staff_list.dsl_id
+      ORDER BY tbl_staffs.staff_sort_code ASC
+    `, [req.body.work_date, req.body.work_date_to])
   
   const list_details = await db.select(
                               "tbl_attendance.at_id as at_id",
