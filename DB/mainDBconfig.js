@@ -7,8 +7,7 @@ const db = require("knex")({
         password: process.env.PASS,
         database: process.env.MAIN_DB,
         timezone: 'utc'
-    },
-    debug: true,
+    }
 });
 
 module.exports =  db ;
