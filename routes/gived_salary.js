@@ -184,6 +184,26 @@ router.post('/changeAddedDays', (req,res) => {
     });
 })
 
+router.post('/saveAddedDaysAndOvertime', (req,res) => {
+    const list = req.body.list
+    for(let i = 0; i < list.length; i++){
+        db('tbl_gived_salary').where('gs_id', list[i].gs_id).update({
+            added_days: list[i].added_days,
+            added_overtime: list[i].added_overtime
+        }).then(() => {
+            if(i == list.length - 1){
+                return res.status(200).json({
+                    message: "Added Days and Overtime Changed"
+                });
+            }
+        }).catch((err) => {
+            return res.status(500).json({
+                message: err
+            });
+        });
+    }
+})
+
 router.post('/changeAddedOvertime', (req,res) => {
     db('tbl_gived_salary').where('gs_id', req.body.gs_id).update({
         added_overtime: req.body.added_overtime
