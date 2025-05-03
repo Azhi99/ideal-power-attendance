@@ -3,7 +3,7 @@ const db = require("knex")({
     client: "mysql",
     connection: {
         host: process.env.HOST,
-        user: 'root',
+        user: process.env.USER,
         password: process.env.PASS,
         database: process.env.MAIN_DB,
         timezone: 'utc'
