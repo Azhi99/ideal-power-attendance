@@ -1643,4 +1643,42 @@ router.patch('/edit_document_name/:id', async (req, res) => {
   return res.status(200).send(document)
 })
 
+router.get('/getHistory/:emp_id', async (req, res) => {
+  const history = await db('employee_history').where('emp_id', req.params.emp_id).select().orderBy('employee_history_id', 'asc')
+  return res.status(200).send(history)
+})
+
+router.post('/addHistory', async (req, res) => {
+  const history = await db('employee_history').insert({
+    emp_id: req.body.emp_id,
+    note: req.body.note || null,
+    date: req.body.date || null,
+  })
+
+  return res.status(200).send({
+    employee_history_id: history[0],
+  })
+})
+
+router.get('/getOneHistory/:id', async (req, res) => {
+  const history = await db('employee_history').where('employee_history_id', req.params.id).select().first()
+  return res.status(200).send(history)
+})
+
+router.patch('/updateHistory/:id', async (req, res) => {
+  await db('employee_history').where('employee_history_id', req.params.id).update({
+    note: req.body.note || null,
+    date: req.body.date || null,
+  })
+
+
+  return res.sendStatus(200)
+})
+
+router.delete('/deleteHistory/:id', async (req, res) => {
+  await db('employee_history').where('employee_history_id', req.params.id).delete()
+  return res.sendStatus(200)
+})
+
+
 module.exports = router;
