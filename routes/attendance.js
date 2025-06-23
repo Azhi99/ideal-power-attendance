@@ -9,6 +9,13 @@ router.post("/addAttendance", async (req, res) => {
     const staff_work_project = await db("staff_work_projects").where("st_id", dslData.st_id).select().first()
 
     const work_project_id = req.body.absent == '1' ? null : (staff_work_project ? staff_work_project.work_project_id : null)
+    let project_work = null
+    if(work_project_id) {
+        let prj = await db('work_projects').where('work_project_id', work_project_id).select('project_work').first()
+        if(prj) {
+            project_work = prj.project_work
+        }
+    }
 
     db("tbl_attendance").insert({
         dsl_id: req.body.dsl_id,
@@ -31,7 +38,8 @@ router.post("/addAttendance", async (req, res) => {
         location: req.body.location,
         st_id: req.body.st_id,
         old_st_id: req.body.st_id,
-        work_project_id
+        work_project_id,
+        project_work
     }).then(async ([data]) => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -93,7 +101,8 @@ router.patch("/setAbsent/:at_id", (req, res) => {
         loan_reason: null,
         accomodation: 0,
         accomodation_reason: null,
-        work_project_id: null
+        work_project_id: null,
+        project_work: null
     }).then(async () => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -128,10 +137,20 @@ router.patch("/cancelAbsent/:at_id", async (req, res) => {
 
     const work_project_id = staff_work_project ? staff_work_project.work_project_id : null
 
+    let project_work = null
+
+    if(work_project_id) {
+        let prj = await db('work_projects').where('work_project_id', work_project_id).select('project_work').first()
+        if(prj) {
+            project_work = prj.project_work
+        }
+    }
+
     db("tbl_attendance").where("at_id", req.params.at_id).update({
         absent: "0",
         worked_hours: 8,
-        work_project_id
+        work_project_id,
+        project_work
     }).then(async () => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -340,18 +359,51 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
     })
 });
 
-router.patch('/setWorkPorject/:at_id',(req, res) => {
-    db('tbl_attendance').where('at_id', req.params.at_id).update({
-        work_project_id: req.body.work_project_id
-    }).then(async () => {
-        return res.status(200).json({
-            message: 'Updated'
-        })
-    }).catch((err) => {
-        return res.status(500).json({
-            message: err
+router.patch('/setWorkPorject/:at_id', async (req, res) => {
+    let project_work = null
+    if(req.body.work_project_id) {
+        let prj = await db('work_projects').where('work_project_id', req.body.work_project_id).select('project_work').first()
+        if(prj) {
+            project_work = prj.project_work
+        }
+    }
+
+    db.select(
+        'tbl_attendance.*',
+        'work_projects.work_project_name as work_project_name'
+    )
+    .from('tbl_attendance')
+    .leftJoin('work_projects', "tbl_attendance.work_project_id", "=", "work_projects.work_project_id")
+    .where('tbl_attendance.at_id', req.params.at_id).select().first().then((data) => {
+        db('tbl_attendance').where('at_id', req.params.at_id).update({
+            work_project_id: req.body.work_project_id,
+            project_work
+        }).then(async () => {
+            if(data.work_project_id != req.body.work_project_id) {
+                const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+                baghdadTime.setHours(baghdadTime.getHours() - 4)
+                req.body.datetime_log = baghdadTime
+                await db('tbl_log').insert({
+                    dsl_id: req.body.dsl_id,
+                    st_id: req.body.st_id,
+                    user: req.body.user,
+                    datetime_log: req.body.datetime_log,
+                    work: (`
+                        گۆڕینی پڕۆژەی ${req.body.employee} ${data.work_project_name ? `لە ${data.work_project_name}` : ''} بۆ ${req.body.work_project_name}
+                    `).trim()
+                });
+            }
+    
+            return res.status(200).json({
+                message: 'Updated'
+            })
+        }).catch((err) => {
+            return res.status(500).json({
+                message: err
+            })
         })
     })
+
 })
 
 router.patch("/setLocation/:at_id", (req, res) => {

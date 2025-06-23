@@ -26,6 +26,7 @@ const loanAccomodationRouter = require("./routes/loan_accomodation.js");
 const notificationsRouter = require("./routes/notifications.js");
 const projectsRouter = require("./routes/projects.js")
 const workProjectsRouter = require("./routes/work_projects.js")
+const finishingAndStructureRouter = require("./routes/finishing_and_structure.js");
 
 const app = express();
 var port = process.env.PORT;
@@ -68,6 +69,7 @@ app.use('/loan_accomodation', loanAccomodationRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/projects', projectsRouter)
 app.use('/work_projects', workProjectsRouter)
+app.use('/finishing_and_structure', finishingAndStructureRouter);
 
 
 app.post("/isLogged", (req, res) => {

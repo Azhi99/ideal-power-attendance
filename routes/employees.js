@@ -146,6 +146,12 @@ router.post("/addEmployee", async (req, res) => {
         family_number_2: req.body.family_number_2 || null,
         certificate: req.body.certificate || null,
         office: req.body.office || 'false',
+        language: req.body.language || null,
+        electricity_works: req.body.electricity_works || null,
+        other_works: req.body.other_works || null,
+        skill: req.body.skill || null,
+        religion: req.body.religion || null,
+        religion_type: req.body.religion_type || null,
       })
       .then(async ([data]) => {
         
@@ -238,6 +244,12 @@ router.patch("/updateEmployee/:emp_id", updateValidation, (req, res) => {
           family_number_2: req.body.family_number_2 || null,
           certificate: req.body.certificate,
           office: req.body.office || 'false',
+          language: req.body.language || null,
+          electricity_works: req.body.electricity_works || null,
+          other_works: req.body.other_works || null,
+          skill: req.body.skill || null,
+          religion: req.body.religion || null,
+          religion_type: req.body.religion_type || null,
         })
         .then(() => {
           return res.status(200).json({
@@ -456,6 +468,12 @@ router.post("/getData", (req, res) => {
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
     "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
 
   )
     .from("tbl_employees")
@@ -519,6 +537,12 @@ router.post("/getAll", (req, res) => {
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
     "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -577,7 +601,14 @@ router.post("/getActived", (req, res) => {
     "tbl_employees.blood_group as blood_group",
     "tbl_employees.family_number_1 as family_number_1",
     "tbl_employees.family_number_2 as family_number_2",
-    "tbl_employees.certificate as certificate"
+    "tbl_employees.certificate as certificate",
+    "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -639,6 +670,12 @@ router.post("/getIraq", (req, res) => {
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
     "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -701,7 +738,13 @@ router.post("/getForReport", (req, res) => {
       tbl_employees.family_number_1 as family_number_1,
       tbl_employees.family_number_2 as family_number_2,
       tbl_employees.certificate as certificate,
-      tbl_employees.office as office
+      tbl_employees.office as office,
+      tbl_employees.language as language,
+      tbl_employees.electricity_works as electricity_works,
+      tbl_employees.other_works as other_works,
+      tbl_employees.skill as skill,
+      tbl_employees.religion as religion,
+      tbl_employees.religion_type as religion_type
     FROM tbl_employees
     JOIN tbl_staffs ON tbl_staffs.st_id = tbl_employees.st_id
     WHERE 
@@ -777,6 +820,12 @@ router.post("/getForeign", (req, res) => {
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
     "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -838,6 +887,12 @@ router.post("/getDeactived", (req, res) => {
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
     "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -917,6 +972,12 @@ router.post("/searchEmployee", (req, res) => {
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
     "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")
@@ -979,6 +1040,12 @@ router.post("/searchByID", (req, res) => {
     "tbl_employees.family_number_2 as family_number_2",
     "tbl_employees.certificate as certificate",
     "tbl_employees.office as office",
+    "tbl_employees.language as language",
+    "tbl_employees.electricity_works as electricity_works",
+    "tbl_employees.other_works as other_works",
+    "tbl_employees.skill as skill",
+    "tbl_employees.religion as religion",
+    "tbl_employees.religion_type as religion_type",
   )
     .from("tbl_employees")
     .join("tbl_staffs", "tbl_staffs.st_id", "=", "tbl_employees.st_id")

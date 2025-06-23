@@ -11,6 +11,14 @@ router.post("/addList", async (req, res) => {
   const work_project = await db('staff_work_projects').where('st_id', req.body.st_id).select().first()
   const work_project_id = work_project ? (work_project.work_project_id || null) : null
 
+  let project_work = null
+  if(work_project_id) {
+    let prj = await db('work_projects').where('work_project_id', work_project_id).select('project_work').first()
+    if(prj) {
+      project_work = prj.project_work
+    }
+  }
+
   db("tbl_daily_staff_list")
     .insert({
       st_id: req.body.st_id,
@@ -63,6 +71,7 @@ router.post("/addList", async (req, res) => {
           db.raw("0 as accomodation"),
           db.raw("null as accomodation_reason"),
           db.raw(`'${req.body.absent}' as absent`),
+          db.raw(`${req.body.absent == '1' ? `NULL` : `'${project_work}'`} as project_work`),
           db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
           db.raw(req.body.st_id + " as st_id"),
           db.raw(req.body.st_id + " as old_st_id"),
@@ -520,6 +529,34 @@ router.post("/getDailyList", async (req, res) => {
     all_rows: data
   });
 });
+
+router.post('/getMissedDailyList', async (req, res) => {
+  const [missed_lists] = await db.raw(`
+    SELECT
+        tbl_daily_staff_list.dsl_id as dsl_id,
+        tbl_staffs.staff_name as staff_name,
+        tbl_staffs.special_staff as special_staff,
+        tbl_daily_staff_list.user as user,
+        tbl_daily_staff_list.st_id as st_id,
+        tbl_daily_staff_list.location as location,
+        tbl_daily_staff_list.note as note,
+        tbl_daily_staff_list.datetime_list as datetime_list,
+        tbl_daily_staff_list.food_number as food_number,
+        tbl_daily_staff_list.food_group as food_group,
+        CONCAT(tbl_engineers.first_name, ' ', tbl_engineers.last_name) as supervisor_name
+    FROM tbl_staffs 
+    LEFT JOIN tbl_daily_staff_list 
+      ON tbl_daily_staff_list.st_id = tbl_staffs.st_id 
+      AND tbl_daily_staff_list.work_date BETWEEN ? AND ?
+    JOIN tbl_engineers ON tbl_engineers.en_id = tbl_staffs.en_id
+    WHERE tbl_daily_staff_list.st_id IS NULL AND tbl_staffs.show_staff = '1'
+    ORDER BY tbl_staffs.staff_sort_code ASC
+  `, [req.body.work_date, req.body.work_date_to]);
+
+  return res.status(200).json({
+    missed_lists: missed_lists || []
+  });
+})
 
 router.get('/getLogViewByDate/:from/:to', (req, res) => {
   db.raw(`select * from log_view where DATE(datetime_log) BETWEEN '${new Date(req.params.from).toISOString().split('T')[0]}' AND '${new Date(req.params.to).toISOString().split('T')[0]}' ORDER BY datetime_log`).then(async ([data])=>{ 
