@@ -13,9 +13,10 @@ router.post("/addList", async (req, res) => {
 
   let project_work = null
   if(work_project_id) {
-    let prj = await db('work_projects').where('work_project_id', work_project_id).select('project_work').first()
+    let prj = await db('work_projects').where('work_project_id', work_project_id).select('*').first()
     if(prj) {
       project_work = prj.project_work
+      project_supervisor = prj.project_supervisor
     }
   }
 
@@ -71,7 +72,8 @@ router.post("/addList", async (req, res) => {
           db.raw("0 as accomodation"),
           db.raw("null as accomodation_reason"),
           db.raw(`'${req.body.absent}' as absent`),
-          db.raw(`${req.body.absent == '1' ? `NULL` : `'${project_work}'`} as project_work`),
+          db.raw(`${req.body.absent == '1' ? `NULL` : `${project_work ? `'${project_work}'` : `NULL`}`} as project_work`),
+          db.raw(`${req.body.absent == '1' ? `NULL` : `${project_supervisor ? `'${project_supervisor}'` : `NULL`}`} as project_supervisor`),
           db.raw("'"+ req.body.location.split(",")[0] +"' as location"),
           db.raw(req.body.st_id + " as st_id"),
           db.raw(req.body.st_id + " as old_st_id"),

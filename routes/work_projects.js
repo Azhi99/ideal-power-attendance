@@ -51,7 +51,8 @@ router.post('/report', async (req, res) => {
                 tbl_attendance.work_project_id,
                 tbl_staffs.staff_name,
                 work_projects.work_project_name,
-                work_projects.project_work
+                work_projects.project_work,
+                work_projects.project_supervisor
             FROM
                 tbl_attendance
             INNER JOIN tbl_employees ON (tbl_employees.emp_id = tbl_attendance.emp_id)
@@ -176,6 +177,7 @@ router.post("/addProject", (req, res) => {
         work_project_name: req.body.work_project_name,
         work_project_status: req.body.work_project_status,
         project_work: req.body.project_work,
+        project_supervisor: req.body.project_supervisor,
     }).then(async (data) => {
         const [[{ sort_code }]] = await db.raw(`select IFNULL(max(sort_code), 0) as sort_code from work_projects where work_project_status = 'enabled' `)
         await db('work_projects').where('work_project_id', data).update({
@@ -204,6 +206,7 @@ router.patch("/updateProject/:work_project_id", (req, res) => {
         work_project_name: req.body.work_project_name,
         work_project_status: req.body.work_project_status,
         project_work: req.body.project_work,
+        project_supervisor: req.body.project_supervisor,
     }).then(() => {
         return res.status(200).json({
             message: "Project Updated"

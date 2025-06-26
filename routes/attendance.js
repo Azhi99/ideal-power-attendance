@@ -10,10 +10,12 @@ router.post("/addAttendance", async (req, res) => {
 
     const work_project_id = req.body.absent == '1' ? null : (staff_work_project ? staff_work_project.work_project_id : null)
     let project_work = null
+    let project_supervisor = null
     if(work_project_id) {
-        let prj = await db('work_projects').where('work_project_id', work_project_id).select('project_work').first()
+        let prj = await db('work_projects').where('work_project_id', work_project_id).select('*').first()
         if(prj) {
-            project_work = prj.project_work
+            project_work = prj.project_work,
+            project_supervisor = prj.project_supervisor
         }
     }
 
@@ -39,7 +41,8 @@ router.post("/addAttendance", async (req, res) => {
         st_id: req.body.st_id,
         old_st_id: req.body.st_id,
         work_project_id,
-        project_work
+        project_work,
+        project_supervisor,
     }).then(async ([data]) => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -102,7 +105,8 @@ router.patch("/setAbsent/:at_id", (req, res) => {
         accomodation: 0,
         accomodation_reason: null,
         work_project_id: null,
-        project_work: null
+        project_work: null,
+        project_supervisor: null
     }).then(async () => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -140,9 +144,10 @@ router.patch("/cancelAbsent/:at_id", async (req, res) => {
     let project_work = null
 
     if(work_project_id) {
-        let prj = await db('work_projects').where('work_project_id', work_project_id).select('project_work').first()
+        let prj = await db('work_projects').where('work_project_id', work_project_id).select('*').first()
         if(prj) {
-            project_work = prj.project_work
+            project_work = prj.project_work,
+            project_supervisor = prj.project_supervisor
         }
     }
 
@@ -150,7 +155,8 @@ router.patch("/cancelAbsent/:at_id", async (req, res) => {
         absent: "0",
         worked_hours: 8,
         work_project_id,
-        project_work
+        project_work,
+        project_supervisor,
     }).then(async () => {
         // await db('tbl_daily_staff_list').where('dsl_id', req.body.dsl_id).update({
         //     datetime_list: req.body.datetime_list
@@ -362,9 +368,10 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
 router.patch('/setWorkPorject/:at_id', async (req, res) => {
     let project_work = null
     if(req.body.work_project_id) {
-        let prj = await db('work_projects').where('work_project_id', req.body.work_project_id).select('project_work').first()
+        let prj = await db('work_projects').where('work_project_id', req.body.work_project_id).select('*').first()
         if(prj) {
             project_work = prj.project_work
+            project_supervisor = prj.project_supervisor
         }
     }
 
@@ -377,7 +384,8 @@ router.patch('/setWorkPorject/:at_id', async (req, res) => {
     .where('tbl_attendance.at_id', req.params.at_id).select().first().then((data) => {
         db('tbl_attendance').where('at_id', req.params.at_id).update({
             work_project_id: req.body.work_project_id,
-            project_work
+            project_work,
+            project_supervisor,
         }).then(async () => {
             if(data.work_project_id != req.body.work_project_id) {
                 const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
