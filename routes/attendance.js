@@ -142,6 +142,7 @@ router.patch("/cancelAbsent/:at_id", async (req, res) => {
     const work_project_id = staff_work_project ? staff_work_project.work_project_id : null
 
     let project_work = null
+    let project_supervisor = null
 
     if(work_project_id) {
         let prj = await db('work_projects').where('work_project_id', work_project_id).select('*').first()
@@ -367,6 +368,7 @@ router.patch('/setOvertime/:at_id',(req, res)=>{
 
 router.patch('/setWorkPorject/:at_id', async (req, res) => {
     let project_work = null
+    let project_supervisor = null
     if(req.body.work_project_id) {
         let prj = await db('work_projects').where('work_project_id', req.body.work_project_id).select('*').first()
         if(prj) {

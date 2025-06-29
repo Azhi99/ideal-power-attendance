@@ -12,6 +12,7 @@ router.post("/addList", async (req, res) => {
   const work_project_id = work_project ? (work_project.work_project_id || null) : null
 
   let project_work = null
+  let project_supervisor = null
   if(work_project_id) {
     let prj = await db('work_projects').where('work_project_id', work_project_id).select('*').first()
     if(prj) {
