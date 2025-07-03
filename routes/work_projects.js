@@ -81,7 +81,9 @@ router.post('/report', async (req, res) => {
                 tbl_attendance.work_project_id,
                 tbl_staffs.staff_name,
                 work_projects.work_project_name,
-                COUNT(tbl_attendance.work_project_id) AS total_working_days_in_project
+                COUNT(tbl_attendance.work_project_id) AS total_working_days_in_project,
+                SUM(tbl_attendance.overtime) AS total_overtime,
+                SUM(tbl_attendance.transport) AS total_transport
             FROM
                 tbl_attendance
             INNER JOIN tbl_employees ON (tbl_employees.emp_id = tbl_attendance.emp_id)
