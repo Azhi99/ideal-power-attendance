@@ -75,7 +75,7 @@ router.post('/all', (req, res) => {
 
     if(req.body.filter === 'all') {
         db.raw(`
-            SELECT * FROM loan_accomodation_view WHERE archived = '${req.body.archived}' ${q} ORDER BY datetime_create ASC    
+            SELECT * FROM loan_accomodation_view WHERE ${req.body.archived == 'all' ? `archived IN ('archived', 'unarchived')` : `archived = '${req.body.archived}'`} ${q} ORDER BY datetime_create ASC    
         `).then((data) => {
             res.status(200).send(data[0])
         }).catch((err) => {
@@ -84,12 +84,12 @@ router.post('/all', (req, res) => {
             })
         })
     } else if(req.body.filter.split(',').length > 1) {
-        db.raw(`SELECT * FROM loan_accomodation_view WHERE archived = '${req.body.archived}' AND la_type IN (${req.body.filter.split(',').map(obj => `'${obj}'`).join(',')}) ${q}`).then(r => {
+        db.raw(`SELECT * FROM loan_accomodation_view WHERE ${req.body.archived == 'all' ? `archived IN ('archived', 'unarchived')` : `archived = '${req.body.archived}'`} AND la_type IN (${req.body.filter.split(',').map(obj => `'${obj}'`).join(',')}) ${q}`).then(r => {
             return res.status(200).send(r[0])
         })
     } else {
         db.raw(`
-            SELECT * FROM loan_accomodation_view WHERE archived = '${req.body.archived}' AND la_type = '${req.body.filter}' ${q} ORDER BY datetime_create ASC    
+            SELECT * FROM loan_accomodation_view WHERE ${req.body.archived == 'all' ? `archived IN ('archived', 'unarchived')` : `archived = '${req.body.archived}'`} AND la_type = '${req.body.filter}' ${q} ORDER BY datetime_create ASC    
         `).then((data) => {
             res.status(200).send(data[0])
         }).catch((err) => {
@@ -103,21 +103,21 @@ router.post('/all', (req, res) => {
 router.get('/getByEngineer/:filter/:en_id/:archived', (req, res) => {
     if(req.params.filter === 'all') {
         db.raw(`
-            SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND st_id IN (
+            SELECT * FROM loan_accomodation_view WHERE ${req.params.archived == 'all' ? `archived IN ('archived', 'unarchived')` : `archived = '${req.params.archived}'`} AND st_id IN (
                 SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
             )
         `).then(r => {
             return res.status(200).send(r[0])
         })
     } else if(req.params.filter.split(',').length > 1) {
-        db.raw(`SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND la_type IN (${req.params.filter.split(',').map(obj => `'${obj}'`).join(',')}) AND st_id IN (
+        db.raw(`SELECT * FROM loan_accomodation_view WHERE ${req.params.archived == 'all' ? `archived IN ('archived', 'unarchived')` : `archived = '${req.params.archived}'`} AND la_type IN (${req.params.filter.split(',').map(obj => `'${obj}'`).join(',')}) AND st_id IN (
             SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
         )`).then(r => {
             return res.status(200).send(r[0])
         })
     } else {
         db.raw(`
-            SELECT * FROM loan_accomodation_view WHERE archived = '${req.params.archived}' AND la_type = '${req.params.filter}' AND st_id IN (
+            SELECT * FROM loan_accomodation_view WHERE ${req.params.archived == 'all' ? `archived IN ('archived', 'unarchived')` : `archived = '${req.params.archived}'`} AND la_type = '${req.params.filter}' AND st_id IN (
                 SELECT st_id FROM tbl_staffs WHERE en_id = ${req.params.en_id}
             )
         `).then(r => {

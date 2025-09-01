@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.68e5395a15477c78e4ee2c6d5ab2f6a0.js"
+  "/precache-manifest.ee9d9fd9b7d64b153769109c8fa8c8e4.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "ideal-power"});
