@@ -1203,6 +1203,91 @@ router.get('/getEmployeeMonthDetail/:month/:year/:emp_id', async (req, res) => {
   return res.status(200).send(rows);
 })
 
+router.get('/getDetailedMonthDetail/:month/:year/:type', async (req, res) => {
+  if(!['transport', 'fine', 'loan', 'expense', 'accomodation', 'food'].includes(req.params.type) || !req.params.month || !req.params.year) {
+    return res.status(400).send({ message: 'Invalid type parameter' });
+  }
+  const staffs = await db.raw(`
+    SELECT 
+      tbl_attendance.st_id,
+      tbl_staffs.staff_name,
+      SUM(tbl_attendance.${req.params.type}) AS total
+    FROM tbl_attendance
+    INNER JOIN tbl_staffs ON (tbl_attendance.st_id = tbl_staffs.st_id)
+    WHERE tbl_attendance.dsl_id IN (
+      SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
+    ) AND tbl_attendance.${req.params.type} > 0
+      AND NOT EXISTS (
+        SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.st_id = tbl_attendance.st_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year}
+      )
+    GROUP BY tbl_attendance.st_id
+    ORDER BY tbl_staffs.staff_sort_code ASC
+  `).then((data) => {
+    return data[0]
+  })
+
+  const all_employees = await db.raw(`
+    SELECT
+      tbl_employees.emp_id,
+      tbl_attendance.st_id,
+      CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name,
+      tbl_daily_staff_list.dsl_id,
+      SUM(tbl_attendance.${req.params.type}) AS total
+    FROM tbl_attendance
+    INNER JOIN tbl_employees ON (tbl_attendance.emp_id = tbl_employees.emp_id)
+    INNER JOIN tbl_daily_staff_list ON (tbl_attendance.dsl_id = tbl_daily_staff_list.dsl_id)
+    WHERE tbl_attendance.dsl_id IN (
+      SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
+    ) AND tbl_attendance.${req.params.type} > 0
+     AND NOT EXISTS (
+      SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.emp_id = tbl_attendance.emp_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year} AND salary_list_to_null.st_id = tbl_attendance.st_id
+     )
+    GROUP BY tbl_attendance.emp_id
+    ORDER BY tbl_employees.sort_code ASC
+  `).then((data) => {
+    return data[0]
+  })
+
+  const all_employee_detail = await db.raw(`
+    SELECT
+      tbl_employees.emp_id,
+      CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name,
+      tbl_daily_staff_list.dsl_id,
+      tbl_daily_staff_list.work_date,
+      tbl_attendance.fine,
+      tbl_attendance.fine_reason,
+      tbl_attendance.food,
+      tbl_attendance.food_reason,
+      tbl_attendance.expense,
+      tbl_attendance.expense_reason,
+      tbl_attendance.transport,
+      tbl_attendance.transport_reason,
+      tbl_attendance.loan,
+      tbl_attendance.loan_reason,
+      tbl_attendance.accomodation,
+      tbl_attendance.accomodation_reason
+        FROM tbl_attendance
+        INNER JOIN tbl_employees ON tbl_attendance.emp_id = tbl_employees.emp_id
+        INNER JOIN tbl_daily_staff_list ON tbl_attendance.dsl_id = tbl_daily_staff_list.dsl_id
+      WHERE tbl_attendance.dsl_id IN (
+        SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
+      ) AND tbl_attendance.${req.params.type} > 0
+        AND NOT EXISTS (
+          SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.emp_id = tbl_attendance.emp_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year} AND salary_list_to_null.st_id = tbl_attendance.st_id
+        )
+      ORDER BY tbl_daily_staff_list.work_date ASC
+
+  `).then((data) => {
+    return data[0]
+  })
+
+  return res.status(200).send({
+    staffs,
+    all_employees,
+    all_employee_detail
+  })
+})
+
 router.get('/getEmployeeByEngineer/:en_id', (req, res) => {
   db.raw(`
     SELECT 
