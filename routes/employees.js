@@ -1218,7 +1218,7 @@ router.get('/getDetailedMonthDetail/:month/:year/:type', async (req, res) => {
       SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
     ) AND tbl_attendance.${req.params.type} > 0
       AND NOT EXISTS (
-        SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.st_id = tbl_attendance.st_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year}
+        SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.st_id = tbl_attendance.st_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year} AND tbl_attendance.emp_id = salary_list_to_null.emp_id
       )
     GROUP BY tbl_attendance.st_id
     ORDER BY tbl_staffs.staff_sort_code ASC
