@@ -107,6 +107,16 @@ router.post("/searchActiveLogChange", (req, res) => {
      });
 });
 
+router.get('/getEnginners', (req, res) => {
+    db('tbl_engineers').select('*').then(r => {
+        return res.status(200).send(r)
+    }).catch(e => {
+        return res.status(500).send({
+            e
+        })
+    })
+})
+
 router.post("/getActiveLog", (req, res) => {
     db.select(
         "tbl_active_log_employee.ale_id as ale_id",
