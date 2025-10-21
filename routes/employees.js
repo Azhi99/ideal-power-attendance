@@ -1088,15 +1088,72 @@ router.post('/getEmployeeInfo/:id/:month/:year', async (req,res)=>{
 });
 
 router.post('/topOvertime/:month/:year', async (req, res)=>{
- const [top_overtime] = await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_o desc', [req.params.month, req.params.year])
- const [top_absent] = await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_apsent desc', [req.params.month, req.params.year])
- const [top_fine] = await db.raw('select * from top_overtime where date_to_m=? and date_to_y=? order by total_f desc', [req.params.month, req.params.year])
-  return res.status(200).json({
-    top_overtime,
-    top_absent,
-    top_fine
+  // Get overtime data grouped by staff, employee, and work project
+  const [overtimeData] = await db.raw(`
+    SELECT
+      tbl_attendance.st_id,
+      tbl_staffs.staff_name,
+      tbl_attendance.emp_id,
+      CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name,
+      tbl_attendance.work_project_id,
+      work_projects.work_project_name,
+      SUM(tbl_attendance.overtime) AS total_overtime
+    FROM tbl_attendance
+    INNER JOIN tbl_employees ON (tbl_attendance.emp_id = tbl_employees.emp_id)
+    INNER JOIN tbl_staffs ON (tbl_attendance.st_id = tbl_staffs.st_id)
+    INNER JOIN tbl_daily_staff_list ON (tbl_attendance.dsl_id = tbl_daily_staff_list.dsl_id)
+    LEFT JOIN work_projects ON (tbl_attendance.work_project_id = work_projects.work_project_id)
+    WHERE MONTH(tbl_daily_staff_list.work_date) = ${req.params.month} 
+      AND YEAR(tbl_daily_staff_list.work_date) = ${req.params.year}
+      AND tbl_attendance.overtime > 0
+    GROUP BY 
+      tbl_attendance.st_id, 
+      tbl_staffs.staff_name,
+      tbl_attendance.emp_id, 
+      tbl_employees.first_name, 
+      tbl_employees.last_name,
+      tbl_attendance.work_project_id,
+      work_projects.work_project_name
+    ORDER BY tbl_staffs.staff_sort_code ASC, tbl_employees.sort_code ASC, work_projects.work_project_name ASC
+  `);
+
+  // Group data by staff -> employee -> work project
+  const uniqueStaffs = Array.from(new Set(overtimeData.map(item => item.st_id)));
+
+  const groupedByStaff = uniqueStaffs.map(st_id => {
+    const staffData = overtimeData.filter(r => r.st_id === st_id);
+    const uniqueEmployees = Array.from(new Set(staffData.map(item => item.emp_id)));
+
+    const employees = uniqueEmployees.map(emp_id => {
+      const employeeData = staffData.filter(r => r.emp_id === emp_id);
+      const workProjects = employeeData.map(project => ({
+        work_project_id: project.work_project_id,
+        work_project_name: project.work_project_name || 'No Project',
+        total_overtime: parseFloat(project.total_overtime) || 0
+      }));
+
+      return {
+        emp_id,
+        full_name: employeeData[0].full_name,
+        work_projects: workProjects,
+        employee_total_overtime: workProjects.reduce((sum, wp) => sum + wp.total_overtime, 0)
+      };
+    });
+
+    return {
+      st_id,
+      staff_name: staffData[0].staff_name,
+      employees,
+      staff_total_overtime: employees.reduce((sum, emp) => sum + emp.employee_total_overtime, 0)
+    };
   });
-});
+
+  return res.status(200).json({
+    rows: groupedByStaff,
+    month: req.params.month,
+    year: req.params.year
+  });
+})
 
 router.post('/getEmployeeBystaff/:st_id/:month/:year',(req,res)=>{
   // db.raw(`select 
@@ -1416,6 +1473,29 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
         ) and old_st_id = ${req.body.staff_id}
       ) AND employee_final_with_give_salary.date_to_m = ${req.body.month} AND employee_final_with_give_salary.date_to_y = ${req.body.year} 
   `);
+
+  const acs_number = await db('acs_numbers').where('st_id', req.body.staff_id).andWhere('month', req.body.month).andWhere('year', req.body.year).select().first()
+
+  // Get distinct work_project_ids from attendance table for the specified month, year, and staff
+  // Exclude employees that are on the zeros list
+  const [work_projects] = await db.raw(`
+    SELECT DISTINCT 
+      tbl_attendance.work_project_id,
+      work_projects.work_project_name
+    FROM tbl_attendance
+    LEFT JOIN work_projects ON (tbl_attendance.work_project_id = work_projects.work_project_id)
+    WHERE tbl_attendance.dsl_id IN (
+      SELECT dsl_id FROM tbl_daily_staff_list 
+      WHERE MONTH(work_date) = ${req.body.month} AND YEAR(work_date) = ${req.body.year}
+    ) AND tbl_attendance.old_st_id = ${req.body.staff_id}
+    AND tbl_attendance.work_project_id IS NOT NULL
+    AND tbl_attendance.emp_id NOT IN (
+      SELECT emp_id FROM salary_list_to_null 
+      WHERE month = ${req.body.month} AND year = ${req.body.year} AND st_id = ${req.body.staff_id}
+    )
+    ORDER BY work_projects.work_project_name ASC
+  `);
+
   const [zeros] = await db.raw(`
     SELECT emp_id FROM salary_list_to_null WHERE month = ${req.body.month} AND year = ${req.body.year} AND st_id = ${req.body.staff_id}
   `)
@@ -1426,8 +1506,10 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
 
   return res.status(200).send({
     salary_list,
+    work_projects,
     zeros,
-    astopaki
+    astopaki,
+    acs_number
   });
 })
 
