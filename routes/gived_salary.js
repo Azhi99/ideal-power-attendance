@@ -75,12 +75,15 @@ router.post('/addListOfEmployees/:st_id', (req, res) => {
                 .andWhere("salary_month", req.body.salary_month)
                 .andWhere("salary_year", req.body.salary_year)
                 .select().then(async (data) => {
-                    const [new_acs_id] = await db('acs_numbers').insert({
-                        st_id: req.params.st_id,
-                        month: req.body.salary_month,
-                        year: req.body.salary_year,
-                        acs_number: req.body.acs_number
-                    })
+                    let new_acs_id = null
+                    if(req.body.acs_number) {
+                        [new_acs_id] = await db('acs_numbers').insert({
+                            st_id: req.params.st_id,
+                            month: req.body.salary_month,
+                            year: req.body.salary_year,
+                            acs_number: req.body.acs_number
+                        })
+                    }
                     return res.status(200).send({
                         rows: data,
                         acs_number_id: new_acs_id
