@@ -1088,7 +1088,6 @@ router.post('/getEmployeeInfo/:id/:month/:year', async (req,res)=>{
 });
 
 router.post('/topOvertime/:month/:year', async (req, res)=>{
-  // Get overtime data grouped by staff, employee, and work project
   const [overtimeData] = await db.raw(`
     SELECT
       tbl_attendance.st_id,
@@ -1106,6 +1105,7 @@ router.post('/topOvertime/:month/:year', async (req, res)=>{
     WHERE MONTH(tbl_daily_staff_list.work_date) = ${req.params.month} 
       AND YEAR(tbl_daily_staff_list.work_date) = ${req.params.year}
       AND tbl_attendance.overtime > 0
+      ${req.body.st_id ? ` AND tbl_attendance.st_id = ${req.body.st_id}` : ''}
     GROUP BY 
       tbl_attendance.st_id, 
       tbl_staffs.staff_name,

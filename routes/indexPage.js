@@ -45,20 +45,6 @@ router.post("/", async (req, res) => {
     const removed_staff_from_passport = removed_staffs_from_passport_and_accomodations.filter(f => f.removed_from == 'passport').map(m => m.st_id)
     const removed_staff_from_accomodations = removed_staffs_from_passport_and_accomodations.filter(f => f.removed_from == 'accomodation').map(m => m.st_id)
 
-    const missed_employees_projects = await db.raw(`
-        SELECT
-            tbl_attendance.emp_id,
-            CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee,
-            tbl_daily_staff_list.work_date,
-            tbl_staffs.staff_name
-        FROM tbl_attendance
-            JOIN tbl_daily_staff_list ON (tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id)
-            JOIN tbl_employees ON (tbl_employees.emp_id = tbl_attendance.emp_id)
-            JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_attendance.st_id)
-        WHERE tbl_attendance.work_project_id IS NULL
-        ORDER BY tbl_daily_staff_list.work_date ASC
-    `).then(d => d[0])
-
     return res.status(200).json({
         noOfEmployees,
         noOfStaffLog,
@@ -68,9 +54,37 @@ router.post("/", async (req, res) => {
         notifications,
         removed_staff_from_passport,
         removed_staff_from_accomodations,
-        missed_employees_projects
     });
 });
+
+router.get('/missedEmployeesProjects/:month/:year', async (req, res) => {
+    if(!req.params.month || !req.params.year){
+        return res.status(400).send({
+            message: "Month and Year are required"
+        })
+    }
+
+    const missed_employees_projects = await db.raw(`
+        SELECT
+            tbl_attendance.emp_id,
+            tbl_attendance.st_id,
+            CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee,
+            tbl_employees.sort_code,
+            tbl_daily_staff_list.work_date,
+            tbl_staffs.staff_name,
+            tbl_staffs.staff_sort_code
+        FROM tbl_attendance
+            JOIN tbl_daily_staff_list ON (tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id)
+            JOIN tbl_employees ON (tbl_employees.emp_id = tbl_attendance.emp_id)
+            JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_attendance.st_id)
+        WHERE tbl_attendance.work_project_id IS NULL
+            AND MONTH(tbl_daily_staff_list.work_date) = ${req.params.month}
+            AND YEAR(tbl_daily_staff_list.work_date) = ${req.params.year}
+        ORDER BY tbl_daily_staff_list.work_date ASC
+    `).then(d => d[0])
+
+    return  res.status(200).send(missed_employees_projects)
+})
 
 router.post("/getStaffLogChange", (req, res) => {
     db("view_staff_log").select().offset(req.body.offset).limit(20).then((data) => {
