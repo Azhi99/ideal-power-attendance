@@ -76,14 +76,34 @@ router.post('/addListOfEmployees/:st_id', (req, res) => {
                 .andWhere("salary_year", req.body.salary_year)
                 .select().then(async (data) => {
                     let new_acs_id = null
-                    if(req.body.acs_number) {
+                    // if(req.body.acs_number) {
+                    //     [new_acs_id] = await db('acs_numbers').insert({
+                    //         st_id: req.params.st_id,
+                    //         month: req.body.salary_month,
+                    //         year: req.body.salary_year,
+                    //         acs_number: req.body.acs_number
+                    //     })
+                    // }
+
+                    let last_acs_number = await db.raw(`
+                        SELECT MAX(CAST(acs_number AS UNSIGNED)) as last_acs_number FROM acs_numbers WHERE year = ${req.body.salary_year}
+                    `).then(result => result[0][0].last_acs_number || null);
+
+                    last_acs_number = last_acs_number ? parseInt(last_acs_number) + 1 : 1
+
+                    try {
+
                         [new_acs_id] = await db('acs_numbers').insert({
                             st_id: req.params.st_id,
                             month: req.body.salary_month,
                             year: req.body.salary_year,
-                            acs_number: req.body.acs_number
+                            acs_number: last_acs_number.toString()
                         })
+                    } catch (error) {
+                        console.log('e: ', error);
+                        
                     }
+                    
                     return res.status(200).send({
                         rows: data,
                         acs_number_id: new_acs_id
@@ -117,12 +137,27 @@ router.post('/getPreGivedSalary/:st_id/:month/:year', async (req, res) => {
       .andWhere("salary_year", req.params.year)
       .select()
 
+        const last_acs_number = await db.raw(`
+            SELECT MAX(CAST(acs_number AS UNSIGNED)) as last_acs_number FROM acs_numbers WHERE year = ${req.params.year}
+        `).then(result => result[0][0].last_acs_number || null);
+
       const acs_number = await db('acs_numbers').where('st_id', req.params.st_id).andWhere('month', req.params.month).andWhere('year', req.params.year).select().first()
         return res.status(200).json({
             rows,
             acs_number: acs_number || {},
+            last_acs_number
         });
 });
+
+router.post('/getLastAcsNumber/:year', (req, res) => {
+    db.raw(`
+        SELECT MAX(acs_number) as last_acs_number FROM acs_numbers WHERE year = ${req.params.year}
+    `).then(result => {
+        return res.status(200).json({
+            last_acs_number: result[0][0].last_acs_number || null
+        });
+    });
+})
 
 router.post("/employeeInfo/:month/:year/:phone", (req, res) => {
     db.select(
