@@ -92,11 +92,15 @@ router.post('/addListOfEmployees/:st_id', async (req, res) => {
                 .select().then(async (data) => {
                     let new_acs_id = null
                     if(req.body.acs_number) {
+                        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+                        baghdadTime.setHours(baghdadTime.getHours() - 4)
+
                         [new_acs_id] = await db('acs_numbers').insert({
                             st_id: req.params.st_id,
                             month: req.body.salary_month,
                             year: req.body.salary_year,
-                            acs_number: req.body.acs_number
+                            acs_number: req.body.acs_number,
+                            created_at: baghdadTime
                         })
                     }
 
@@ -106,18 +110,7 @@ router.post('/addListOfEmployees/:st_id', async (req, res) => {
 
                     // last_acs_number = last_acs_number ? parseInt(last_acs_number) + 1 : 1
 
-                    try {
-
-                        [new_acs_id] = await db('acs_numbers').insert({
-                            st_id: req.params.st_id,
-                            month: req.body.salary_month,
-                            year: req.body.salary_year,
-                            acs_number: last_acs_number.toString()
-                        })
-                    } catch (error) {
-                        console.log('e: ', error);
-                        
-                    }
+                    
                     
                     return res.status(200).send({
                         rows: data,

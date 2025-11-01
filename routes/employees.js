@@ -1087,6 +1087,43 @@ router.post('/getEmployeeInfo/:id/:month/:year', async (req,res)=>{
   });
 });
 
+router.post('/getAllEmployeeInfo/:month/:year', async (req,res)=>{
+  const [employees] = await db.raw('select emp_id, full_name from employee_final_with_give_salary where date_to_m=? and date_to_y=? order by staff_sort_code asc, emp_sort_code asc', [req.params.month,req.params.year])
+  for(let i = 0; i < employees.length; i++) {
+    [employees[i].gived_salary] = await db("tbl_gived_salary")
+    .where("salary_month", req.params.month)
+    .andWhere("salary_year", req.params.year)
+    .andWhereRaw("emp_id = ?", [employees[i].emp_id])
+    .select([
+      "gs_id",
+      "monthly_salary",
+      "daily_salary",
+      "hour_salary",
+      "food_money",
+      "transport_money",
+      "cabina_money",
+      "expense_money",
+      "fine_money",
+      "loan_money",
+      "accomodation_money",
+      "other_expense",
+      "other_minus",
+    ]).limit(1)
+
+    const gs_id = (typeof employees[i].gived_salary == "undefined" ? null: employees[i].gived_salary.gs_id);
+    employees[i].gs_id = gs_id;
+
+    const [each_days] = await db.raw('select * from employee_month_info_each_days where emp_id=? and date_to_m=? and date_to_y=?', [employees[i].emp_id,req.params.month,req.params.year])
+    const [each_give_salary] = await db.raw("select * from tbl_gived_salary_detail where gs_id = ?", [gs_id])
+    
+    employees[i].each_days = each_days
+    employees[i].each_give_salary = each_give_salary
+  }
+  return res.status(200).json({
+    employees
+  })
+})
+
 router.post('/topOvertime/:month/:year', async (req, res)=>{
   const [overtimeData] = await db.raw(`
     SELECT
