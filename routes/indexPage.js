@@ -57,7 +57,7 @@ router.post("/", async (req, res) => {
     });
 });
 
-router.get('/missedEmployeesProjects/:month/:year', async (req, res) => {
+router.get('/missedEmployeesProjects/:month/:year/:st_id?', async (req, res) => {
     if(!req.params.month || !req.params.year){
         return res.status(400).send({
             message: "Month and Year are required"
@@ -80,6 +80,7 @@ router.get('/missedEmployeesProjects/:month/:year', async (req, res) => {
         WHERE tbl_attendance.work_project_id IS NULL
             AND MONTH(tbl_daily_staff_list.work_date) = ${req.params.month}
             AND YEAR(tbl_daily_staff_list.work_date) = ${req.params.year}
+            ${req.params.st_id ? `AND tbl_attendance.st_id = ${req.params.st_id}` : ''}
         ORDER BY tbl_daily_staff_list.work_date ASC
     `).then(d => d[0])
 
