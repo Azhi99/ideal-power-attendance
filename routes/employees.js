@@ -1088,7 +1088,8 @@ router.post('/getEmployeeInfo/:id/:month/:year', async (req,res)=>{
 });
 
 router.post('/getAllEmployeeInfo/:month/:year', async (req,res)=>{
-  const [employees] = await db.raw('select emp_id, full_name from employee_final_with_give_salary where date_to_m=? and date_to_y=? order by staff_sort_code asc, emp_sort_code asc', [req.params.month,req.params.year])
+  const staff_ids = req.body.st_id_list || [];
+  const [employees] = await db.raw(`select * from employee_final_with_give_salary where date_to_m=? and date_to_y=? ${staff_ids.length  > 0 ? ` AND emp_id IN (SELECT tbl_employees.emp_id FROM tbl_employees WHERE tbl_employees.st_id IN (${staff_ids.join(",")}))` :''} order by staff_sort_code asc, emp_sort_code asc`, [req.params.month,req.params.year])
   for(let i = 0; i < employees.length; i++) {
     [employees[i].gived_salary] = await db("tbl_gived_salary")
     .where("salary_month", req.params.month)
@@ -1297,7 +1298,7 @@ router.get('/getEmployeeMonthDetail/:month/:year/:emp_id', async (req, res) => {
   return res.status(200).send(rows);
 })
 
-router.get('/getDetailedMonthDetail/:month/:year/:type', async (req, res) => {
+router.get('/getDetailedMonthDetail/:month/:year/:type/:special_staff', async (req, res) => {
   if(!['transport', 'fine', 'loan', 'expense', 'accomodation', 'food'].includes(req.params.type) || !req.params.month || !req.params.year) {
     return res.status(400).send({ message: 'Invalid type parameter' });
   }
@@ -1308,7 +1309,7 @@ router.get('/getDetailedMonthDetail/:month/:year/:type', async (req, res) => {
       SUM(tbl_attendance.${req.params.type}) AS total
     FROM tbl_attendance
     INNER JOIN tbl_staffs ON (tbl_attendance.st_id = tbl_staffs.st_id)
-    WHERE tbl_attendance.dsl_id IN (
+    WHERE tbl_staffs.special_staff = '${req.params.special_staff}' AND tbl_attendance.dsl_id IN (
       SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
     ) AND tbl_attendance.${req.params.type} > 0
       AND NOT EXISTS (
