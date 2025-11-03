@@ -131,7 +131,8 @@ router.delete('/deleteGiveSalary/:month/:year/:st_id', (req, res) => {
         delete from tbl_gived_salary where emp_id in (
             select emp_id from tbl_employees where st_id=${req.params.st_id}
         ) and salary_month=${req.params.month} and salary_year=${req.params.year}
-    `).then(() => {
+    `).then(async () => {
+        await db('acs_numbers').where('st_id', req.params.st_id).andWhere('month', req.params.month).andWhere('year', req.params.year).del()
         res.sendStatus(200)
     }).catch(() => {
         res.sendStatus(500)
