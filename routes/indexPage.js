@@ -77,10 +77,10 @@ router.get('/missedEmployeesProjects/:month/:year/:st_id?', async (req, res) => 
             JOIN tbl_daily_staff_list ON (tbl_daily_staff_list.dsl_id = tbl_attendance.dsl_id)
             JOIN tbl_employees ON (tbl_employees.emp_id = tbl_attendance.emp_id)
             JOIN tbl_staffs ON (tbl_staffs.st_id = tbl_attendance.st_id)
-        WHERE tbl_attendance.work_project_id IS NULL
+        WHERE tbl_attendance.work_project_id IS NULL AND (tbl_attendance.absent = '0' OR tbl_attendance.absent = '2')
             AND MONTH(tbl_daily_staff_list.work_date) = ${req.params.month}
             AND YEAR(tbl_daily_staff_list.work_date) = ${req.params.year}
-            ${req.params.st_id ? `AND tbl_attendance.st_id = ${req.params.st_id}` : ''}
+            ${req.params.st_id ? ` AND tbl_attendance.st_id = ${req.params.st_id}` : ''}
         ORDER BY tbl_daily_staff_list.work_date ASC
     `).then(d => d[0])
 
