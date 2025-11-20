@@ -1,4 +1,5 @@
 const express = require("express");
+const moment = require('moment-timezone')
 const db = require("../DB/mainDBconfig.js");
 
 const router = express.Router();
@@ -556,8 +557,41 @@ router.patch("/returnEmployee/:at_id/:st_id", (req, res) => {
     });
 });
 
-router.delete("/deleteAttendance/:at_id", (req, res) => {
-    db("tbl_attendance").where("at_id", req.params.at_id).delete().then(() => {
+router.post("/deleteAttendance/:at_id", async (req, res) => {
+    const old_data = await db("tbl_attendance").where("at_id", req.params.at_id).select().first()
+    if(!old_data) {
+        return res.status(500).send({
+            message: 'Attendance not found'
+        })
+    }
+
+    const dsl = await db("tbl_daily_staff_list").where("dsl_id", old_data.dsl_id).select().first()
+
+    const month_dsl = moment(dsl.work_date).format('MM')
+    const year_dsl = moment(dsl.work_date).format('YYYY')
+
+    const gived_salary = await db('tbl_gived_salary').where('emp_id', old_data.emp_id).andWhere('salary_month', month_dsl).andWhere('salary_year', year_dsl).select().first()
+    
+    if(gived_salary && gived_salary.gs_id) {
+        return res.status(500).send({
+            message: 'Can not delete this attendance because it has salary list'
+        })
+    }
+    const employee = await db('tbl_employees').where('emp_id', old_data.emp_id).select().first()
+
+    db("tbl_attendance").where("at_id", req.params.at_id).delete().then(async () => {
+        const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
+        baghdadTime.setHours(baghdadTime.getHours() - 4)
+        await db('tbl_log').insert({
+            dsl_id: dsl.dsl_id,
+            st_id: dsl.st_id,
+            user: req.body.user,
+            datetime_log: baghdadTime,
+            work: (`
+            سڕینەوەی غیاباتی ${employee.first_name} ${employee.last_name}
+            `).trim()
+        });
+
         return res.status(200).json({
             message: "Attendance deleted"
         });
