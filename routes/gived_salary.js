@@ -102,7 +102,22 @@ router.post('/addListOfEmployees/:st_id', async (req, res) => {
                     //         acs_number: req.body.acs_number,
                     //         created_at: baghdadTime
                     //     })
-                    // }                    
+                    // } 
+                    
+                    const exist_info = await db('gived_salary_info').where('st_id', req.params.st_id).andWhere('month', req.body.salary_month).andWhere('year', req.body.salary_year).select().first()
+                    if(exist_info) {
+                        await db('gived_salary_info').where('st_id', req.params.st_id).andWhere('month', req.body.salary_month).andWhere('year', req.body.salary_year).update({
+                            note: req.body.note
+                        })
+                    } else {
+                        await db('gived_salary_info').insert({
+                            st_id: req.params.st_id,
+                            month: req.body.salary_month,
+                            year: req.body.salary_year,
+                            note: req.body.note || null
+                        })
+                    }
+                    
                     
                     return res.status(200).send({
                         rows: data,
@@ -125,6 +140,7 @@ router.delete('/deleteGiveSalary/:month/:year/:st_id', (req, res) => {
         ) and salary_month=${req.params.month} and salary_year=${req.params.year}
     `).then(async () => {
         await db('acs_numbers').where('st_id', req.params.st_id).andWhere('month', req.params.month).andWhere('year', req.params.year).del()
+        await db('gived_salary_info').where('st_id', req.params.st_id).andWhere('month', req.params.month).andWhere('year', req.params.year).del()
         res.sendStatus(200)
     }).catch(() => {
         res.sendStatus(500)
@@ -143,11 +159,13 @@ router.post('/getPreGivedSalary/:st_id/:month/:year', async (req, res) => {
         `).then(result => result[0][0].last_acs_number || null);
 
       const acs_number = await db('acs_numbers').where('st_id', req.params.st_id).andWhere('month', req.params.month).andWhere('year', req.params.year).select().first()
-        return res.status(200).json({
-            rows,
-            acs_number: acs_number || {},
-            last_acs_number
-        });
+    const list_info = await db('gived_salary_info').where('st_id', req.params.st_id).andWhere('month', req.params.month).andWhere('year', req.params.year).select().first()
+      return res.status(200).json({
+        rows,
+        acs_number: acs_number || {},
+        last_acs_number,
+        list_info
+    });
 });
 
 router.post('/getLastAcsNumber/:year', (req, res) => {

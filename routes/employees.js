@@ -1513,6 +1513,7 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
   `);
 
   const acs_number = await db('acs_numbers').where('st_id', req.body.staff_id).andWhere('month', req.body.month).andWhere('year', req.body.year).select().first()
+  const list_info = await db('gived_salary_info').where('st_id', req.body.staff_id).andWhere('month', req.body.month).andWhere('year', req.body.year).select().first()
 
   // Get distinct work_project_ids from attendance table for the specified month, year, and staff
   // Exclude employees that are on the zeros list
@@ -1547,7 +1548,8 @@ router.post('/getSalaryListByMonthAndYear', async (req, res) => {
     work_projects,
     zeros,
     astopaki,
-    acs_number
+    acs_number,
+    list_info: list_info || {}
   });
 })
 
