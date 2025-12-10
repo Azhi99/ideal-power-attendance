@@ -1265,7 +1265,7 @@ router.post('/getDeactivedEmployeeBystaff/:st_id',(req,res)=>{
   });
 });
 
-router.get('/getEmployeeMonthDetail/:month/:year/:emp_id', async (req, res) => {
+router.get('/getEmployeeMonthDetail/:month/:year/:emp_id/:st_id', async (req, res) => {
   const rows = await db.raw(`
     SELECT
       tbl_employees.emp_id,
@@ -1289,7 +1289,7 @@ router.get('/getEmployeeMonthDetail/:month/:year/:emp_id', async (req, res) => {
         INNER JOIN tbl_daily_staff_list ON tbl_attendance.dsl_id = tbl_daily_staff_list.dsl_id
       WHERE tbl_attendance.dsl_id IN (
         SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
-      ) AND tbl_attendance.emp_id = ${req.params.emp_id}
+      ) AND tbl_attendance.emp_id = ${req.params.emp_id} AND tbl_attendance.st_id = ${req.params.st_id}
       ORDER BY tbl_daily_staff_list.work_date ASC
 
   `).then((data) => {
@@ -1337,7 +1337,7 @@ router.get('/getDetailedMonthDetail/:month/:year/:type/:special_staff', async (r
      AND NOT EXISTS (
       SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.emp_id = tbl_attendance.emp_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year} AND salary_list_to_null.st_id = tbl_attendance.st_id
      )
-    GROUP BY tbl_attendance.emp_id
+    GROUP BY tbl_attendance.emp_id, tbl_attendance.st_id
     ORDER BY tbl_employees.sort_code ASC
   `).then((data) => {
     return data[0]
@@ -1349,6 +1349,7 @@ router.get('/getDetailedMonthDetail/:month/:year/:type/:special_staff', async (r
       CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name,
       tbl_daily_staff_list.dsl_id,
       tbl_daily_staff_list.work_date,
+      tbl_attendance.st_id,
       tbl_attendance.fine,
       tbl_attendance.fine_reason,
       tbl_attendance.food,
