@@ -1326,22 +1326,23 @@ router.get('/getDetailedMonthDetail/:month/:year/:type/:special_staff', async (r
       tbl_employees.emp_id,
       tbl_attendance.st_id,
       CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS full_name,
-      tbl_daily_staff_list.dsl_id,
       SUM(tbl_attendance.${req.params.type}) AS total
     FROM tbl_attendance
     INNER JOIN tbl_employees ON (tbl_attendance.emp_id = tbl_employees.emp_id)
     INNER JOIN tbl_daily_staff_list ON (tbl_attendance.dsl_id = tbl_daily_staff_list.dsl_id)
-    WHERE tbl_attendance.dsl_id IN (
+    INNER JOIN tbl_staffs ON (tbl_attendance.st_id = tbl_staffs.st_id)
+    WHERE tbl_staffs.special_staff = '${req.params.special_staff}' AND tbl_attendance.dsl_id IN (
       SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
     ) AND tbl_attendance.${req.params.type} > 0
-     AND NOT EXISTS (
-      SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.emp_id = tbl_attendance.emp_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year} AND salary_list_to_null.st_id = tbl_attendance.st_id
-     )
     GROUP BY tbl_attendance.emp_id, tbl_attendance.st_id
     ORDER BY tbl_employees.sort_code ASC
   `).then((data) => {
     return data[0]
   })
+
+  // AND NOT EXISTS (
+  //         SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.emp_id = tbl_attendance.emp_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year} AND salary_list_to_null.st_id = tbl_attendance.st_id
+  //       )
 
   const all_employee_detail = await db.raw(`
     SELECT
@@ -1368,9 +1369,6 @@ router.get('/getDetailedMonthDetail/:month/:year/:type/:special_staff', async (r
       WHERE tbl_attendance.dsl_id IN (
         SELECT dsl_id FROM tbl_daily_staff_list WHERE MONTH(work_date) = ${req.params.month} AND YEAR(work_date) = ${req.params.year}
       ) AND tbl_attendance.${req.params.type} > 0
-        AND NOT EXISTS (
-          SELECT 1 FROM salary_list_to_null WHERE salary_list_to_null.emp_id = tbl_attendance.emp_id AND salary_list_to_null.month = ${req.params.month} AND salary_list_to_null.year = ${req.params.year} AND salary_list_to_null.st_id = tbl_attendance.st_id
-        )
       ORDER BY tbl_daily_staff_list.work_date ASC
 
   `).then((data) => {
