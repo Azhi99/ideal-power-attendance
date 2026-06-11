@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/60c5b64719b1dd3bf6e9.worker.js"
   },
   {
-    "revision": "4b2c8e8fb5e91066e24f",
+    "revision": "b32c63c28e48d3805f84",
     "url": "/css/app.96f0b477.css"
   },
   {
@@ -64,6 +64,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/css/chunk-6ec7f5d9.6052ce53.css"
   },
   {
+    "revision": "d71c3ca04a8c0b336d7f",
+    "url": "/css/chunk-738bf196.b01ba4cf.css"
+  },
+  {
     "revision": "0def5f3a01b144027f3d",
     "url": "/css/chunk-79b05830.0cb6a326.css"
   },
@@ -82,10 +86,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "3a4df5dde87322399812",
     "url": "/css/chunk-b995aeae.95957f58.css"
-  },
-  {
-    "revision": "4138582e112c346bb437",
-    "url": "/css/chunk-c669cb90.94597c97.css"
   },
   {
     "revision": "597cdbdc52436bbfba10",
@@ -120,12 +120,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/user2.bfd4000e.jpg"
   },
   {
-    "revision": "ee13430bc5ba23896e285a5df6672f3c",
+    "revision": "1c3fb0c9531f9af78e78410759cc0f28",
     "url": "/index.html"
   },
   {
-    "revision": "4b2c8e8fb5e91066e24f",
-    "url": "/js/app.802b371d.js"
+    "revision": "b32c63c28e48d3805f84",
+    "url": "/js/app.d22feaf6.js"
   },
   {
     "revision": "d6acccaf4fde384b049b",
@@ -204,6 +204,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/js/chunk-6ec7f5d9.dc3b5ce8.js"
   },
   {
+    "revision": "d71c3ca04a8c0b336d7f",
+    "url": "/js/chunk-738bf196.56fc2934.js"
+  },
+  {
     "revision": "0def5f3a01b144027f3d",
     "url": "/js/chunk-79b05830.e9e3fb37.js"
   },
@@ -222,10 +226,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "3a4df5dde87322399812",
     "url": "/js/chunk-b995aeae.2c8c2162.js"
-  },
-  {
-    "revision": "4138582e112c346bb437",
-    "url": "/js/chunk-c669cb90.311debf9.js"
   },
   {
     "revision": "eae8346419305a759ff5",

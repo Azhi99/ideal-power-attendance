@@ -786,13 +786,15 @@ router.get('/getDateEmployees/:date', async (req, res) => {
       tbl_attendance.*,
       CONCAT(tbl_employees.first_name, ' ', tbl_employees.last_name) AS employee_full_name,
       tbl_employees.job,
-      work_projects.work_project_name
+      work_projects.work_project_name,
+      tbl_staffs.staff_name
     FROM tbl_attendance
     JOIN tbl_employees ON (tbl_attendance.emp_id = tbl_employees.emp_id)
     LEFT JOIN work_projects ON (tbl_attendance.work_project_id = work_projects.work_project_id)
     JOIN tbl_daily_staff_list ON (tbl_attendance.dsl_id = tbl_daily_staff_list.dsl_id)
+    JOIN tbl_staffs ON (tbl_daily_staff_list.st_id = tbl_staffs.st_id)
     WHERE tbl_daily_staff_list.work_date = '${new Date(req.params.date).toISOString().split('T')[0]}'
-  `)
+  `).then(r => r[0])
 
   return res.status(200).send(data)
 })
