@@ -39,12 +39,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// app.use(cors({
-//   origin: '*',
-//   credentials: true
-// }));
+const allowedOrigins = [
+  "https://idealpower.co",
+  "https://www.idealpower.co",
+  "http://localhost:8080",
+  "http://localhost:3000",
+  "http://localhost:5173",
+];
 
-app.use(cors())
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 
 app.use(session({
   cookieName: "session",
