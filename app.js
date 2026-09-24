@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.use(cors({
-  origin: ['http://localhost:8080'],
+  origin: '*',
   credentials: true
 }));
 
