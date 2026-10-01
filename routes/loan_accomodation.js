@@ -30,6 +30,16 @@ router.post('/create_list', (req, res) => {
                 res.status(200).send({
                     new_data
                 })
+            }).catch((err) => {
+                console.log(err)
+                res.status(500).send({
+                    err
+                })
+            })
+        }).catch((err) => {
+            console.log(err)
+            res.status(500).send({
+                err
             })
         })
     } else {
