@@ -5,13 +5,17 @@ const router = express.Router();
 
 router.post('/create_list', (req, res) => {
     if(req.body.list.length > 0) {
+        let datetime_create = req.body.loan_accomodation.datetime_create
+        let date = datetime_create.split('T')[0]
+        let time = datetime_create.split('T')[1].split('.')[0]
+        let d = `${date} ${time}`
         db('loan_accomodation').insert({
             emp_id: req.body.loan_accomodation.emp_id,
             st_id: req.body.loan_accomodation.st_id,
             la_type: req.body.loan_accomodation.la_type,
             amount: req.body.loan_accomodation.amount,
             salary_type: req.body.loan_accomodation.salary_type,
-            datetime_create: req.body.loan_accomodation.datetime_create,
+            datetime_create: d,
             user: req.body.loan_accomodation.user,
             note: req.body.loan_accomodation.note,
             la_date: req.body.loan_accomodation.la_date,
@@ -183,13 +187,17 @@ router.delete('/delete_by_id/:id', (req, res) => {
 })
 
 router.patch('/update_list', (req, res) => {
+    let datetime_create = req.body.loan_accomodation.datetime_create
+    let date = datetime_create.split('T')[0]
+    let time = datetime_create.split('T')[1].split('.')[0]
+    let d = `${date} ${time}`
     db('loan_accomodation').where('la_id', req.body.loan_accomodation.la_id).update({
         emp_id: req.body.loan_accomodation.emp_id,
         st_id: req.body.loan_accomodation.st_id,
         la_type: req.body.loan_accomodation.la_type,
         amount: req.body.loan_accomodation.amount,
         salary_type: req.body.loan_accomodation.salary_type,
-        datetime_create: req.body.loan_accomodation.datetime_create,
+        datetime_create: d,
         user: req.body.loan_accomodation.user,
         note: req.body.loan_accomodation.note,
         la_date: req.body.loan_accomodation.la_date,
