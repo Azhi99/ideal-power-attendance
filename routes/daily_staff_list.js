@@ -644,9 +644,13 @@ router.post('/getFoods', async (req, res) => {
 
 router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).select().first().then((data) => {
+    let datetime_food = req.body.datetime_food
+    let date = datetime_food.split('T')[0]
+    let time = datetime_food.split('T')[1].split('.')[0]
+    let d = `${date} ${time}`
     db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
       food_number:req.body.food_number,
-      datetime_food: req.body.datetime_food
+      datetime_food: d
     }).then(async () => {
       if(data.food_number != req.body.food_number) {
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
