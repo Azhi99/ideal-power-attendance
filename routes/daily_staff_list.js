@@ -675,9 +675,14 @@ router.patch('/setFoodNumber/:dsl_id', (req, res)=>{
 
 router.patch('/setFoodGroup/:dsl_id', (req, res)=>{
   db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).select().first().then((data) => {
+    let datetime_food = req.body.datetime_food
+    let date = datetime_create.split('T')[0]
+    let time = datetime_create.split('T')[1].split('.')[0]
+    let d = `${date} ${time}`
+
     db("tbl_daily_staff_list").where("dsl_id", req.params.dsl_id).update({
       food_group:req.body.food_group,
-      datetime_food: req.body.datetime_food
+      datetime_food: d
     }).then(async () => {
       if(data.food_group != req.body.food_group) {
         const baghdadTime = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Baghdad'}))
